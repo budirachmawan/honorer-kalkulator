@@ -5,30 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kalkulator Keamanan – HONORER DIGITAL</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+<!-- Font Premium: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-/* ===== VARS & RESET ===== */
+/* ===== VARS (DESIGN TOKENS) ===== */
 :root {
-  --primary: #047857;
-  --primary-dark: #064e3b;
-  --accent: #d97706;
-  --bg: #f0fdf4;
-  --card-bg: rgba(255, 255, 255, 0.95);
-  --text-main: #1f2937;
+  --primary: #fbbf24;      /* Kuning Emas - Tombol & Aksen */
+  --primary-dark: #d97706; /* Amber Gelap - Hover */
+  --success: #10b981;      /* Hijau - Aman */
+  --success-dark: #047857; /* Hijau Gelap - Teks Aman */
+  
+  /* Neutrals */
+  --bg-body: #f1f5f9; /* Latar Belakang Utama (Abu-abu muda kebiruan) */
+  --bg-card: #ffffff;
+  --text-main: #1e293b;
   --text-muted: #64748b;
+  --border: #e2e8f0;
+  
+  /* Spacing & Radius */
   --radius: 20px;
-  --shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.05);
+  --radius-sm: 12px;
+  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
-*{ box-sizing: border-box; }
+/* ===== RESET ===== */
+*{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body{
-  font-family: 'Outfit', sans-serif;
-  background: radial-gradient(circle at top right, #dcfce7, #ecfccb);
-  background-attachment: fixed;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg-body);
+  /* Background pola grid halus agar modern tapi tetap ringan */
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 24px 24px;
   margin:0;
-  padding:30px 20px;
+  padding:40px 20px;
   color:var(--text-main);
   min-height: 100vh;
 }
@@ -37,163 +48,280 @@ body{
 .header-wrapper {
   text-align: center;
   margin-bottom: 40px;
+  animation: fadeIn 0.8s ease-out;
 }
 .header-wrapper h1 {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--primary-dark);
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--text-main);
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: -1px;
 }
-.header-wrapper span { color: var(--accent); }
+.header-wrapper span { color: var(--primary-dark); }
 
 /* ===== LAYOUT ===== */
 .app{
-  max-width:900px;
+  max-width:980px;
   margin:0 auto;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:30px;
+  gap:32px;
 }
 
+/* ===== CARDS ===== */
 .card{
-  background: var(--card-bg);
-  padding: 35px;
+  background: var(--bg-card);
+  padding: 36px;
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-soft);
   border: 1px solid rgba(255,255,255,0.8);
+  position: relative;
+  overflow: hidden;
 }
+/* Animasi halus saat kartu muncul */
+.card { animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; transform: translateY(20px); }
+.card:nth-child(2) { animation-delay: 0.1s; }
 
-/* ===== FORM ELEMENTS ===== */
+/* ===== TYPOGRAPHY ===== */
 h2 {
-  margin-top:0; margin-bottom:25px; font-size: 20px; color: var(--text-main); font-weight: 600;
+  margin-top:0; margin-bottom:32px; 
+  font-size: 20px; 
+  color: var(--text-main); 
+  font-weight: 700; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
 }
 
 label {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-muted);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   display: block;
-  margin-top: 20px;
+  margin-top: 24px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
+/* ===== FORM ELEMENTS ===== */
 input, select {
   width:100%;
-  padding: 16px;
+  padding: 18px;
   font-size: 16px;
   font-family: inherit;
   color: var(--text-main);
   background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
+  font-weight: 500;
 }
 input:focus, select:focus {
   background: #fff;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.1);
+  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2);
+  transform: translateY(-2px);
 }
 
-/* ===== BUTTON ===== */
+/* ===== BUTTONS ===== */
 button {
   width: 100%;
   padding: 18px;
-  margin-top: 35px;
+  margin-top: 40px;
   font-size: 16px;
   font-weight: 700;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   border: none;
   cursor: pointer;
   font-family: inherit;
   letter-spacing: 0.5px;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 #btn-calc {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary) 0%, #f59e0b 100%);
   color: white;
-  box-shadow: 0 10px 20px rgba(4, 120, 87, 0.2);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+  position: relative;
+  overflow: hidden;
 }
-#btn-calc:hover { background: var(--primary-dark); transform: translateY(-2px); }
-#btn-calc:active { transform: translateY(0); }
-#btn-calc:disabled { background: #cbd5e1; cursor: wait; transform: none; }
+#btn-calc:hover { 
+  transform: translateY(-3px); 
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4); 
+}
+#btn-calc:active { transform: translateY(-1px); }
+#btn-calc:disabled { 
+  background: #cbd5e1; 
+  color: #94a3b8;
+  cursor: not-allowed; 
+  transform: none; 
+  box-shadow: none; 
+}
 
+/* Loading Spinner */
 .spinner {
-  width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff;
-  animation: spin 0.8s linear infinite; display: none; margin-right: 10px; vertical-align: middle;
+  width: 20px; height: 20px; 
+  border: 3px solid rgba(255,255,255,0.3); 
+  border-radius: 50%; 
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite; 
+  display: none; 
+  margin-right: 10px; 
+  vertical-align: middle;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* CTA Buttons (Bottom) */
+.cta-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
 .cta { 
-  background: var(--text-main); color: #fff; margin-top: 12px; 
-  display: inline-block; width: auto; padding: 12px 24px; font-size: 14px;
+  background: var(--text-main); 
+  color: #fff; 
+  padding: 14px;
+  margin-top: 0;
+  font-size: 14px;
+  border-radius: 12px;
+  text-align: center;
 }
 .cta:hover { background: black; }
+.cta.wa {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+}
+.cta.save {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
 
 /* ===== RESULT AREA ===== */
-.result-header { text-align: center; margin-bottom: 25px; }
+.result-wrapper {
+  text-align: center;
+  margin-bottom: 35px;
+  padding-bottom: 35px;
+  border-bottom: 1px solid var(--border);
+  animation: fadeIn 1s ease-out;
+}
+
 .big-label { 
-  font-size: 12px; text-transform: uppercase; letter-spacing: 2px; 
-  color: var(--text-muted); font-weight: 700; margin-bottom: 5px;
+  font-size: 11px; 
+  text-transform: uppercase; 
+  letter-spacing: 1.5px; 
+  color: var(--text-muted); 
+  font-weight: 800; 
+  margin-bottom: 12px;
 }
 .big-value {
-  font-size: 36px; font-weight: 800; color: var(--primary); margin: 0; line-height: 1.1;
+  font-size: 42px; 
+  font-weight: 800; 
+  color: var(--success-dark); 
+  margin: 0; 
+  line-height: 1.1;
 }
 .sub-value {
-  font-size: 13px; color: var(--text-muted); margin-top: 5px;
+  font-size: 13px; color: var(--text-muted); margin-top: 8px; font-weight: 500;
 }
 
-#chart-container { position: relative; height: 200px; width: 100%; margin-bottom: 25px; }
+#chart-container { 
+  position: relative; 
+  height: 220px; 
+  width: 100%; 
+  margin-bottom: 30px; 
+  animation: fadeIn 1.2s ease-out;
+}
 
 #detail {
-  background: #fff; padding: 0; border-radius: 12px; font-size: 14px; line-height: 1.6;
-  color: var(--text-main); display:none; border:1px solid #e2e8f0;
+  font-size: 14px; 
+  line-height: 1.6;
+  color: var(--text-main); 
+  display:none;
 }
 
+/* Detail Boxes */
 .section-box {
-  padding: 20px; border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+  padding: 24px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  /* Staggered Animation via JS class toggle */
+  opacity: 0; 
+  animation: slideUpFade 0.6s ease forwards;
 }
-.section-box:last-child { border-bottom: none; }
 
 .section-title {
-  font-weight: 700; font-size: 15px; margin-bottom: 5px; color: var(--text-main);
-  display: flex; justify-content: space-between;
+  font-weight: 700; font-size: 15px; margin-bottom: 6px; color: var(--text-main);
+  display: flex; justify-content: space-between; align-items: center;
 }
+.section-tag {
+  font-size: 10px; padding: 4px 10px; border-radius: 20px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tag-yellow { background: #fffbeb; color: #b45309; border: 1px solid #fcd34d; }
+.tag-green { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+
 .section-price {
-  font-size: 17px; font-weight: 700; color: var(--primary); margin-bottom: 8px;
+  font-size: 24px; font-weight: 800; color: var(--text-main); margin: 8px 0 12px 0; letter-spacing: -0.5px;
 }
 .section-desc {
-  font-size: 13px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5;
+  font-size: 13px; color: var(--text-muted); margin-bottom: 0; line-height: 1.6;
 }
 
-.list-simple { margin: 10px 0 0 0; padding-left: 15px; color: var(--text-muted); font-size: 13px; }
-.list-simple li { margin-bottom: 4px; }
-
+/* Plan Box (The one user liked) */
 .plan-box {
-  background: #f0fdf4; border-radius: 8px; padding: 15px; margin-top: 10px;
-  border: 1px solid #bbf7d0;
+  background: #ffffff; 
+  border-radius: 12px; 
+  padding: 20px; 
+  margin-top: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
 }
-.plan-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; color: #064e3b; }
-.plan-row.highlight { font-size: 16px; font-weight: 700; border-top: 1px dashed #6ee7b7; padding-top: 8px; margin-top: 8px; margin-bottom: 0; }
+.plan-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; color: #475569; }
+.plan-row.highlight { font-size: 17px; font-weight: 800; color: var(--success-dark); border-top: 1px dashed #cbd5e1; padding-top: 12px; margin-top: 10px; margin-bottom: 0; }
 
+.footnote {
+  font-size: 11px; color: #64748b; margin-top: 12px; line-height: 1.5; font-style: italic;
+}
+
+/* API STATUS & ANIMATION */
 .api-status {
-  font-size: 10px; padding: 3px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1;
-  margin-left: auto; font-weight: 600;
+  font-size: 10px; padding: 4px 10px; border-radius: 20px; background: #f1f5f9; color: #64748b;
+  font-weight: 700; text-transform: uppercase; transition: all 0.3s;
+}
+.api-status.status-online {
+  background: #d1fae5; color: #047857;
+  animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { 
+  from { opacity: 0; transform: translateY(20px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== MOBILE ===== */
 @media(max-width:768px){
   .app{grid-template-columns:1fr;}
-  .header-wrapper h1{ font-size: 26px; }
-  .big-value { font-size: 32px; }
-  .card { padding: 25px; }
+  .header-wrapper h1{ font-size: 28px; }
+  .big-value { font-size: 36px; }
+  .card { padding: 28px 24px; }
+  .section-price { font-size: 22px; }
+  .cta-group { grid-template-columns: 1fr; }
 }
-.fade-in { animation: fadeIn 0.5s ease forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 
@@ -208,7 +336,10 @@ button {
 
 <!-- LEFT CARD: INPUT -->
 <div class="card">
-<h2>Rencana Keuangan <span class="api-status" id="apiStatus">Checking...</span></h2>
+<h2>
+  <span>Rencana Keuangan</span>
+  <span class="api-status" id="apiStatus">Checking...</span>
+</h2>
 
 <label>Status saat ini</label>
 <select id="status">
@@ -219,15 +350,13 @@ button {
 
 <label>Penghasilan bulanan</label>
 <div class="input-group">
-  <!-- Input kosong saat awal buka -->
   <input id="income" type="text" placeholder="Contoh: 3.000.000" autocomplete="off">
 </div>
 
 <label>Target Tercapai Tanggal (Opsional)</label>
 <div class="input-group">
-  <!-- Input kosong saat awal buka -->
   <input id="targetDate" type="date">
-  <div style="font-size:12px; color:#94a3b8; margin-top:5px;">Contoh: Tanggal rencana nikah / HPL</div>
+  <div style="font-size:12px; color:#94a3b8; margin-top:8px; line-height:1.4;">Contoh: Tanggal rencana nikah / HPL</div>
 </div>
 
 <button id="btn-calc" onclick="hitung()">
@@ -240,7 +369,7 @@ button {
 <div class="card">
 <h2>Hasil Analisis</h2>
 
-<div class="result-header">
+<div class="result-wrapper">
   <div class="big-label">Total Aset Aman Tercatat</div>
   <div class="big-value" id="emas">0 gram</div>
   <div class="sub-value">Dana yang bisa dikunci ke emas</div>
@@ -250,19 +379,18 @@ button {
   <canvas id="chart"></canvas>
 </div>
 
-<!-- Tombol WA muncul setelah dihitung, tapi di sini saya buat kodenya ada -->
+<!-- Detail Content -->
 <div id="detail"></div>
 
-<div style="text-align: center; margin-top: 20px; display:none;" id="btn-container">
-  <button class="cta" id="waBtn">Kunci Dana di Emas</button>
-  <button class="cta" id="shareBtn" style="background:#2563eb">Simpan Analisa</button>
+<!-- CTA Buttons -->
+<div class="cta-group" id="btn-container" style="display:none;">
+  <button class="cta wa" id="waBtn">🔒 Kunci Dana di Emas</button>
+  <button class="cta save" id="shareBtn">💾 Simpan Analisa</button>
 </div>
 
-<div style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 20px;">
-  Harga emas diupdate secara realtime (Logam Mulia)
-</div>
-<div style="font-size: 12px; color: #92400e; background: #fffbeb; padding: 12px; border-radius: 8px; margin-top: 15px; line-height: 1.4;">
-  <strong>Catatan:</strong> Kalkulator ini menghitung Dana Tujuan (nikah/kelahiran/anak), bukan dana darurat.
+<div style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 25px; line-height: 1.5;">
+  Data harga emas diupdate realtime (Logam Mulia)<br>
+  <strong>Catatan:</strong> Ini adalah dana tujuan, bukan dana darurat.
 </div>
 </div>
 
@@ -274,11 +402,13 @@ let animationFrameId;
 
 function formatIDR(x){return x.toLocaleString("id-ID");}
 
+// Input Formatter
 document.getElementById("income").addEventListener("input",e=>{
   let v=e.target.value.replace(/[^0-9]/g,"");
   e.target.value=v?parseInt(v).toLocaleString("id-ID"):"";
 });
 
+// Animation Logic (Optimized)
 function animateValue(obj, start, end, duration) {
   if (animationFrameId) cancelAnimationFrame(animationFrameId);
   let startTimestamp = null;
@@ -293,7 +423,7 @@ function animateValue(obj, start, end, duration) {
   animationFrameId = window.requestAnimationFrame(step);
 }
 
-/* ===== LOGIC ===== */
+/* ===== SYSTEM LOGIC ===== */
 function getCachedHarga(){
   const c=localStorage.getItem("harga_emas_cache");
   if(!c) return null;
@@ -306,27 +436,35 @@ function setCachedHarga(p){
 }
 async function getHargaEmas(){
   const cached=getCachedHarga();
+  // Tampilkan status UI
+  const badge = document.getElementById("apiStatus");
+  
   if(cached) {
-    document.getElementById("apiStatus").innerText = "Cache Harga";
+    badge.innerText = "LIVE"; 
+    badge.classList.add("status-online");
     return cached;
   }
-  document.getElementById("apiStatus").innerText = "Updating...";
+  
+  badge.innerText = "Updating...";
   try{
     const r=await fetch("https://logam-mulia-api.vercel.app/api/antam");
     const d=await r.json();
     setCachedHarga(d.buy);
-    document.getElementById("apiStatus").innerText = "Live Price";
+    // Jika sukses: Berkedip Hijau
+    badge.innerText = "LIVE";
+    badge.classList.add("status-online");
     return d.buy;
   }catch(err){
     console.log("API Error:", err);
-    document.getElementById("apiStatus").innerText = "Offline Mode";
+    // Jika gagal: Offline
+    badge.innerText = "OFFLINE";
+    badge.classList.remove("status-online");
     return getCachedHarga()||2652000; 
   }
 }
 
 window.onload=async ()=>{
   await getHargaEmas();
-  // TIDAK ada auto-load lagi, biar input bersih
 };
 
 async function hitung(){
@@ -356,9 +494,9 @@ async function hitung(){
     anak:["Biaya Rutin Susu & Makanan","Imunisasi & Kesehatan","Perlengkapan Anak","Biaya Pendidikan Awal","Transportasi & Aktivitas","Biaya Hidup Tambahan","Dana Sakit Anak"]
   };
 
-  const target=income*mult[status]; // Total Kebutuhan Sekali Bayar
-  const buffer=income*0.7*3; // Dana Penyangga (Cash)
-  const aman=Math.max(0,target-buffer); // Dana Aman (Invest/Emas)
+  const target=income*mult[status]; 
+  const buffer=income*0.7*3; 
+  const aman=Math.max(0,target-buffer); 
 
   const harga=await getHargaEmas();
   const gram=aman/harga;
@@ -367,7 +505,7 @@ async function hitung(){
 
   const list=reason[status].map(x=>"<li>"+x+"</li>").join("");
 
-  // LOGIC TANGGAL
+  // Logic Tanggal
   let targetPlanHTML = "";
   if (targetDateInput) {
     const targetDate = new Date(targetDateInput);
@@ -379,13 +517,10 @@ async function hitung(){
     if (diffMonths <= 0) {
        targetPlanHTML = `<div class="plan-box" style="background:#fee2e2; border-color:#fca5a5;">
          <div style="color:#b91c1c; font-weight:bold;">Waktu Terlampaui</div>
-         <div style="font-size:12px; color:#991b1b;">Tanggal target sudah lewat. Anda harus menabung lebih banyak sekarang.</div>
+         <div style="font-size:12px; color:#991b1b;">Tanggal target sudah lewat.</div>
        </div>`;
     } else {
-       // Hanya menghitung tabungan untuk bagian EMAS (Aman)
-       // Penjelasan: Bagian Buffer (Cash) dianggap cicilan dari penghasilan sehari-hari
        const tabunganPerBulan = Math.ceil(aman / diffMonths);
-       const tabunganPerMinggu = Math.ceil(tabunganPerBulan / 4);
        
        targetPlanHTML = `
        <div class="plan-box">
@@ -394,7 +529,7 @@ async function hitung(){
          <div class="plan-row highlight">
            <span>Tabungan Emas:</span> <span>Rp ${formatIDR(tabunganPerBulan)} / bln</span>
          </div>
-         <div style="font-size:11px; color:#064e3b; margin-top:6px; line-height:1.3;">
+         <div class="footnote">
            *Angka ini hanya untuk penguncian emas (Dana Aman). Sisanya (${formatIDR(buffer)}) adalah dana tunai yang dianggap tercicil dari gaji bulanan.
          </div>
        </div>`;
@@ -404,49 +539,56 @@ async function hitung(){
     const cicil12=aman/12;
     targetPlanHTML = `
     <div class="plan-box" style="background:#f8fafc; border-color:#e2e8f0;">
-      <div style="font-size:12px; color:#64748b; margin-bottom:5px;">Simulasi Tabungan Emas (Tanpa Target Tanggal)</div>
+      <div style="font-size:12px; color:#64748b; margin-bottom:8px; font-weight:600;">Simulasi Tabungan Emas (Umum)</div>
       <div class="plan-row"><span>6 Bulan:</span> <strong>Rp ${formatIDR(Math.ceil(cicil6))} / bln</strong></div>
       <div class="plan-row"><span>12 Bulan:</span> <strong>Rp ${formatIDR(Math.ceil(cicil12))} / bln</strong></div>
     </div>`;
   }
 
   document.getElementById("detail").style.display = "block";
-  document.getElementById("detail").className = "fade-in";
   
-  // HTML Baru: Lebih jelas, tanpa ikon
+  // HTML Layout (Disesuaikan permintaan user)
   document.getElementById("detail").innerHTML=`
-<div class="section-box">
-  <div class="section-title">Kebutuhan Dana Besar <span style="font-weight:400; font-size:12px; color:var(--text-muted)">Sekali Bayar</span></div>
+<div class="section-box" style="animation-delay: 0.1s;">
+  <div class="section-title">
+    Kebutuhan Dana Besar
+    <span class="section-tag tag-yellow">Yang Wajib Dianggarkan</span>
+  </div>
   <div class="section-price">Rp ${formatIDR(target)}</div>
   <div class="section-desc">
     Total biaya yang dibutuhkan saat kejadian tersebut terjadi. 
-    Rincian kebutuhan meliputi:
-    <ul class="list-simple">${list}</ul>
+    <ul style="margin: 10px 0 0 0; padding-left: 16px; color: var(--text-muted); font-size: 13px;">${list}</ul>
   </div>
 </div>
 
-<div class="section-box">
-  <div class="section-title">Dana Penyangga Hidup <span style="font-weight:400; font-size:12px; color:var(--text-muted)">Wajib Tunai</span></div>
-  <div class="section-price" style="color:#d97706;">Rp ${formatIDR(buffer)}</div>
+<div class="section-box" style="animation-delay: 0.2s;">
+  <div class="section-title">
+    Dana Penyangga Hidup
+    <span class="section-tag tag-yellow">Wajib Tunai</span>
+  </div>
+  <div class="section-price" style="color:var(--primary-dark);">Rp ${formatIDR(buffer)}</div>
   <div class="section-desc">
-    Ini adalah uang tunai yang wajib ada di rekening. Gunanya sebagai sabuk pengaman jika penghasilan berhenti (misal sakit atau cuti), agar kebutuhan makan dan sewa tetap aman. Uang ini tidak boleh dikunci.
+    Uang tunai yang wajib ada di rekening. Gunanya sebagai sabuk pengaman jika penghasilan berhenti, agar kebutuhan dasar tetap aman.
   </div>
 </div>
 
-<div class="section-box">
-  <div class="section-title">Dana Siap Dikunci <span style="font-weight:400; font-size:12px; color:var(--text-muted)">Bisa di Emas</span></div>
-  <div class="section-price" style="color:#047857;">Rp ${formatIDR(aman)}</div>
+<div class="section-box" style="animation-delay: 0.3s; background: #fff; border: 1px solid #d1fae5;">
+  <div class="section-title">
+    Dana Siap Dikunci
+    <span class="section-tag tag-green">Bisa di Emas</span>
+  </div>
+  <div class="section-price" style="color:var(--success-dark);">Rp ${formatIDR(aman)}</div>
   <div class="section-desc">
     Ini adalah sisa dana dari total kebutuhan yang aman untuk dikunci (diinvestasikan) dalam bentuk emas.
     <br><br>
-    <strong>Setara emas:</strong> ${gram.toFixed(2)} gram <br>
+    <strong>Setara emas:</strong> ${gram.toFixed(2)} gram<br>
     <strong>Harga emas:</strong> Rp ${formatIDR(harga)} / gram
   </div>
   ${targetPlanHTML}
 </div>
 `;
 
-  // Chart Labels Update: Jelas
+  // Chart Logic (Warna Hijau & Kuning Screenshot)
   const data=[aman,buffer];
   if(chart) chart.destroy();
   
@@ -454,43 +596,65 @@ async function hitung(){
   chart=new Chart(ctx,{
     type:"doughnut",
     data:{
-      labels:["Dana Aman (Emas)","Dana Penyangga (Tunai)"], // LABEL JELAS
+      labels:["Aman","Penyangga"],
       datasets:[{
         data:data,
-        backgroundColor: ["#047857", "#f59e0b"], // Hijau & Kuning/Oranye
+        backgroundColor: ["#10b981", "#fbbf24"], // HIJAU & KUNING
         borderWidth:0,
-        hoverOffset: 4
+        hoverOffset: 6
       }]
     },
     options: {
-      cutout: '75%',
+      cutout: '78%',
       responsive: true,
       maintainAspectRatio: false,
       plugins: { 
-        legend: { position: 'bottom', labels: { boxWidth: 12, font: {family:'Outfit'} } } 
+        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: {size: 12, family: 'Plus Jakarta Sans'} } } 
+      },
+      animation: {
+        animateScale: true,
+        animateRotate: true,
+        duration: 1500,
+        easing: 'easeOutQuart'
       }
     }
   });
 
   localStorage.setItem("honorer_kalkulasi",JSON.stringify({status,income,targetDate:targetDateInput,target,buffer,aman,gram,harga}));
 
-  // Tampilkan Tombol
-  document.getElementById("btn-container").style.display = "block";
-  document.getElementById("waBtn").style.display = "inline-block";
-  document.getElementById("shareBtn").style.display = "inline-block";
+  // Show Buttons
+  document.getElementById("btn-container").style.display = "grid";
 
-  const wa=encodeURIComponent(
-`HONORER DIGITAL
+  // PREPARE DETAILED WA MESSAGES
+  const fullWaText = encodeURIComponent(
+`HONORER DIGITAL - PERENCANAAN KEAMANAN
 
-Target: Rp ${formatIDR(target)}
-Dana aman: Rp ${formatIDR(aman)}
-Setara: ${gram.toFixed(2)} gram
+DATA PERENCANAAN:
+Status: ${status.charAt(0).toUpperCase() + status.slice(1)}
+Penghasilan: Rp ${formatIDR(income)}
+
+1. KEBUTUHAN DANA BESAR: Rp ${formatIDR(target)}
+   (Sekali bayar saat kejadian)
+
+2. DANA PENYANGGA: Rp ${formatIDR(buffer)}
+   (Wajib Tunai - Safety Buffer)
+
+3. DANA AMAN (BUAT EMAS): Rp ${formatIDR(aman)}
+   Setara Emas: ${gram.toFixed(2)} gram
+   Harga Emas: Rp ${formatIDR(harga)}/gr
+
+RENCANA TABUNGAN:
+- Target Tanggal: ${targetDateInput ? new Date(targetDateInput).toLocaleDateString('id-ID') : '-'}
+- Tabungan Emas: Rp ${targetDateInput ? formatIDR(Math.ceil(aman/Math.ceil((new Date(targetDateInput)-new Date())/(1000*60*60*24*30)))) : '-'} / bln
 
 Mohon bantu penguncian.`
   );
 
-  document.getElementById("waBtn").onclick=()=>window.open("https://wa.me/6285123882845?text="+wa);
-  document.getElementById("shareBtn").onclick=()=>window.open("https://wa.me/?text="+encodeURIComponent("HONORER DIGITAL – simpan perhitungan saya"));
+  // Tombol WA Admin
+  document.getElementById("waBtn").onclick=()=>window.open("https://wa.me/6285123882845?text="+fullWaText);
+  
+  // Tombol Simpan/Send ke Sendiri
+  document.getElementById("shareBtn").onclick=()=>window.open("https://wa.me/?text="+encodeURIComponent("Simpan Analisa Keuangan Saya:\n\n"+fullWaText));
 
   // Reset Button
   btn.disabled = false;
