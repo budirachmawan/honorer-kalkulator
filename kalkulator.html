@@ -3,128 +3,88 @@
 <head>
 <meta charset="UTF-8">
 <title>Kalkulator Keamanan Nikah & Lahiran</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background:#f7f7f7;
-  padding:20px;
-}
-.card {
-  background:#fff;
-  max-width:480px;
-  margin:auto;
-  padding:25px;
-  border-radius:14px;
-  box-shadow:0 5px 15px rgba(0,0,0,0.05);
-}
-h2 {text-align:center;}
-label {font-weight:bold; display:block; margin-top:15px;}
-select,input,button {
-  width:100%;
-  padding:14px;
-  margin-top:8px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  font-size:16px;
-}
-button {
-  background:#f5c400;
-  border:none;
-  font-weight:bold;
-  cursor:pointer;
-}
-#hasil {
-  margin-top:20px;
-  background:#fafafa;
-  padding:15px;
-  border-radius:10px;
-  display:none;
-  line-height:1.6;
-}
-.note {
-  background:#fff3cd;
-  padding:10px;
-  border-radius:8px;
-  font-size:13px;
-  margin-top:10px;
-}
+body {font-family:Arial;background:#f3f4f6;margin:0;padding:20px;}
+.app {max-width:900px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.card {background:#fff;padding:20px;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,.05);}
+h2 {margin-top:0;}
+input,select,button {width:100%;padding:12px;margin-top:10px;font-size:16px;border-radius:8px;border:1px solid #ddd;}
+button {background:#f5c400;border:none;font-weight:bold;cursor:pointer;}
+.big {font-size:28px;font-weight:bold;}
+.note {font-size:12px;background:#fff3cd;padding:10px;border-radius:8px;margin-top:10px;}
 </style>
 </head>
 
 <body>
 
-<div class="card">
-<h2>Kalkulator Keamanan Nikah & Lahiran</h2>
+<div class="app">
 
-<label>Status hidup kamu</label>
+<div class="card">
+<h2>Kalkulator Keamanan</h2>
+<label>Status hidup</label>
 <select id="status">
   <option value="nikah">Akan Menikah</option>
   <option value="hamil">Hamil</option>
-  <option value="anak">Sudah Punya Anak</option>
+  <option value="anak">Punya Anak</option>
 </select>
 
-<label>Penghasilan per bulan (Rp)</label>
-<input id="penghasilan" type="number" placeholder="contoh: 4000000">
+<label>Penghasilan / bulan</label>
+<input id="income" type="number" placeholder="contoh 4000000">
 
-<button onclick="hitung()">Lihat Posisi Keamanan Saya</button>
+<button onclick="hitung()">Hitung Keamanan</button>
+</div>
 
-<div id="hasil"></div>
+<div class="card">
+<div class="big" id="emas">–</div>
+<canvas id="chart"></canvas>
+<div id="detail"></div>
+<div class="note">
+Harga emas diambil dari kurs XAU→IDR pasar global. Harga beli di toko bisa berbeda dan berubah sewaktu-waktu.
+</div>
+</div>
+
 </div>
 
 <script>
-const API_KEY = "goldapi-12qy19mkcon6hi-io";
-
-async function getHargaEmas() {
-  try {
-    const res = await fetch("https://www.goldapi.io/api/XAU/IDR", {
-      headers: { "x-access-token": API_KEY }
-    });
-    const data = await res.json();
-    return Math.round(data.price / 31.1035);
-  } catch (e) {
-    return 2480000;
-  }
+async function getHargaEmas(){
+  const res = await fetch("https://api.exchangerate.host/convert?from=XAU&to=IDR");
+  const data = await res.json();
+  return Math.round(data.result / 31.1035);
 }
 
-async function hitung() {
+let chart;
+
+async function hitung(){
+  const income = Number(document.getElementById("income").value);
   const status = document.getElementById("status").value;
-  const income = Number(document.getElementById("penghasilan").value);
+  const mult = {nikah:6, hamil:4, anak:3};
 
-  if (!income || income <= 0) {
-    alert("Masukkan penghasilan bulanan yang valid.");
-    return;
-  }
+  const risiko = income * mult[status];
+  const hidup = income * 0.7;
+  const buffer = hidup * 3;
+  let aman = risiko - buffer;
+  if(aman < 0) aman = 0;
 
-  const mult = { nikah:6, hamil:4, anak:3 };
-  const statusText = { nikah:"Akan Menikah", hamil:"Hamil", anak:"Sudah Punya Anak" };
+  const harga = await getHargaEmas();
+  const gram = Math.floor(aman / harga);
 
-  const kejutan = income * mult[status];
-  const biayaHidup = income * 0.7;
-  const danaPenyangga = biayaHidup * 3;
-  let danaAman = kejutan - danaPenyangga;
-  if (danaAman < 0) danaAman = 0;
-
-  const hargaEmas = await getHargaEmas();
-  const gram = Math.floor(danaAman / hargaEmas);
-
-  document.getElementById("hasil").style.display = "block";
-  document.getElementById("hasil").innerHTML = `
-    <strong>Status:</strong> ${statusText[status]}<br>
-    <strong>Penghasilan:</strong> Rp ${income.toLocaleString()}<br><br>
-
-    <strong>Risiko biaya besar:</strong> Rp ${kejutan.toLocaleString()}<br>
-    <strong>Kebutuhan hidup per bulan:</strong> Rp ${biayaHidup.toLocaleString()}<br>
-    <strong>Dana penyangga 90 hari:</strong> Rp ${danaPenyangga.toLocaleString()}<br><br>
-
-    <strong>Uang yang aman untuk dikunci:</strong> Rp ${danaAman.toLocaleString()}<br>
-    ≈ <strong>${gram} gram emas</strong><br>
-    <small>Harga emas saat ini: Rp ${hargaEmas.toLocaleString()} / gram</small>
-
-    <div class="note">
-      Harga emas ini adalah harga spot pasar global (perkiraan). Harga beli di toko atau lembaga bisa berbeda dan berubah sewaktu-waktu.
-    </div>
+  document.getElementById("emas").innerHTML = gram + " gram emas";
+  document.getElementById("detail").innerHTML = `
+    Risiko biaya: Rp ${risiko.toLocaleString()}<br>
+    Dana penyangga: Rp ${buffer.toLocaleString()}<br>
+    Aman dikunci: Rp ${aman.toLocaleString()}<br>
+    Harga emas: Rp ${harga.toLocaleString()} / gram
   `;
+
+  const data = [aman, risiko-aman];
+  if(chart) chart.destroy();
+  chart = new Chart(document.getElementById("chart"),{
+    type:"doughnut",
+    data:{labels:["Aman","Berisiko"],datasets:[{data}]}
+  });
 }
 </script>
 
