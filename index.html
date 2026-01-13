@@ -7,27 +7,101 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body{font-family:Arial;background:#f3f4f6;margin:0;padding:14px;}
-.header{position:relative;margin-bottom:14px}
-.header img{width:100%;height:220px;object-fit:cover;border-radius:14px}
-.logo{position:absolute;top:12px;left:12px;width:60px;background:#fff;padding:6px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+body{
+  font-family:Arial;
+  background:#f3f4f6;
+  margin:0;
+  padding:14px;
+}
 
-.app{max-width:980px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.card{background:#fff;padding:22px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+/* ===== HEADER ===== */
+.header{
+  position:relative;
+  margin-bottom:14px;
+}
+.header img{
+  width:100%;
+  height:auto;
+  max-height:220px;
+  object-fit:contain;
+  background:#fff;
+  border-radius:14px;
+}
+.logo{
+  position:absolute;
+  top:12px;
+  left:12px;
+  width:60px;
+  background:#fff;
+  padding:6px;
+  border-radius:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+
+/* ===== LAYOUT ===== */
+.app{
+  max-width:980px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+.card{
+  background:#fff;
+  padding:22px;
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,.06);
+}
+
 h2{margin-top:0}
 label{font-weight:bold;display:block;margin-top:14px}
-input,select,button{width:100%;padding:14px;margin-top:8px;font-size:16px;border-radius:10px;border:1px solid #ddd}
-button{background:#f5c400;border:none;font-weight:bold;cursor:pointer}
-.big{font-size:32px;font-weight:bold;text-align:center}
-.cta{background:#0f9d58;color:#fff;font-size:18px;margin-top:18px;padding:14px}
-.note{font-size:13px;background:#fff3cd;padding:12px;border-radius:10px;margin-top:14px}
-.small{font-size:12px;color:#777;margin-top:10px;text-align:center}
+input,select,button{
+  width:100%;
+  padding:14px;
+  margin-top:8px;
+  font-size:16px;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+button{
+  background:#f5c400;
+  border:none;
+  font-weight:bold;
+  cursor:pointer;
+}
 
+.big{
+  font-size:32px;
+  font-weight:bold;
+  text-align:center;
+}
+.cta{
+  background:#0f9d58;
+  color:#fff;
+  font-size:18px;
+  margin-top:18px;
+  padding:14px;
+}
+.note{
+  font-size:13px;
+  background:#fff3cd;
+  padding:12px;
+  border-radius:10px;
+  margin-top:14px;
+}
+.small{
+  font-size:12px;
+  color:#777;
+  margin-top:10px;
+  text-align:center;
+}
+
+/* ===== MOBILE ===== */
 @media(max-width:768px){
-  .app{grid-template-columns:1fr}
-  .big{font-size:26px}
-  .logo{width:46px}
-  .header img{height:140px}
+  .app{grid-template-columns:1fr;}
+  .big{font-size:26px;}
+  .logo{width:46px;}
+  .header img{max-height:140px;}
 }
 </style>
 </head>
@@ -35,8 +109,8 @@ button{background:#f5c400;border:none;font-weight:bold;cursor:pointer}
 <body>
 
 <div class="header">
-  <img src="banner.png">
-  <img src="logo.png" class="logo">
+  <img src="banner.png" alt="HONORER DIGITAL">
+  <img src="logo.png" class="logo" alt="HONORER DIGITAL">
 </div>
 
 <div class="app">
@@ -46,9 +120,9 @@ button{background:#f5c400;border:none;font-weight:bold;cursor:pointer}
 
 <label>Status hidup</label>
 <select id="status">
-<option value="nikah">Akan Menikah</option>
-<option value="hamil">Hamil</option>
-<option value="anak">Sudah Punya Anak</option>
+  <option value="nikah">Akan Menikah</option>
+  <option value="hamil">Hamil</option>
+  <option value="anak">Sudah Punya Anak</option>
 </select>
 
 <label>Penghasilan per bulan</label>
@@ -62,10 +136,14 @@ button{background:#f5c400;border:none;font-weight:bold;cursor:pointer}
 <div id="detail" style="margin-top:18px"></div>
 
 <button class="cta" id="waBtn" style="display:none">Kunci Dana Saya di Emas</button>
-<button class="cta" id="shareBtn" style="background:#2563eb;display:none;margin-top:10px">Simpan / Kirim ke WA Saya</button>
+<button class="cta" id="shareBtn" style="background:#2563eb;display:none;margin-top:10px">
+Simpan / Kirim ke WA Saya
+</button>
 
 <div class="small">Harga emas diambil dari sumber resmi dan diupdate realtime</div>
-<div class="note">Ini bukan dana darurat. Ini dana tujuan (nikah, lahiran, anak). Dana darurat tetap harus kamu punya terpisah.</div>
+<div class="note">
+Ini bukan dana darurat. Ini dana tujuan (nikah, lahiran, anak). Dana darurat tetap harus kamu punya terpisah.
+</div>
 </div>
 
 </div>
@@ -75,165 +153,117 @@ let chart;
 
 /* ===== INPUT FORMAT ===== */
 document.getElementById("income").addEventListener("input",e=>{
- let v=e.target.value.replace(/\D/g,"");
- e.target.value=v?parseInt(v).toLocaleString("id-ID"):"";
+  let v=e.target.value.replace(/\D/g,"");
+  e.target.value=v?parseInt(v).toLocaleString("id-ID"):"";
 });
 function formatIDR(x){return x.toLocaleString("id-ID");}
 
-/* ===== HARGA EMAS DENGAN CACHE ===== */
+/* ===== HARGA EMAS CACHE ===== */
 function getCachedHarga(){
- const c=localStorage.getItem("harga_emas_cache");
- if(!c) return null;
- const o=JSON.parse(c);
- if(Date.now()-o.time>15*60*1000) return null;
- return o.price;
+  const c=localStorage.getItem("harga_emas_cache");
+  if(!c) return null;
+  const o=JSON.parse(c);
+  if(Date.now()-o.time>15*60*1000) return null;
+  return o.price;
 }
 function setCachedHarga(p){
- localStorage.setItem("harga_emas_cache",JSON.stringify({time:Date.now(),price:p}));
+  localStorage.setItem("harga_emas_cache",JSON.stringify({time:Date.now(),price:p}));
 }
 async function getHargaEmas(){
- const cached=getCachedHarga();
- if(cached) return cached;
- try{
-  const r=await fetch("https://logam-mulia-api.vercel.app/api/antam");
-  const d=await r.json();
-  setCachedHarga(d.buy);
-  return d.buy;
- }catch{
-  return getCachedHarga()||2652000;
- }
+  const cached=getCachedHarga();
+  if(cached) return cached;
+  try{
+    const r=await fetch("https://logam-mulia-api.vercel.app/api/antam");
+    const d=await r.json();
+    setCachedHarga(d.buy);
+    return d.buy;
+  }catch{
+    return getCachedHarga()||2652000;
+  }
 }
 
-/* ===== AUTO LOAD SAVED ===== */
+/* ===== AUTO LOAD ===== */
 window.onload=()=>{
- const saved=localStorage.getItem("honorer_kalkulasi");
- if(!saved) return;
- const d=JSON.parse(saved);
- document.getElementById("status").value=d.status;
- document.getElementById("income").value=d.income.toLocaleString("id-ID");
- setTimeout(()=>hitung(),300);
+  const saved=localStorage.getItem("honorer_kalkulasi");
+  if(!saved) return;
+  const d=JSON.parse(saved);
+  document.getElementById("status").value=d.status;
+  document.getElementById("income").value=d.income.toLocaleString("id-ID");
+  setTimeout(()=>hitung(),300);
 };
 
 /* ===== HITUNG ===== */
 async function hitung(){
- const income=Number(document.getElementById("income").value.replace(/\./g,""));
- const status=document.getElementById("status").value;
- if(!income) return;
+  const income=Number(document.getElementById("income").value.replace(/\./g,""));
+  const status=document.getElementById("status").value;
+  if(!income) return;
 
- const mult={nikah:6,hamil:4,anak:3};
+  const mult={nikah:6,hamil:4,anak:3};
 
- const reason={
- nikah:[
-  "akad & resepsi sederhana",
-  "mahar",
-  "pindahan & tempat tinggal awal",
-  "perlengkapan rumah tangga",
-  "biaya hidup bulan pertama",
-  "administrasi & dokumen",
-  "dana adaptasi pasangan"
- ],
- hamil:[
-  "kontrol & pemeriksaan rutin",
-  "vitamin & nutrisi ibu",
-  "persiapan persalinan",
-  "biaya melahirkan",
-  "perlengkapan bayi",
-  "cadangan komplikasi",
-  "pemulihan ibu"
- ],
- anak:[
-  "susu & makanan",
-  "kesehatan & imunisasi",
-  "perlengkapan anak",
-  "pendidikan awal",
-  "transport & aktivitas",
-  "biaya hidup tambahan",
-  "cadangan sakit"
- ]
-};
+  const reason={
+    nikah:["akad & resepsi sederhana","mahar","pindahan & tempat tinggal awal","perlengkapan rumah tangga","biaya hidup bulan pertama","administrasi & dokumen","dana adaptasi pasangan"],
+    hamil:["kontrol & pemeriksaan rutin","vitamin & nutrisi ibu","persiapan persalinan","biaya melahirkan","perlengkapan bayi","cadangan komplikasi","pemulihan ibu"],
+    anak:["susu & makanan","kesehatan & imunisasi","perlengkapan anak","pendidikan awal","transport & aktivitas","biaya hidup tambahan","cadangan sakit"]
+  };
 
- const target=income*mult[status];
- const buffer=income*0.7*3;
- const aman=Math.max(0,target-buffer);
+  const target=income*mult[status];
+  const buffer=income*0.7*3;
+  const aman=Math.max(0,target-buffer);
 
- const harga=await getHargaEmas();
- const gram=aman/harga;
- const cicil6=aman/6;
- const cicil12=aman/12;
+  const harga=await getHargaEmas();
+  const gram=aman/harga;
+  const cicil6=aman/6;
+  const cicil12=aman/12;
 
- document.getElementById("emas").innerText=gram.toFixed(2)+" gram emas";
+  document.getElementById("emas").innerText=gram.toFixed(2)+" gram emas";
 
- const list=reason[status].map(x=>"– "+x).join("<br>");
+  const list=reason[status].map(x=>"– "+x).join("<br>");
 
- document.getElementById("detail").innerHTML=`
+  document.getElementById("detail").innerHTML=`
 <b>Dana besar yang kamu butuhkan</b><br>
 Rp ${formatIDR(target)}<br>
 <i>estimasi realistis karena mencakup:</i><br>${list}<br><br>
 
 <b>Dana penyangga hidup (3 bulan)</b><br>
 Rp ${formatIDR(buffer)}<br>
-<i>sabuk pengaman hidup. Jika penghasilan terganggu, kamu masih bisa makan, bayar kontrakan, listrik, dan kebutuhan dasar tanpa hutang atau menjual aset.</i><br><br>
+<i>sabuk pengaman hidup jika penghasilan terganggu.</i><br><br>
 
 <b>Dana yang sudah aman dikunci</b><br>
 Rp ${formatIDR(aman)}<br>
-<i>ini dana tujuan setelah hidup aman. Tidak dipakai bertahan hidup, sehingga boleh dikunci ke emas tanpa risiko.</i><br><br>
-
-<div style="background:#eef6ff;padding:12px;border-radius:10px">
-<b>Urutan yang benar:</b><br>
-1) Amankan dulu dana penyangga hidup<br>
-2) Setelah itu baru kunci dana aman ke emas
-</div><br>
+<i>uang tujuan yang boleh dikunci ke emas.</i><br><br>
 
 <b>Setara emas:</b> ${gram.toFixed(2)} gram<br>
 <b>Harga emas:</b> Rp ${formatIDR(harga)} / gram<br><br>
 
-<b>Jika dikumpulkan bertahap (bukan hutang):</b><br>
-<i>ini bukan cicilan beban. Ini menyisihkan penghasilan sampai dana aman ini terkumpul.</i><br>
+<b>Jika dikumpulkan bertahap:</b><br>
 6 bulan → Rp ${formatIDR(cicil6)} / bulan<br>
 12 bulan → Rp ${formatIDR(cicil12)} / bulan
 `;
 
- const data=[aman,target-aman];
- if(chart) chart.destroy();
- chart=new Chart(document.getElementById("chart"),{
-  type:"doughnut",
-  data:{labels:["Aman","Berisiko"],datasets:[{data}]}
- });
+  const data=[aman,target-aman];
+  if(chart) chart.destroy();
+  chart=new Chart(document.getElementById("chart"),{
+    type:"doughnut",
+    data:{labels:["Aman","Berisiko"],datasets:[{data}]}
+  });
 
- localStorage.setItem("honorer_kalkulasi",JSON.stringify({
-  status,income,target,buffer,aman,gram,harga,time:Date.now()
- }));
+  localStorage.setItem("honorer_kalkulasi",JSON.stringify({status,income,target,buffer,aman,gram,harga}));
 
- const wa=encodeURIComponent(
+  const wa=encodeURIComponent(
 `HONORER DIGITAL
 
-Saya mau mengamankan dana fase hidup saya.
-
-Target dana: Rp ${formatIDR(target)}
-Dana penyangga: Rp ${formatIDR(buffer)}
-Dana siap dikunci: Rp ${formatIDR(aman)}
-Setara: ${gram.toFixed(2)} gram emas
-
-Mohon bantu saya skema pengunciannya.`
- );
-
- document.getElementById("waBtn").style.display="block";
- document.getElementById("waBtn").onclick=()=>window.open("https://wa.me/6285123882845?text="+wa);
-
- document.getElementById("shareBtn").style.display="block";
- document.getElementById("shareBtn").onclick=()=>{
-  const msg=encodeURIComponent(
-`HONORER DIGITAL – Simpan Perhitungan
-
-Target dana: Rp ${formatIDR(target)}
+Target: Rp ${formatIDR(target)}
 Dana aman: Rp ${formatIDR(aman)}
 Setara: ${gram.toFixed(2)} gram
 
-Buka kembali:
-https://honorer-kalkulator.pages.dev`
+Mohon bantu penguncian.`
   );
-  window.open("https://wa.me/?text="+msg);
- };
+
+  document.getElementById("waBtn").style.display="block";
+  document.getElementById("waBtn").onclick=()=>window.open("https://wa.me/6285123882845?text="+wa);
+
+  document.getElementById("shareBtn").style.display="block";
+  document.getElementById("shareBtn").onclick=()=>window.open("https://wa.me/?text="+encodeURIComponent("HONORER DIGITAL – simpan perhitungan saya"));
 }
 </script>
 </body>
