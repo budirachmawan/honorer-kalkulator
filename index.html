@@ -8,22 +8,24 @@
 
 <style>
 body {font-family:Arial;background:#f3f4f6;margin:0;padding:20px;}
-.app {max-width:900px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.card {background:#fff;padding:20px;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,.05);}
+.app {max-width:960px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.card {background:#fff;padding:24px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.06);}
 h2 {margin-top:0;}
-input,select,button {width:100%;padding:12px;margin-top:10px;font-size:16px;border-radius:8px;border:1px solid #ddd;}
+label {font-weight:bold;display:block;margin-top:15px;}
+input,select,button {width:100%;padding:14px;margin-top:8px;font-size:16px;border-radius:10px;border:1px solid #ddd;}
 button {background:#f5c400;border:none;font-weight:bold;cursor:pointer;}
-.big {font-size:28px;font-weight:bold;}
-.note {font-size:12px;background:#fff3cd;padding:10px;border-radius:8px;margin-top:10px;}
+.big {font-size:32px;font-weight:bold;margin:10px 0;}
+.note {font-size:13px;background:#fff3cd;padding:12px;border-radius:10px;margin-top:12px;}
+.cta {background:#0f9d58;color:white;font-size:18px;margin-top:15px;}
 </style>
 </head>
 
 <body>
-
 <div class="app">
 
 <div class="card">
 <h2>Kalkulator Keamanan</h2>
+
 <label>Status hidup</label>
 <select id="status">
   <option value="nikah">Akan Menikah</option>
@@ -32,7 +34,7 @@ button {background:#f5c400;border:none;font-weight:bold;cursor:pointer;}
 </select>
 
 <label>Penghasilan / bulan</label>
-<input id="income" type="number" placeholder="contoh 4000000">
+<input id="income" type="number" placeholder="contoh: 4000000">
 
 <button onclick="hitung()">Hitung Keamanan</button>
 </div>
@@ -41,26 +43,42 @@ button {background:#f5c400;border:none;font-weight:bold;cursor:pointer;}
 <div class="big" id="emas">–</div>
 <canvas id="chart"></canvas>
 <div id="detail"></div>
+
+<button class="cta" id="waBtn" style="display:none;">Amankan Dana Ini Sekarang</button>
+
 <div class="note">
-Harga emas diambil dari kurs XAU→IDR pasar global. Harga beli di toko bisa berbeda dan berubah sewaktu-waktu.
+Ini bukan dana darurat. Ini dana tujuan (nikah, lahiran, anak).  
+Dana darurat tetap harus kamu punya terpisah.
 </div>
 </div>
 
 </div>
 
 <script>
-async function getHargaEmas(){
-  const res = await fetch("https://api.exchangerate.host/convert?from=XAU&to=IDR");
-  const data = await res.json();
-  return Math.round(data.result / 31.1035);
+let chart;
+
+function formatIDR(x){
+  return x.toLocaleString("id-ID");
 }
 
-let chart;
+async function getHargaEmas(){
+  try {
+    const res = await fetch("https://api.exchangerate.host/convert?from=XAU&to=IDR");
+    const data = await res.json();
+    if(!data || !data.result || isNaN(data.result)) throw "error";
+    return Math.round(data.result / 31.1035);
+  } catch {
+    return 1050000; // fallback harga emas
+  }
+}
 
 async function hitung(){
   const income = Number(document.getElementById("income").value);
   const status = document.getElementById("status").value;
+  if(!income || income <= 0) return;
+
   const mult = {nikah:6, hamil:4, anak:3};
+  const statusText = {nikah:"Akan Menikah", hamil:"Hamil", anak:"Punya Anak"};
 
   const risiko = income * mult[status];
   const hidup = income * 0.7;
@@ -71,12 +89,20 @@ async function hitung(){
   const harga = await getHargaEmas();
   const gram = Math.floor(aman / harga);
 
-  document.getElementById("emas").innerHTML = gram + " gram emas";
+  const cicil6 = Math.ceil(aman / 6);
+  const cicil12 = Math.ceil(aman / 12);
+
+  document.getElementById("emas").innerText = gram + " gram emas";
+
   document.getElementById("detail").innerHTML = `
-    Risiko biaya: Rp ${risiko.toLocaleString()}<br>
-    Dana penyangga: Rp ${buffer.toLocaleString()}<br>
-    Aman dikunci: Rp ${aman.toLocaleString()}<br>
-    Harga emas: Rp ${harga.toLocaleString()} / gram
+    <b>Status:</b> ${statusText[status]}<br>
+    <b>Risiko biaya:</b> Rp ${formatIDR(risiko)}<br>
+    <b>Dana penyangga (90 hari):</b> Rp ${formatIDR(buffer)}<br><br>
+    <b>Uang yang boleh dikunci:</b> Rp ${formatIDR(aman)}<br>
+    <b>Setara emas:</b> ${gram} gram<br>
+    <b>Harga emas:</b> Rp ${formatIDR(harga)} / gram<br><br>
+    • 6 bulan: Rp ${formatIDR(cicil6)} / bulan<br>
+    • 12 bulan: Rp ${formatIDR(cicil12)} / bulan
   `;
 
   const data = [aman, risiko-aman];
@@ -85,9 +111,22 @@ async function hitung(){
     type:"doughnut",
     data:{labels:["Aman","Berisiko"],datasets:[{data}]}
   });
+
+  const waText = encodeURIComponent(
+`Saya mau amankan dana ${statusText[status]} saya.
+Dana aman: Rp ${formatIDR(aman)}
+Setara: ${gram} gram emas`
+  );
+
+  document.getElementById("waBtn").style.display = "block";
+  document.getElementById("waBtn").onclick = function(){
+    window.open("https://wa.me/6285123882845?text="+waText,"_blank");
+  };
 }
+
+document.getElementById("income").addEventListener("input", hitung);
+document.getElementById("status").addEventListener("change", hitung);
 </script>
 
 </body>
 </html>
-
