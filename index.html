@@ -14,12 +14,12 @@ body{
   padding:12px;
 }
 
-/* ==== BRAND HEADER ==== */
+/* ===== BRAND HEADER ===== */
 .header{
   position:relative;
-  margin-bottom:14px;
+  margin-bottom:16px;
 }
-.header img{
+.banner{
   width:100%;
   border-radius:14px;
 }
@@ -27,13 +27,14 @@ body{
   position:absolute;
   top:10px;
   left:10px;
-  width:60px;
+  width:64px;
   background:#fff;
   padding:6px;
   border-radius:10px;
   box-shadow:0 4px 10px rgba(0,0,0,.15);
 }
 
+/* ===== LAYOUT ===== */
 .app{
   max-width:980px;
   margin:auto;
@@ -86,6 +87,7 @@ button{
 .loading{display:none;margin-top:10px;font-size:14px;color:#555;}
 .small{font-size:12px;color:#777;margin-top:10px;text-align:center;}
 
+/* ===== MOBILE ===== */
 @media(max-width:768px){
   .app{grid-template-columns:1fr;}
   .big{font-size:26px;}
@@ -96,9 +98,9 @@ button{
 
 <body>
 
-<!-- ==== BRANDING ==== -->
+<!-- ===== BRANDING ===== -->
 <div class="header">
-  <img src="banner.jpg">
+  <img src="banner.png" class="banner">
   <img src="logo.png" class="logo">
 </div>
 
@@ -142,14 +144,14 @@ Ini bukan dana darurat. Ini dana tujuan (nikah, lahiran, anak). Dana darurat tet
 <script>
 let chart;
 
-/* ===== INPUT FORMAT ===== */
+/* ===== FORMAT INPUT ===== */
 document.getElementById("income").addEventListener("input",e=>{
   let v=e.target.value.replace(/\D/g,"");
   e.target.value=v?parseInt(v).toLocaleString("id-ID"):"";
 });
 function formatIDR(x){return x.toLocaleString("id-ID");}
 
-/* ===== CACHE HARGA EMAS ===== */
+/* ===== CACHE HARGA ===== */
 function getCachedHarga(){
   const c=localStorage.getItem("harga_emas_cache");
   if(!c) return null;
@@ -161,7 +163,7 @@ function setCachedHarga(p){
   localStorage.setItem("harga_emas_cache",JSON.stringify({time:Date.now(),price:p}));
 }
 
-/* ===== API EMAS ===== */
+/* ===== API ===== */
 async function getHargaEmas(){
   const cached=getCachedHarga();
   if(cached) return cached;
@@ -196,8 +198,8 @@ async function hitung(){
   document.getElementById("emas").innerText=gram.toFixed(2)+" gram emas";
 
   document.getElementById("detail").innerHTML=`
-<b>Dana besar yang kamu butuhkan</b><br>Rp ${formatIDR(target)}<br>
-<b>Dana penyangga 3 bulan</b><br>Rp ${formatIDR(buffer)}<br>
+<b>Dana besar yang kamu butuhkan</b><br>Rp ${formatIDR(target)}<br><br>
+<b>Dana penyangga 3 bulan</b><br>Rp ${formatIDR(buffer)}<br><br>
 <b>Dana aman dikunci</b><br>Rp ${formatIDR(aman)}<br><br>
 <b>Setara emas:</b> ${gram.toFixed(2)} gram<br>
 <b>Harga emas:</b> Rp ${formatIDR(harga)} / gram
