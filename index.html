@@ -2,147 +2,267 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Kalkulator Keamanan Nikah & Keluarga – HONORER DIGITAL</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Keamanan – HONORER DIGITAL</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
+/* ===== VARS & RESET ===== */
+:root {
+  --primary: #047857;
+  --primary-dark: #064e3b;
+  --accent: #d97706;
+  --bg: #f0fdf4;
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --text-main: #1f2937;
+  --text-muted: #64748b;
+  --radius: 20px;
+  --shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.05);
+}
+
+*{ box-sizing: border-box; }
+
 body{
-  font-family:Arial;
-  background:#f3f4f6;
+  font-family: 'Outfit', sans-serif;
+  background: radial-gradient(circle at top right, #dcfce7, #ecfccb);
+  background-attachment: fixed;
   margin:0;
-  padding:14px;
+  padding:30px 20px;
+  color:var(--text-main);
+  min-height: 100vh;
 }
 
 /* ===== HEADER ===== */
-.header{
-  position:relative;
-  margin-bottom:14px;
+.header-wrapper {
+  text-align: center;
+  margin-bottom: 40px;
 }
-.header img{
-  width:100%;
-  height:auto;
-  max-height:220px;
-  object-fit:contain;
-  background:#fff;
-  border-radius:14px;
+.header-wrapper h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
-.logo{
-  position:absolute;
-  top:12px;
-  left:12px;
-  width:60px;
-  background:#fff;
-  padding:6px;
-  border-radius:10px;
-  box-shadow:0 4px 10px rgba(0,0,0,.15);
-}
+.header-wrapper span { color: var(--accent); }
 
 /* ===== LAYOUT ===== */
 .app{
-  max-width:980px;
-  margin:auto;
+  max-width:900px;
+  margin:0 auto;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:18px;
+  gap:30px;
 }
+
 .card{
-  background:#fff;
-  padding:22px;
-  border-radius:16px;
-  box-shadow:0 6px 20px rgba(0,0,0,.06);
+  background: var(--card-bg);
+  padding: 35px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255,255,255,0.8);
 }
 
-h2{margin-top:0}
-label{font-weight:bold;display:block;margin-top:14px}
-input,select,button{
+/* ===== FORM ELEMENTS ===== */
+h2 {
+  margin-top:0; margin-bottom:25px; font-size: 20px; color: var(--text-main); font-weight: 600;
+}
+
+label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: block;
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+input, select {
   width:100%;
-  padding:14px;
-  margin-top:8px;
-  font-size:16px;
-  border-radius:10px;
-  border:1px solid #ddd;
+  padding: 16px;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--text-main);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  outline: none;
 }
-button{
-  background:#f5c400;
-  border:none;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.big{
-  font-size:32px;
-  font-weight:bold;
-  text-align:center;
-}
-.cta{
-  background:#0f9d58;
-  color:#fff;
-  font-size:18px;
-  margin-top:18px;
-  padding:14px;
-}
-.note{
-  font-size:13px;
-  background:#fff3cd;
-  padding:12px;
-  border-radius:10px;
-  margin-top:14px;
-}
-.small{
-  font-size:12px;
-  color:#777;
-  margin-top:10px;
-  text-align:center;
+input:focus, select:focus {
+  background: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.1);
 }
 
-/* ===== MOBILE ===== */
+/* ===== BUTTON ===== */
+button {
+  width: 100%;
+  padding: 18px;
+  margin-top: 35px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+}
+
+#btn-calc {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 10px 20px rgba(4, 120, 87, 0.2);
+}
+#btn-calc:hover { background: var(--primary-dark); transform: translateY(-2px); }
+#btn-calc:active { transform: translateY(0); }
+#btn-calc:disabled { background: #cbd5e1; cursor: wait; transform: none; }
+
+.spinner {
+  width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff;
+  animation: spin 0.8s linear infinite; display: none; margin-right: 10px; vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.cta { 
+  background: var(--text-main); color: #fff; margin-top: 12px; 
+  display: inline-block; width: auto; padding: 12px 24px; font-size: 14px;
+}
+.cta:hover { background: black; }
+
+/* ===== RESULT AREA ===== */
+.result-header { text-align: center; margin-bottom: 25px; }
+.big-label { 
+  font-size: 12px; text-transform: uppercase; letter-spacing: 2px; 
+  color: var(--text-muted); font-weight: 700; margin-bottom: 5px;
+}
+.big-value {
+  font-size: 36px; font-weight: 800; color: var(--primary); margin: 0; line-height: 1.1;
+}
+.sub-value {
+  font-size: 13px; color: var(--text-muted); margin-top: 5px;
+}
+
+#chart-container { position: relative; height: 200px; width: 100%; margin-bottom: 25px; }
+
+#detail {
+  background: #fff; padding: 0; border-radius: 12px; font-size: 14px; line-height: 1.6;
+  color: var(--text-main); display:none; border:1px solid #e2e8f0;
+}
+
+.section-box {
+  padding: 20px; border-bottom: 1px solid #f1f5f9;
+}
+.section-box:last-child { border-bottom: none; }
+
+.section-title {
+  font-weight: 700; font-size: 15px; margin-bottom: 5px; color: var(--text-main);
+  display: flex; justify-content: space-between;
+}
+.section-price {
+  font-size: 17px; font-weight: 700; color: var(--primary); margin-bottom: 8px;
+}
+.section-desc {
+  font-size: 13px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5;
+}
+
+.list-simple { margin: 10px 0 0 0; padding-left: 15px; color: var(--text-muted); font-size: 13px; }
+.list-simple li { margin-bottom: 4px; }
+
+.plan-box {
+  background: #f0fdf4; border-radius: 8px; padding: 15px; margin-top: 10px;
+  border: 1px solid #bbf7d0;
+}
+.plan-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; color: #064e3b; }
+.plan-row.highlight { font-size: 16px; font-weight: 700; border-top: 1px dashed #6ee7b7; padding-top: 8px; margin-top: 8px; margin-bottom: 0; }
+
+.api-status {
+  font-size: 10px; padding: 3px 8px; border-radius: 4px; background: #e0f2fe; color: #0369a1;
+  margin-left: auto; font-weight: 600;
+}
+
 @media(max-width:768px){
   .app{grid-template-columns:1fr;}
-  .big{font-size:26px;}
-  .logo{width:46px;}
-  .header img{max-height:140px;}
+  .header-wrapper h1{ font-size: 26px; }
+  .big-value { font-size: 32px; }
+  .card { padding: 25px; }
 }
+.fade-in { animation: fadeIn 0.5s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <img src="banner.png" alt="HONORER DIGITAL">
-  <img src="logo.png" class="logo" alt="HONORER DIGITAL">
+<!-- HEADER -->
+<div class="header-wrapper">
+  <h1>HONORER <span>DIGITAL</span></h1>
 </div>
 
 <div class="app">
 
+<!-- LEFT CARD: INPUT -->
 <div class="card">
-<h2>Kalkulator Keamanan</h2>
+<h2>Rencana Keuangan <span class="api-status" id="apiStatus">Checking...</span></h2>
 
-<label>Status hidup</label>
+<label>Status saat ini</label>
 <select id="status">
   <option value="nikah">Akan Menikah</option>
-  <option value="hamil">Hamil</option>
+  <option value="hamil">Hamil / Persalinan</option>
   <option value="anak">Sudah Punya Anak</option>
 </select>
 
-<label>Penghasilan per bulan</label>
-<input id="income" type="text" placeholder="contoh: 3.000.000">
-<button onclick="hitung()">Hitung Keamanan</button>
+<label>Penghasilan bulanan</label>
+<div class="input-group">
+  <!-- Input kosong saat awal buka -->
+  <input id="income" type="text" placeholder="Contoh: 3.000.000" autocomplete="off">
 </div>
 
-<div class="card">
-<div class="big" id="emas">–</div>
-<canvas id="chart"></canvas>
-<div id="detail" style="margin-top:18px"></div>
+<label>Target Tercapai Tanggal (Opsional)</label>
+<div class="input-group">
+  <!-- Input kosong saat awal buka -->
+  <input id="targetDate" type="date">
+  <div style="font-size:12px; color:#94a3b8; margin-top:5px;">Contoh: Tanggal rencana nikah / HPL</div>
+</div>
 
-<button class="cta" id="waBtn" style="display:none">Kunci Dana Saya di Emas</button>
-<button class="cta" id="shareBtn" style="background:#2563eb;display:none;margin-top:10px">
-Simpan / Kirim ke WA Saya
+<button id="btn-calc" onclick="hitung()">
+  <span class="spinner" id="btn-spinner"></span>
+  <span id="btn-text">Hitung Keamanan</span>
 </button>
+</div>
 
-<div class="small">Harga emas diambil dari sumber resmi dan diupdate realtime</div>
-<div class="note">
-Ini bukan dana darurat. Ini dana tujuan (nikah, lahiran, anak). Dana darurat tetap harus kamu punya terpisah.
+<!-- RIGHT CARD: RESULT -->
+<div class="card">
+<h2>Hasil Analisis</h2>
+
+<div class="result-header">
+  <div class="big-label">Total Aset Aman Tercatat</div>
+  <div class="big-value" id="emas">0 gram</div>
+  <div class="sub-value">Dana yang bisa dikunci ke emas</div>
+</div>
+
+<div id="chart-container">
+  <canvas id="chart"></canvas>
+</div>
+
+<!-- Tombol WA muncul setelah dihitung, tapi di sini saya buat kodenya ada -->
+<div id="detail"></div>
+
+<div style="text-align: center; margin-top: 20px; display:none;" id="btn-container">
+  <button class="cta" id="waBtn">Kunci Dana di Emas</button>
+  <button class="cta" id="shareBtn" style="background:#2563eb">Simpan Analisa</button>
+</div>
+
+<div style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 20px;">
+  Harga emas diupdate secara realtime (Logam Mulia)
+</div>
+<div style="font-size: 12px; color: #92400e; background: #fffbeb; padding: 12px; border-radius: 8px; margin-top: 15px; line-height: 1.4;">
+  <strong>Catatan:</strong> Kalkulator ini menghitung Dana Tujuan (nikah/kelahiran/anak), bukan dana darurat.
 </div>
 </div>
 
@@ -150,15 +270,30 @@ Ini bukan dana darurat. Ini dana tujuan (nikah, lahiran, anak). Dana darurat tet
 
 <script>
 let chart;
+let animationFrameId; 
 
-/* ===== INPUT FORMAT ===== */
-document.getElementById("income").addEventListener("input",e=>{
-  let v=e.target.value.replace(/\D/g,"");
-  e.target.value=v?parseInt(v).toLocaleString("id-ID"):"";
-});
 function formatIDR(x){return x.toLocaleString("id-ID");}
 
-/* ===== HARGA EMAS CACHE ===== */
+document.getElementById("income").addEventListener("input",e=>{
+  let v=e.target.value.replace(/[^0-9]/g,"");
+  e.target.value=v?parseInt(v).toLocaleString("id-ID"):"";
+});
+
+function animateValue(obj, start, end, duration) {
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    obj.innerHTML = (progress * (end - start) + start).toFixed(2) + " gram";
+    if (progress < 1) {
+      animationFrameId = window.requestAnimationFrame(step);
+    }
+  };
+  animationFrameId = window.requestAnimationFrame(step);
+}
+
+/* ===== LOGIC ===== */
 function getCachedHarga(){
   const c=localStorage.getItem("harga_emas_cache");
   if(!c) return null;
@@ -171,83 +306,178 @@ function setCachedHarga(p){
 }
 async function getHargaEmas(){
   const cached=getCachedHarga();
-  if(cached) return cached;
+  if(cached) {
+    document.getElementById("apiStatus").innerText = "Cache Harga";
+    return cached;
+  }
+  document.getElementById("apiStatus").innerText = "Updating...";
   try{
     const r=await fetch("https://logam-mulia-api.vercel.app/api/antam");
     const d=await r.json();
     setCachedHarga(d.buy);
+    document.getElementById("apiStatus").innerText = "Live Price";
     return d.buy;
-  }catch{
-    return getCachedHarga()||2652000;
+  }catch(err){
+    console.log("API Error:", err);
+    document.getElementById("apiStatus").innerText = "Offline Mode";
+    return getCachedHarga()||2652000; 
   }
 }
 
-/* ===== AUTO LOAD ===== */
-window.onload=()=>{
-  const saved=localStorage.getItem("honorer_kalkulasi");
-  if(!saved) return;
-  const d=JSON.parse(saved);
-  document.getElementById("status").value=d.status;
-  document.getElementById("income").value=d.income.toLocaleString("id-ID");
-  setTimeout(()=>hitung(),300);
+window.onload=async ()=>{
+  await getHargaEmas();
+  // TIDAK ada auto-load lagi, biar input bersih
 };
 
-/* ===== HITUNG ===== */
 async function hitung(){
-  const income=Number(document.getElementById("income").value.replace(/\./g,""));
+  const incomeStr = document.getElementById("income").value;
+  const income=Number(incomeStr.replace(/[^0-9]/g,""));
   const status=document.getElementById("status").value;
-  if(!income) return;
+  const targetDateInput = document.getElementById("targetDate").value;
+  
+  if(!income || income === 0) {
+    alert("Mohon isi penghasilan dengan benar.");
+    document.getElementById("income").focus();
+    return;
+  }
+
+  // Loading State
+  const btn = document.getElementById("btn-calc");
+  const btnText = document.getElementById("btn-text");
+  const btnSpinner = document.getElementById("btn-spinner");
+  btn.disabled = true;
+  btnText.innerText = "Menganalisis...";
+  btnSpinner.style.display = "inline-block";
 
   const mult={nikah:6,hamil:4,anak:3};
-
   const reason={
-    nikah:["akad & resepsi sederhana","mahar","pindahan & tempat tinggal awal","perlengkapan rumah tangga","biaya hidup bulan pertama","administrasi & dokumen","dana adaptasi pasangan"],
-    hamil:["kontrol & pemeriksaan rutin","vitamin & nutrisi ibu","persiapan persalinan","biaya melahirkan","perlengkapan bayi","cadangan komplikasi","pemulihan ibu"],
-    anak:["susu & makanan","kesehatan & imunisasi","perlengkapan anak","pendidikan awal","transport & aktivitas","biaya hidup tambahan","cadangan sakit"]
+    nikah:["Biaya KUA & Legalitas Dokumen","Mahar/Seserahan","Biaya Akad & Pesta Sederhana","Pindahan & Uang Muka Tempat Tinggal","Perlengkapan Rumah Tangga","Biaya Hidup Bulan Pertama","Dana Cadangan Tak Terduga"],
+    hamil:["Biaya Kontrol Rutin & USG","Suplemen & Nutrisi Ibu","Biaya Persalinan & RS","Biaya Dokter Spesialis","Perlengkapan Bayi Baru","Biaya Perawatan Pasca Melahirkan","Dana Darurat Komplikasi"],
+    anak:["Biaya Rutin Susu & Makanan","Imunisasi & Kesehatan","Perlengkapan Anak","Biaya Pendidikan Awal","Transportasi & Aktivitas","Biaya Hidup Tambahan","Dana Sakit Anak"]
   };
 
-  const target=income*mult[status];
-  const buffer=income*0.7*3;
-  const aman=Math.max(0,target-buffer);
+  const target=income*mult[status]; // Total Kebutuhan Sekali Bayar
+  const buffer=income*0.7*3; // Dana Penyangga (Cash)
+  const aman=Math.max(0,target-buffer); // Dana Aman (Invest/Emas)
 
   const harga=await getHargaEmas();
   const gram=aman/harga;
-  const cicil6=aman/6;
-  const cicil12=aman/12;
 
-  document.getElementById("emas").innerText=gram.toFixed(2)+" gram emas";
+  animateValue(document.getElementById("emas"), 0, gram, 1000);
 
-  const list=reason[status].map(x=>"– "+x).join("<br>");
+  const list=reason[status].map(x=>"<li>"+x+"</li>").join("");
 
+  // LOGIC TANGGAL
+  let targetPlanHTML = "";
+  if (targetDateInput) {
+    const targetDate = new Date(targetDateInput);
+    const now = new Date();
+    const diffTime = targetDate - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+    const diffMonths = Math.ceil(diffDays / 30);
+
+    if (diffMonths <= 0) {
+       targetPlanHTML = `<div class="plan-box" style="background:#fee2e2; border-color:#fca5a5;">
+         <div style="color:#b91c1c; font-weight:bold;">Waktu Terlampaui</div>
+         <div style="font-size:12px; color:#991b1b;">Tanggal target sudah lewat. Anda harus menabung lebih banyak sekarang.</div>
+       </div>`;
+    } else {
+       // Hanya menghitung tabungan untuk bagian EMAS (Aman)
+       // Penjelasan: Bagian Buffer (Cash) dianggap cicilan dari penghasilan sehari-hari
+       const tabunganPerBulan = Math.ceil(aman / diffMonths);
+       const tabunganPerMinggu = Math.ceil(tabunganPerBulan / 4);
+       
+       targetPlanHTML = `
+       <div class="plan-box">
+         <div class="plan-row"><span>Target Tanggal:</span> <strong>${targetDate.toLocaleDateString('id-ID')}</strong></div>
+         <div class="plan-row"><span>Sisa Waktu:</span> <strong>${diffMonths} Bulan</strong></div>
+         <div class="plan-row highlight">
+           <span>Tabungan Emas:</span> <span>Rp ${formatIDR(tabunganPerBulan)} / bln</span>
+         </div>
+         <div style="font-size:11px; color:#064e3b; margin-top:6px; line-height:1.3;">
+           *Angka ini hanya untuk penguncian emas (Dana Aman). Sisanya (${formatIDR(buffer)}) adalah dana tunai yang dianggap tercicil dari gaji bulanan.
+         </div>
+       </div>`;
+    }
+  } else {
+    const cicil6=aman/6;
+    const cicil12=aman/12;
+    targetPlanHTML = `
+    <div class="plan-box" style="background:#f8fafc; border-color:#e2e8f0;">
+      <div style="font-size:12px; color:#64748b; margin-bottom:5px;">Simulasi Tabungan Emas (Tanpa Target Tanggal)</div>
+      <div class="plan-row"><span>6 Bulan:</span> <strong>Rp ${formatIDR(Math.ceil(cicil6))} / bln</strong></div>
+      <div class="plan-row"><span>12 Bulan:</span> <strong>Rp ${formatIDR(Math.ceil(cicil12))} / bln</strong></div>
+    </div>`;
+  }
+
+  document.getElementById("detail").style.display = "block";
+  document.getElementById("detail").className = "fade-in";
+  
+  // HTML Baru: Lebih jelas, tanpa ikon
   document.getElementById("detail").innerHTML=`
-<b>Dana besar yang kamu butuhkan</b><br>
-Rp ${formatIDR(target)}<br>
-<i>estimasi realistis karena mencakup:</i><br>${list}<br><br>
+<div class="section-box">
+  <div class="section-title">Kebutuhan Dana Besar <span style="font-weight:400; font-size:12px; color:var(--text-muted)">Sekali Bayar</span></div>
+  <div class="section-price">Rp ${formatIDR(target)}</div>
+  <div class="section-desc">
+    Total biaya yang dibutuhkan saat kejadian tersebut terjadi. 
+    Rincian kebutuhan meliputi:
+    <ul class="list-simple">${list}</ul>
+  </div>
+</div>
 
-<b>Dana penyangga hidup (3 bulan)</b><br>
-Rp ${formatIDR(buffer)}<br>
-<i>sabuk pengaman hidup jika penghasilan terganggu.</i><br><br>
+<div class="section-box">
+  <div class="section-title">Dana Penyangga Hidup <span style="font-weight:400; font-size:12px; color:var(--text-muted)">Wajib Tunai</span></div>
+  <div class="section-price" style="color:#d97706;">Rp ${formatIDR(buffer)}</div>
+  <div class="section-desc">
+    Ini adalah uang tunai yang wajib ada di rekening. Gunanya sebagai sabuk pengaman jika penghasilan berhenti (misal sakit atau cuti), agar kebutuhan makan dan sewa tetap aman. Uang ini tidak boleh dikunci.
+  </div>
+</div>
 
-<b>Dana yang sudah aman dikunci</b><br>
-Rp ${formatIDR(aman)}<br>
-<i>uang tujuan yang boleh dikunci ke emas.</i><br><br>
-
-<b>Setara emas:</b> ${gram.toFixed(2)} gram<br>
-<b>Harga emas:</b> Rp ${formatIDR(harga)} / gram<br><br>
-
-<b>Jika dikumpulkan bertahap:</b><br>
-6 bulan → Rp ${formatIDR(cicil6)} / bulan<br>
-12 bulan → Rp ${formatIDR(cicil12)} / bulan
+<div class="section-box">
+  <div class="section-title">Dana Siap Dikunci <span style="font-weight:400; font-size:12px; color:var(--text-muted)">Bisa di Emas</span></div>
+  <div class="section-price" style="color:#047857;">Rp ${formatIDR(aman)}</div>
+  <div class="section-desc">
+    Ini adalah sisa dana dari total kebutuhan yang aman untuk dikunci (diinvestasikan) dalam bentuk emas.
+    <br><br>
+    <strong>Setara emas:</strong> ${gram.toFixed(2)} gram <br>
+    <strong>Harga emas:</strong> Rp ${formatIDR(harga)} / gram
+  </div>
+  ${targetPlanHTML}
+</div>
 `;
 
-  const data=[aman,target-aman];
+  // Chart Labels Update: Jelas
+  const data=[aman,buffer];
   if(chart) chart.destroy();
-  chart=new Chart(document.getElementById("chart"),{
+  
+  const ctx = document.getElementById('chart').getContext('2d');
+  chart=new Chart(ctx,{
     type:"doughnut",
-    data:{labels:["Aman","Berisiko"],datasets:[{data}]}
+    data:{
+      labels:["Dana Aman (Emas)","Dana Penyangga (Tunai)"], // LABEL JELAS
+      datasets:[{
+        data:data,
+        backgroundColor: ["#047857", "#f59e0b"], // Hijau & Kuning/Oranye
+        borderWidth:0,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      cutout: '75%',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { 
+        legend: { position: 'bottom', labels: { boxWidth: 12, font: {family:'Outfit'} } } 
+      }
+    }
   });
 
-  localStorage.setItem("honorer_kalkulasi",JSON.stringify({status,income,target,buffer,aman,gram,harga}));
+  localStorage.setItem("honorer_kalkulasi",JSON.stringify({status,income,targetDate:targetDateInput,target,buffer,aman,gram,harga}));
+
+  // Tampilkan Tombol
+  document.getElementById("btn-container").style.display = "block";
+  document.getElementById("waBtn").style.display = "inline-block";
+  document.getElementById("shareBtn").style.display = "inline-block";
 
   const wa=encodeURIComponent(
 `HONORER DIGITAL
@@ -259,11 +489,13 @@ Setara: ${gram.toFixed(2)} gram
 Mohon bantu penguncian.`
   );
 
-  document.getElementById("waBtn").style.display="block";
   document.getElementById("waBtn").onclick=()=>window.open("https://wa.me/6285123882845?text="+wa);
-
-  document.getElementById("shareBtn").style.display="block";
   document.getElementById("shareBtn").onclick=()=>window.open("https://wa.me/?text="+encodeURIComponent("HONORER DIGITAL – simpan perhitungan saya"));
+
+  // Reset Button
+  btn.disabled = false;
+  btnText.innerText = "Hitung Keamanan";
+  btnSpinner.style.display = "none";
 }
 </script>
 </body>
