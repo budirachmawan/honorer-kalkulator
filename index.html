@@ -34,8 +34,8 @@ button{background:#f5c400;border:none;font-weight:bold;cursor:pointer}
 <body>
 
 <div class="header">
-  <img src="banner.png">
-  <img src="logo.png" class="logo">
+  <img src="banner.png" alt="HONORER DIGITAL">
+  <img src="logo.png" class="logo" alt="HONORER DIGITAL">
 </div>
 
 <div class="app">
@@ -90,8 +90,8 @@ async function hitung(){
  const mult={nikah:6,hamil:4,anak:3};
  const reason={
   nikah:`akad & resepsi sederhana, mahar, pindahan & rumah tangga awal, perlengkapan dasar, biaya hidup bulan pertama, dokumen & administrasi, dana adaptasi pasangan`,
-  hamil:`kontrol kehamilan, vitamin & nutrisi ibu, persiapan persalinan, dana kelahiran, perlengkapan bayi, cadangan komplikasi, pemulihan ibu`,
-  anak:`susu & makanan, kesehatan & imunisasi, perlengkapan, pendidikan awal, transport, biaya hidup tambahan, cadangan sakit`
+  hamil:`kontrol kehamilan rutin, vitamin & nutrisi ibu, persiapan persalinan, biaya melahirkan, perlengkapan bayi awal, cadangan komplikasi, pemulihan ibu pasca lahir`,
+  anak:`susu & makanan, kesehatan & imunisasi, pakaian & perlengkapan, pendidikan awal, transportasi, biaya hidup tambahan, dana sakit`
  };
 
  const target=income*mult[status];
@@ -108,27 +108,27 @@ async function hitung(){
  document.getElementById("detail").innerHTML=`
 <b>Dana besar yang kamu butuhkan</b><br>
 Rp ${formatIDR(target)}<br>
-<i>estimasi realistis karena mencakup: ${reason[status]}</i><br><br>
+<i>Estimasi realistis karena mencakup: ${reason[status]}.</i><br><br>
 
 <b>Dana penyangga hidup (3 bulan)</b><br>
 Rp ${formatIDR(buffer)}<br>
-<i>ini adalah sabuk pengaman hidup: biaya makan, kontrakan, listrik, dan kebutuhan dasar jika penghasilan terganggu. 3 bulan dipakai karena itu waktu minimum memulihkan arus kas tanpa hutang atau jual aset.</i><br><br>
+<i>Ini adalah sabuk pengaman hidup: biaya makan, kontrakan, listrik, dan kebutuhan dasar jika penghasilan terganggu. Tiga bulan adalah waktu minimum agar kamu bisa menyesuaikan arus kas tanpa hutang atau menjual aset.</i><br><br>
 
 <b>Dana yang sudah aman dikunci</b><br>
 Rp ${formatIDR(aman)}<br>
-<i>ini adalah sisa dana tujuan setelah hidup kamu aman. Uang ini tidak dipakai untuk hidup, sehingga boleh dikunci ke emas tanpa risiko.</i><br><br>
+<i>Ini adalah dana tujuan setelah hidup kamu aman. Karena tidak dipakai untuk kebutuhan harian, uang ini boleh dikonversi ke emas agar nilainya tidak tergerus.</i><br><br>
 
 <div style="background:#eef6ff;padding:12px;border-radius:10px">
 <b>Urutan yang benar:</b><br>
-1) Amankan dulu dana penyangga hidup 3 bulan<br>
-2) Setelah itu baru kunci dana aman ke emas
+1) Amankan dulu dana penyangga hidup 3 bulan.<br>
+2) Setelah itu baru kunci dana aman ke emas.
 </div><br>
 
 <b>Setara emas:</b> ${gram.toFixed(2)} gram<br>
 <b>Harga emas:</b> Rp ${formatIDR(harga)} / gram<br><br>
 
 <b>Jika dikumpulkan bertahap (bukan hutang):</b><br>
-<i>ini adalah menabung emas, bukan cicilan beban. Kamu hanya menyisihkan sebagian penghasilan sampai dana aman ini terkumpul.</i><br>
+<i>Ini bukan cicilan hutang. Ini adalah rencana menabung sampai dana aman ini terkumpul.</i><br>
 6 bulan → Rp ${formatIDR(cicil6)} / bulan<br>
 12 bulan → Rp ${formatIDR(cicil12)} / bulan
 `;
@@ -154,7 +154,7 @@ Mohon bantu saya skema pengunciannya.`
  );
 
  document.getElementById("waBtn").style.display="block";
- document.getElementById("waBtn").onclick=()=>window.open("https://wa.me/6285123882845?text="+wa);
+ document.getElementById("waBtn").onclick=()=>window.open("https://wa.me/6285123882845?text="+wa,"_blank");
 }
 </script>
 </body>
