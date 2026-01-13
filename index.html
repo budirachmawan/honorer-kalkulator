@@ -2,21 +2,21 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Kalkulator Keamanan Nikah & Lahiran</title>
+<title>Kalkulator Keamanan Nikah & Kelahiran</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body {font-family:Arial;background:#f3f4f6;margin:0;padding:20px;}
-.app {max-width:960px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.card {background:#fff;padding:24px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.06);}
-h2 {margin-top:0;}
-label {font-weight:bold;display:block;margin-top:15px;}
-input,select,button {width:100%;padding:14px;margin-top:8px;font-size:16px;border-radius:10px;border:1px solid #ddd;}
-button {background:#f5c400;border:none;font-weight:bold;cursor:pointer;}
-.big {font-size:32px;font-weight:bold;margin:10px 0;}
-.note {font-size:13px;background:#fff3cd;padding:12px;border-radius:10px;margin-top:12px;}
-.cta {background:#0f9d58;color:white;font-size:18px;margin-top:15px;}
+body{font-family:Arial;background:#f3f4f6;margin:0;padding:20px}
+.app{max-width:960px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:#fff;padding:24px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+h2{margin-top:0}
+label{font-weight:bold;display:block;margin-top:15px}
+input,select,button{width:100%;padding:14px;margin-top:8px;font-size:16px;border-radius:10px;border:1px solid #ddd}
+button{background:#f5c400;border:none;font-weight:bold;cursor:pointer}
+.big{font-size:34px;font-weight:bold;margin:10px 0}
+.note{font-size:13px;background:#fff3cd;padding:12px;border-radius:10px;margin-top:12px}
+.cta{background:#0f9d58;color:#fff;font-size:18px;margin-top:15px}
 </style>
 </head>
 
@@ -28,13 +28,13 @@ button {background:#f5c400;border:none;font-weight:bold;cursor:pointer;}
 
 <label>Status hidup</label>
 <select id="status">
-  <option value="nikah">Akan Menikah</option>
-  <option value="hamil">Hamil</option>
-  <option value="anak">Punya Anak</option>
+<option value="nikah">Akan Menikah</option>
+<option value="hamil">Hamil</option>
+<option value="anak">Sudah Punya Anak</option>
 </select>
 
 <label>Penghasilan / bulan</label>
-<input id="income" type="number" placeholder="contoh: 4000000">
+<input id="income" type="text" inputmode="numeric" placeholder="contoh: 3.000.000">
 
 <button onclick="hitung()">Hitung Keamanan</button>
 </div>
@@ -43,13 +43,8 @@ button {background:#f5c400;border:none;font-weight:bold;cursor:pointer;}
 <div class="big" id="emas">–</div>
 <canvas id="chart"></canvas>
 <div id="detail"></div>
-
 <button class="cta" id="waBtn" style="display:none;">Amankan Dana Ini Sekarang</button>
-
-<div class="note">
-Ini bukan dana darurat. Ini dana tujuan (nikah, lahiran, anak).  
-Dana darurat tetap harus kamu punya terpisah.
-</div>
+<div class="note">Ini bukan dana darurat. Ini dana tujuan (nikah, lahiran, anak).</div>
 </div>
 
 </div>
@@ -57,60 +52,73 @@ Dana darurat tetap harus kamu punya terpisah.
 <script>
 let chart;
 
+/* ===== format rupiah ===== */
 function formatIDR(x){
   return x.toLocaleString("id-ID");
 }
 
+/* ===== input ribuan ===== */
+const incomeInput = document.getElementById("income");
+incomeInput.addEventListener("input",function(){
+  let val = this.value.replace(/\D/g,"");
+  this.value = val.replace(/\B(?=(\d{3})+(?!\d))/g,".");
+});
+
+/* ===== animasi angka ===== */
+function animateNumber(el,start,end,duration=800){
+  const startTime = performance.now();
+  function tick(now){
+    const p = Math.min((now-startTime)/duration,1);
+    const val = Math.floor(start+(end-start)*p);
+    el.innerText = val.toLocaleString("id-ID");
+    if(p<1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ===== harga emas Indonesia ===== */
 async function getHargaEmas(){
-  try {
-    const res = await fetch("https://api.exchangerate.host/convert?from=XAU&to=IDR");
+  try{
+    const res = await fetch("https://logammulia.com/api/price");
     const data = await res.json();
-    if(!data || !data.result || isNaN(data.result)) throw "error";
-    return Math.round(data.result / 31.1035);
-  } catch {
-    return 1050000; // fallback harga emas
+    return data.data.buy;
+  }catch{
+    return 1250000; // fallback harga emas Indonesia
   }
 }
 
+/* ===== hitung ===== */
 async function hitung(){
-  const income = Number(document.getElementById("income").value);
+  const income = Number(document.getElementById("income").value.replace(/\./g,""));
   const status = document.getElementById("status").value;
-  if(!income || income <= 0) return;
+  if(!income || income<=0) return;
 
-  const mult = {nikah:6, hamil:4, anak:3};
-  const statusText = {nikah:"Akan Menikah", hamil:"Hamil", anak:"Punya Anak"};
+  const mult = {nikah:6,hamil:4,anak:3};
+  const statusText = {nikah:"Akan Menikah",hamil:"Hamil",anak:"Punya Anak"};
 
   const risiko = income * mult[status];
-  const hidup = income * 0.7;
-  const buffer = hidup * 3;
+  const buffer = income * 0.7 * 3;
   let aman = risiko - buffer;
-  if(aman < 0) aman = 0;
+  if(aman<0) aman = 0;
 
   const harga = await getHargaEmas();
   const gram = Math.floor(aman / harga);
 
-  const cicil6 = Math.ceil(aman / 6);
-  const cicil12 = Math.ceil(aman / 12);
+  animateNumber(document.getElementById("emas"),0,gram);
+  document.getElementById("emas").innerHTML += " gram emas";
 
-  document.getElementById("emas").innerText = gram + " gram emas";
+  const cicil6 = Math.ceil(aman/6);
+  const cicil12 = Math.ceil(aman/12);
 
   document.getElementById("detail").innerHTML = `
-    <b>Status:</b> ${statusText[status]}<br>
-    <b>Risiko biaya:</b> Rp ${formatIDR(risiko)}<br>
-    <b>Dana penyangga (90 hari):</b> Rp ${formatIDR(buffer)}<br><br>
-    <b>Uang yang boleh dikunci:</b> Rp ${formatIDR(aman)}<br>
-    <b>Setara emas:</b> ${gram} gram<br>
-    <b>Harga emas:</b> Rp ${formatIDR(harga)} / gram<br><br>
-    • 6 bulan: Rp ${formatIDR(cicil6)} / bulan<br>
-    • 12 bulan: Rp ${formatIDR(cicil12)} / bulan
-  `;
-
-  const data = [aman, risiko-aman];
-  if(chart) chart.destroy();
-  chart = new Chart(document.getElementById("chart"),{
-    type:"doughnut",
-    data:{labels:["Aman","Berisiko"],datasets:[{data}]}
-  });
+<b>Status:</b> ${statusText[status]}<br>
+<b>Risiko biaya:</b> Rp ${formatIDR(risiko)}<br>
+<b>Dana penyangga (90 hari):</b> Rp ${formatIDR(buffer)}<br><br>
+<b>Uang aman dikunci:</b> Rp ${formatIDR(aman)}<br>
+<b>Harga emas Antam:</b> Rp ${formatIDR(harga)} / gram<br><br>
+• 6 bulan: Rp ${formatIDR(cicil6)} / bulan<br>
+• 12 bulan: Rp ${formatIDR(cicil12)} / bulan
+`;
 
   const waText = encodeURIComponent(
 `Saya mau amankan dana ${statusText[status]} saya.
@@ -118,15 +126,20 @@ Dana aman: Rp ${formatIDR(aman)}
 Setara: ${gram} gram emas`
   );
 
-  document.getElementById("waBtn").style.display = "block";
-  document.getElementById("waBtn").onclick = function(){
-    window.open("https://wa.me/6285123882845?text="+waText,"_blank");
-  };
+  const wa = document.getElementById("waBtn");
+  wa.style.display="block";
+  wa.onclick=()=>window.open("https://wa.me/6285123882845?text="+waText,"_blank");
+
+  if(chart) chart.destroy();
+  chart=new Chart(document.getElementById("chart"),{
+    type:"doughnut",
+    data:{labels:["Aman","Berisiko"],datasets:[{data:[aman,risiko-aman]}]}
+  });
 }
 
-document.getElementById("income").addEventListener("input", hitung);
-document.getElementById("status").addEventListener("change", hitung);
+/* realtime */
+incomeInput.addEventListener("input",hitung);
+document.getElementById("status").addEventListener("change",hitung);
 </script>
-
 </body>
 </html>
