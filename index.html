@@ -2,108 +2,32 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Kalkulator Keamanan Nikah</title>
+<title>Kalkulator Keamanan Nikah & Kelahiran</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body{
-  font-family:Arial;
-  background:#f3f4f6;
-  margin:0;
-  padding:12px;
-}
-
-/* ===== BRAND HEADER ===== */
-.header{
-  position:relative;
-  margin-bottom:16px;
-}
-.banner{
-  width:100%;
-  border-radius:14px;
-}
-.logo{
-  position:absolute;
-  top:10px;
-  left:10px;
-  width:64px;
-  background:#fff;
-  padding:6px;
-  border-radius:10px;
-  box-shadow:0 4px 10px rgba(0,0,0,.15);
-}
-
-/* ===== LAYOUT ===== */
-.app{
-  max-width:980px;
-  margin:auto;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px;
-}
-.card{
-  background:#fff;
-  padding:22px;
-  border-radius:16px;
-  box-shadow:0 6px 20px rgba(0,0,0,.06);
-}
+body{font-family:Arial;background:#f3f4f6;margin:0;padding:12px;}
+.app{max-width:980px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.card{background:#fff;padding:22px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.06);}
 h2{margin-top:0;}
 label{font-weight:bold;display:block;margin-top:14px;}
-input,select,button{
-  width:100%;
-  padding:14px;
-  margin-top:8px;
-  font-size:16px;
-  border-radius:10px;
-  border:1px solid #ddd;
-}
-button{
-  background:#f5c400;
-  border:none;
-  font-weight:bold;
-  cursor:pointer;
-}
-.big{
-  font-size:32px;
-  font-weight:bold;
-  margin:10px 0;
-  text-align:center;
-}
-.cta{
-  background:#0f9d58;
-  color:white;
-  font-size:18px;
-  margin-top:18px;
-  padding:14px;
-}
-.note{
-  font-size:13px;
-  background:#fff3cd;
-  padding:12px;
-  border-radius:10px;
-  margin-top:14px;
-}
+input,select,button{width:100%;padding:14px;margin-top:8px;font-size:16px;border-radius:10px;border:1px solid #ddd;}
+button{background:#f5c400;border:none;font-weight:bold;cursor:pointer;}
+.big{font-size:32px;font-weight:bold;margin:10px 0;text-align:center;}
+.cta{background:#0f9d58;color:white;font-size:18px;margin-top:18px;padding:14px;}
+.note{font-size:13px;background:#fff3cd;padding:12px;border-radius:10px;margin-top:14px;}
 .loading{display:none;margin-top:10px;font-size:14px;color:#555;}
 .small{font-size:12px;color:#777;margin-top:10px;text-align:center;}
 
-/* ===== MOBILE ===== */
 @media(max-width:768px){
   .app{grid-template-columns:1fr;}
   .big{font-size:26px;}
-  .logo{width:48px;}
 }
 </style>
 </head>
 
 <body>
-
-<!-- ===== BRANDING ===== -->
-<div class="header">
-  <img src="banner.png" class="banner">
-  <img src="logo.png" class="logo">
-</div>
-
 <div class="app">
 
 <div class="card">
@@ -128,7 +52,7 @@ button{
 <canvas id="chart"></canvas>
 <div id="detail" style="margin-top:18px"></div>
 
-<button class="cta" id="waBtn" style="display:none;">Kunci Dana Nikah Saya di Emas</button>
+<button class="cta" id="waBtn" style="display:none;">Kunci Dana Saya di Emas</button>
 
 <div class="small">
 Harga emas diambil dari sumber resmi dan diupdate realtime
@@ -151,7 +75,7 @@ document.getElementById("income").addEventListener("input",e=>{
 });
 function formatIDR(x){return x.toLocaleString("id-ID");}
 
-/* ===== CACHE HARGA ===== */
+/* ===== CACHE HARGA EMAS ===== */
 function getCachedHarga(){
   const c=localStorage.getItem("harga_emas_cache");
   if(!c) return null;
@@ -163,7 +87,7 @@ function setCachedHarga(p){
   localStorage.setItem("harga_emas_cache",JSON.stringify({time:Date.now(),price:p}));
 }
 
-/* ===== API ===== */
+/* ===== API EMAS ===== */
 async function getHargaEmas(){
   const cached=getCachedHarga();
   if(cached) return cached;
@@ -177,6 +101,34 @@ async function getHargaEmas(){
   }
 }
 
+/* ===== FASE COPY ===== */
+function faseText(status){
+  if(status==="nikah") return "estimasi realistis untuk menikah & memulai hidup bersama";
+  if(status==="hamil") return "estimasi realistis untuk kehamilan, persalinan, dan kebutuhan awal bayi";
+  if(status==="anak") return "estimasi realistis untuk membesarkan anak dan stabilitas keluarga";
+}
+
+function faseDetail(status){
+  if(status==="nikah") return `
+– akad & resepsi sederhana<br>
+– mas kawin dan keluarga<br>
+– pindahan & rumah tangga awal<br>
+– biaya hidup pasangan di bulan awal
+`;
+  if(status==="hamil") return `
+– kontrol dokter & USG<br>
+– biaya persalinan / RS<br>
+– perlengkapan bayi<br>
+– biaya hidup saat pemasukan terganggu
+`;
+  if(status==="anak") return `
+– makan, susu & kebutuhan anak<br>
+– kesehatan & imunisasi<br>
+– perlengkapan harian<br>
+– biaya hidup keluarga yang meningkat
+`;
+}
+
 /* ===== HITUNG ===== */
 async function hitung(){
   const income=Number(document.getElementById("income").value.replace(/\./g,""));
@@ -185,8 +137,6 @@ async function hitung(){
 
   const status=document.getElementById("status").value;
   const mult={nikah:6,hamil:4,anak:3};
-  const text={nikah:"menikah",hamil:"kehamilan",anak:"anak"};
-
   const target=income*mult[status];
   const buffer=income*0.7*3;
   let aman=target-buffer;
@@ -194,27 +144,50 @@ async function hitung(){
 
   const harga=await getHargaEmas();
   const gram=aman/harga;
+  const cicil6=aman/6;
+  const cicil12=aman/12;
 
   document.getElementById("emas").innerText=gram.toFixed(2)+" gram emas";
 
   document.getElementById("detail").innerHTML=`
-<b>Dana besar yang kamu butuhkan</b><br>Rp ${formatIDR(target)}<br><br>
-<b>Dana penyangga 3 bulan</b><br>Rp ${formatIDR(buffer)}<br><br>
-<b>Dana aman dikunci</b><br>Rp ${formatIDR(aman)}<br><br>
+<b>Dana besar yang kamu butuhkan</b><br>
+Rp ${formatIDR(target)}<br>
+<i>${faseText(status)}</i><br><br>
+
+<b>Apa saja di dalamnya:</b><br>
+${faseDetail(status)}<br>
+
+<b>Dana penyangga 3 bulan</b><br>
+Rp ${formatIDR(buffer)}<br><br>
+
+<b>Dana yang aman dikunci</b><br>
+Rp ${formatIDR(aman)}<br><br>
+
+<div style="background:#eef6ff;padding:12px;border-radius:10px">
+<b>Urutan yang benar:</b><br>
+1) Amankan dulu dana penyangga<br>
+2) Baru kunci dana aman ke emas
+</div><br>
+
 <b>Setara emas:</b> ${gram.toFixed(2)} gram<br>
-<b>Harga emas:</b> Rp ${formatIDR(harga)} / gram
+<b>Harga emas:</b> Rp ${formatIDR(harga)} / gram<br><br>
+
+<b>Jika dikumpulkan bertahap (bukan hutang):</b><br>
+6 bulan → Rp ${formatIDR(cicil6)} / bulan<br>
+12 bulan → Rp ${formatIDR(cicil12)} / bulan
 `;
 
-  const data=[aman,target-aman];
   if(chart) chart.destroy();
   chart=new Chart(document.getElementById("chart"),{
     type:"doughnut",
-    data:{labels:["Aman","Berisiko"],datasets:[{data}]}
+    data:{labels:["Aman","Berisiko"],datasets:[{data:[aman,target-aman]}]}
   });
 
   const waText=encodeURIComponent(
-`Saya mau mengamankan dana ${text[status]} saya.
-Dana siap dikunci: Rp ${formatIDR(aman)}
+`Halo, saya mau mengamankan dana ${status}.
+Target: Rp ${formatIDR(target)}
+Dana penyangga: Rp ${formatIDR(buffer)}
+Dana dikunci: Rp ${formatIDR(aman)}
 Setara: ${gram.toFixed(2)} gram emas`
   );
 
