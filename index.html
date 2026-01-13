@@ -19,8 +19,41 @@ button{background:#f5c400;border:none;font-weight:bold;cursor:pointer;}
 .cta{background:#0f9d58;color:white;font-size:18px;margin-top:20px;}
 .loading{display:none;margin-top:10px;font-size:14px;color:#555;}
 .small{font-size:12px;color:#777;margin-top:8px;}
+
+/* ====== MOBILE LAYOUT FIX ====== */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .app {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .card {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .big {
+    font-size: 26px;
+    text-align: center;
+  }
+
+  canvas {
+    max-width: 100%;
+    height: auto !important;
+  }
+
+  .cta {
+    font-size: 16px;
+    padding: 14px;
+  }
+}
 </style>
 </head>
+
 
 <body>
 <div class="app">
@@ -63,7 +96,7 @@ Ini bukan dana darurat. Ini dana tujuan (nikah, lahiran, anak). Dana darurat tet
 <script>
 let chart;
 
-// ribuan otomatis di input
+/* ========= FORMAT INPUT ========= */
 document.getElementById("income").addEventListener("input",function(e){
   let v=e.target.value.replace(/\D/g,"");
   e.target.value=v?parseInt(v).toLocaleString("id-ID"):"";
@@ -71,17 +104,39 @@ document.getElementById("income").addEventListener("input",function(e){
 
 function formatIDR(x){return x.toLocaleString("id-ID");}
 
-// API harga emas Antam (proxy realtime)
+/* ========= CACHE HARGA EMAS ========= */
+function getCachedHarga() {
+  const c = localStorage.getItem("harga_emas_cache");
+  if(!c) return null;
+  const obj = JSON.parse(c);
+  if(Date.now() - obj.time > 15 * 60 * 1000) return null;
+  return obj.price;
+}
+
+function setCachedHarga(price){
+  localStorage.setItem("harga_emas_cache", JSON.stringify({
+    time: Date.now(),
+    price
+  }));
+}
+
+/* ========= API HARGA EMAS ========= */
 async function getHargaEmas(){
+  const cached = getCachedHarga();
+  if(cached) return cached;
+
   try{
-    const res=await fetch("https://logam-mulia-api.vercel.app/api/antam");
-    const data=await res.json();
-    return data.buy; // harga beli 1 gram
+    const res = await fetch("https://logam-mulia-api.vercel.app/api/antam");
+    const data = await res.json();
+    const price = data.buy;
+    setCachedHarga(price);
+    return price;
   }catch{
-    return 2652000; // fallback aman
+    return getCachedHarga() || 2652000;
   }
 }
 
+/* ========= KALKULATOR ========= */
 async function hitung(){
   const raw=document.getElementById("income").value.replace(/\./g,"");
   const income=Number(raw);
@@ -124,7 +179,6 @@ Rp ${formatIDR(aman)}<br>
 2) Setelah itu, barulah <b>dana yang sudah aman dikunci</b> ini boleh kamu ubah menjadi emas.
 </div>
 
-
 <b>Setara emas:</b> ${gram.toFixed(2)} gram<br>
 <b>Harga emas hari ini:</b> Rp ${formatIDR(harga)} / gram<br><br>
 
@@ -163,4 +217,3 @@ Mohon bantu saya skema pengunciannya.`
 </script>
 </body>
 </html>
-
