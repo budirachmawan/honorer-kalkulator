@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Kalkulator Keamanan Nikah & Lahiran</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background:#f7f7f7;
+  padding:20px;
+}
+.card {
+  background:#fff;
+  max-width:480px;
+  margin:auto;
+  padding:25px;
+  border-radius:14px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.05);
+}
+h2 {text-align:center;}
+label {font-weight:bold; display:block; margin-top:15px;}
+select,input,button {
+  width:100%;
+  padding:14px;
+  margin-top:8px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+button {
+  background:#f5c400;
+  border:none;
+  font-weight:bold;
+  cursor:pointer;
+}
+#hasil {
+  margin-top:20px;
+  background:#fafafa;
+  padding:15px;
+  border-radius:10px;
+  display:none;
+  line-height:1.6;
+}
+.note {
+  background:#fff3cd;
+  padding:10px;
+  border-radius:8px;
+  font-size:13px;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+<h2>Kalkulator Keamanan Nikah & Lahiran</h2>
+
+<label>Status hidup kamu</label>
+<select id="status">
+  <option value="nikah">Akan Menikah</option>
+  <option value="hamil">Hamil</option>
+  <option value="anak">Sudah Punya Anak</option>
+</select>
+
+<label>Penghasilan per bulan (Rp)</label>
+<input id="penghasilan" type="number" placeholder="contoh: 4000000">
+
+<button onclick="hitung()">Lihat Posisi Keamanan Saya</button>
+
+<div id="hasil"></div>
+</div>
+
+<script>
+const API_KEY = "goldapi-12qy19mkcon6hi-io";
+
+async function getHargaEmas() {
+  try {
+    const res = await fetch("https://www.goldapi.io/api/XAU/IDR", {
+      headers: { "x-access-token": API_KEY }
+    });
+    const data = await res.json();
+    return Math.round(data.price / 31.1035);
+  } catch (e) {
+    return 2480000;
+  }
+}
+
+async function hitung() {
+  const status = document.getElementById("status").value;
+  const income = Number(document.getElementById("penghasilan").value);
+
+  if (!income || income <= 0) {
+    alert("Masukkan penghasilan bulanan yang valid.");
+    return;
+  }
+
+  const mult = { nikah:6, hamil:4, anak:3 };
+  const statusText = { nikah:"Akan Menikah", hamil:"Hamil", anak:"Sudah Punya Anak" };
+
+  const kejutan = income * mult[status];
+  const biayaHidup = income * 0.7;
+  const danaPenyangga = biayaHidup * 3;
+  let danaAman = kejutan - danaPenyangga;
+  if (danaAman < 0) danaAman = 0;
+
+  const hargaEmas = await getHargaEmas();
+  const gram = Math.floor(danaAman / hargaEmas);
+
+  document.getElementById("hasil").style.display = "block";
+  document.getElementById("hasil").innerHTML = `
+    <strong>Status:</strong> ${statusText[status]}<br>
+    <strong>Penghasilan:</strong> Rp ${income.toLocaleString()}<br><br>
+
+    <strong>Risiko biaya besar:</strong> Rp ${kejutan.toLocaleString()}<br>
+    <strong>Kebutuhan hidup per bulan:</strong> Rp ${biayaHidup.toLocaleString()}<br>
+    <strong>Dana penyangga 90 hari:</strong> Rp ${danaPenyangga.toLocaleString()}<br><br>
+
+    <strong>Uang yang aman untuk dikunci:</strong> Rp ${danaAman.toLocaleString()}<br>
+    ≈ <strong>${gram} gram emas</strong><br>
+    <small>Harga emas saat ini: Rp ${hargaEmas.toLocaleString()} / gram</small>
+
+    <div class="note">
+      Harga emas ini adalah harga spot pasar global (perkiraan). Harga beli di toko atau lembaga bisa berbeda dan berubah sewaktu-waktu.
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
