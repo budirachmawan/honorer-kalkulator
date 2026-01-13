@@ -17,7 +17,7 @@ button {background:#f5c400; border:none; font-weight:bold; cursor:pointer;}
 .big {font-size:28px; font-weight:bold; margin:10px 0;}
 .note {font-size:13px; background:#fff3cd; padding:12px; border-radius:10px; margin-top:12px;}
 .cta {background:#0f9d58; color:white; font-size:18px; margin-top:15px;}
-.loading {display:none; margin-top:10px; font-size:14px;}
+.loading {display:none; margin-top:10px; font-size:14px; color:#555;}
 </style>
 </head>
 
@@ -30,9 +30,9 @@ button {background:#f5c400; border:none; font-weight:bold; cursor:pointer;}
 
 <label>Status hidup</label>
 <select id="status">
-<option value="nikah">Akan Menikah</option>
-<option value="hamil">Hamil</option>
-<option value="anak">Sudah Punya Anak</option>
+  <option value="nikah">Akan Menikah</option>
+  <option value="hamil">Hamil</option>
+  <option value="anak">Sudah Punya Anak</option>
 </select>
 
 <label>Penghasilan per bulan</label>
@@ -59,22 +59,27 @@ Ini bukan dana darurat. Ini dana tujuan (nikah, lahiran, anak). Dana darurat tet
 <script>
 let chart;
 
+// format rupiah
 function formatIDR(x){
   return x.toLocaleString("id-ID");
 }
 
-// Input with thousand separator
+// input titik ribuan
 document.getElementById("income").addEventListener("input", function(e){
   let val = e.target.value.replace(/\D/g,"");
   e.target.value = val ? parseInt(val).toLocaleString("id-ID") : "";
 });
 
+// harga emas realtime Antam
 async function getHargaEmas(){
-  const res = await fetch("https://logammulia.com/id/harga-emas-hari-ini");
-  const text = await res.text();
-  const match = text.match(/1 gr<\/td>\\s*<td>([0-9\\.]+)/);
-  if(!match) return 2652000; // fallback
-  return parseInt(match[1].replace(/\./g,""));
+  try{
+    const res = await fetch("https://logam-mulia-api.vercel.app/api/antam");
+    const data = await res.json();
+    return data.price;
+  }catch(e){
+    console.error("API emas gagal, pakai fallback", e);
+    return 2652000; // fallback aman
+  }
 }
 
 async function hitung(){
