@@ -3,35 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>HONORER DIGITAL - Financial Calculator</title>
+<title>HONORER DIGITAL V2.4 (FIXED)</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-/* ===== DESIGN SYSTEM & VARIABLES ===== */
+/* ===== DESIGN SYSTEM ===== */
 :root {
-  /* Palette Warna */
   --primary: #fbbf24;
   --primary-dark: #b45309;
   --primary-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
   --success: #10b981;
   --success-bg: #ecfdf5;
-  --success-dark: #064e3b;
   --danger: #ef4444;
   --danger-bg: #fef2f2;
   --info: #3b82f6;
   --info-bg: #eff6ff;
   --warning: #f59e0b;
-  
-  /* Backgrounds & Text */
   --bg-body: #f8fafc;
   --bg-card: #ffffff;
   --text-main: #0f172a;
   --text-muted: #64748b;
   --text-light: #94a3b8;
   --border: #e2e8f0;
-  
-  /* Shapes */
   --radius-xl: 24px;
   --radius-lg: 16px;
   --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
@@ -61,12 +55,11 @@ body {
   gap: 24px;
 }
 
-/* Desktop Grid */
 @media (min-width: 768px) {
   .app-container { grid-template-columns: 400px 1fr; align-items: start; }
 }
 
-/* ===== HEADER & NAV ===== */
+/* ===== HEADER ===== */
 header { text-align: center; margin-bottom: 20px; animation: fadeInDown 0.6s ease-out; }
 .brand-title { font-size: 28px; font-weight: 800; letter-spacing: -0.05em; color: var(--text-main); margin: 0; }
 .brand-gold { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -89,7 +82,13 @@ header { text-align: center; margin-bottom: 20px; animation: fadeInDown 0.6s eas
 
 /* ===== INPUTS ===== */
 .form-group { margin-bottom: 24px; position: relative; }
-.form-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px; display: block; }
+.form-label { 
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; 
+  color: var(--text-muted); margin-bottom: 8px; display: block; 
+}
+.required-mark { color: var(--danger); margin-left: 2px; }
+.optional-tag { font-size: 10px; font-weight: 400; color: var(--text-light); text-transform: none; margin-left: 6px; letter-spacing: 0; }
+
 .input-wrapper { position: relative; }
 input, select {
   width: 100%; padding: 12px 4px; font-size: 16px; font-family: inherit;
@@ -101,6 +100,15 @@ input:focus, select:focus { border-bottom-color: var(--primary); background: lin
 select { appearance: none; cursor: pointer; }
 .select-arrow { position: absolute; right: 0; top: 12px; pointer-events: none; color: var(--primary); font-size: 12px; }
 .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* Toggle Switch */
+.switch-container { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--primary); }
+input:checked + .slider:before { transform: translateX(20px); }
 
 /* DREAM CARD DARK THEME */
 .dream-card {
@@ -157,6 +165,12 @@ select { appearance: none; cursor: pointer; }
 .tag-success { background: var(--success-bg); color: var(--success); }
 .tag-info { background: var(--info-bg); color: var(--info); }
 
+/* Gamification Progress */
+.progress-container { margin-top: 10px; }
+.progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+.progress-track { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--primary-gradient); width: 0%; transition: width 1s ease; }
+
 /* List Styling */
 .budget-list { list-style: none; padding: 0; margin: 10px 0 0 0; }
 .budget-list li { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; padding-left: 12px; position: relative; }
@@ -164,11 +178,20 @@ select { appearance: none; cursor: pointer; }
 
 /* Advice Section */
 .advice-card {
-  background: #fff; border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-lg);
+  background: #fff; border:1px solid var(--border); padding: 16px; border-radius: var(--radius-lg);
   margin-bottom: 16px; box-shadow: var(--shadow-soft);
 }
-.advice-title { font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-size: 14px; }
-.advice-text { font-size: 13px; line-height: 1.6; color: var(--text-main); font-weight: 500; }
+.advice-title { font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.advice-list { font-size: 13px; line-height: 1.6; color: var(--text-main); font-weight: 500; }
+.advice-list li { margin-bottom: 8px; padding-left: 20px; position: relative; }
+.advice-list li::before { content: "✅"; position: absolute; left: 0; color: var(--success); font-weight: bold; }
+
+/* Hustle Tags */
+.hustle-container { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+.hustle-tag {
+  font-size: 10px; background: white; border: 1px solid var(--primary); color: var(--primary-dark);
+  padding: 4px 10px; border-radius: 20px; font-weight: 700;
+}
 
 /* Dream Result Specifics */
 .dream-result-card {
@@ -181,19 +204,30 @@ select { appearance: none; cursor: pointer; }
 .status-success { background: var(--success-bg); color: var(--success); }
 .status-fail { background: var(--danger-bg); color: var(--danger); }
 
-/* Locked Content */
+/* Executive Summary */
+.summary-list { font-size: 13px; line-height: 1.6; color: var(--text-main); padding-left: 20px; }
+.summary-list li { margin-bottom: 8px; font-weight: 500; }
+.summary-highlight { color: var(--primary-dark); font-weight: 800; }
+
+/* Locked / Donate Section */
 .locked-section {
   margin-top: 24px; padding: 24px; border: 2px dashed var(--border);
   background: #fff; border-radius: var(--radius-xl); text-align: center;
 }
-.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-.product-card {
+.action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+.action-card {
   background: white; border: 1px solid var(--border); padding: 16px;
   border-radius: var(--radius-lg); text-decoration: none; color: inherit;
   display: block; transition: 0.2s;
 }
-.product-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-soft); }
-.product-price { color: var(--primary-dark); font-weight: 800; font-size: 12px; margin-top: 4px; }
+.action-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-soft); }
+.action-title { font-weight: 700; margin-top: 4px; font-size: 13px; }
+.btn-donate {
+  display: inline-block; width: 100%; padding: 12px; margin-top: 12px; border: 1px solid var(--primary);
+  background: var(--primary-gradient); color: white; border-radius: 8px; font-weight: 700; font-size: 13px;
+  text-decoration: none; transition: 0.2s; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+}
+.btn-donate:hover { box-shadow: 0 6px 15px rgba(245, 158, 11, 0.5); transform: translateY(-2px); }
 
 .hidden { display: none !important; }
 
@@ -214,12 +248,12 @@ select { appearance: none; cursor: pointer; }
 
     <div class="input-row form-group">
       <div>
-        <label class="form-label">Gaji Pokok</label>
-        <input type="text" id="gajiPokok" placeholder="0" autocomplete="off">
+        <label class="form-label">Gaji Pokok <span class="required-mark">*</span></label>
+        <input type="text" id="gajiPokok" placeholder="Contoh: 5.000.000" autocomplete="off">
       </div>
       <div>
-        <label class="form-label">Side Hustle</label>
-        <input type="text" id="sideHustle" placeholder="0" autocomplete="off">
+        <label class="form-label">Side Hustle <span class="optional-tag">(Opsional)</span></label>
+        <input type="text" id="sideHustle" placeholder="Contoh: 1.000.000" autocomplete="off">
       </div>
     </div>
 
@@ -232,6 +266,21 @@ select { appearance: none; cursor: pointer; }
           <option value="anak">Sudah Punya Anak</option>
         </select>
         <span class="select-arrow">▼</span>
+      </div>
+    </div>
+
+    <!-- Target Tanggal -->
+    <div class="form-group">
+      <label class="form-label">Target Tanggal Pencapaian <span class="optional-tag">(Opsional)</span></label>
+      <input type="date" id="targetDate" style="color: var(--text-muted);">
+      <div style="font-size:11px; color:var(--text-light); margin-top:6px;">Contoh: Tanggal rencana nikah / target tabungan.</div>
+      
+      <div class="switch-container">
+        <span style="font-size:11px; font-weight:700; color:var(--text-muted);">Kalkulasi Inflasi (Est. 6% / thn)</span>
+        <label class="switch">
+          <input type="checkbox" id="inflationToggle">
+          <span class="slider"></span>
+        </label>
       </div>
     </div>
 
@@ -248,14 +297,22 @@ select { appearance: none; cursor: pointer; }
         </div>
       </div>
       <div>
-        <label class="form-label">Cicilan/Bln</label>
-        <input type="text" id="debt" placeholder="0" autocomplete="off">
+        <label class="form-label">Cicilan/Bln <span class="optional-tag">(Opsional)</span></label>
+        <input type="text" id="debt" placeholder="Contoh: 500.000" autocomplete="off">
       </div>
     </div>
 
+    <!-- Tabungan Saat Ini -->
+    <div class="form-group">
+      <label class="form-label">Tabungan Saat Ini <span class="optional-tag">(Opsional)</span></label>
+      <input type="text" id="currentSavings" placeholder="Contoh: 2.000.000" autocomplete="off" style="color:var(--primary);">
+      <div style="font-size:10px; color:var(--text-light); margin-top:4px;">Untuk melihat progres bar.</div>
+    </div>
+
+    <!-- DREAM CARD -->
     <div class="dream-card">
       <div class="dream-header">
-        <span class="dream-title">🎯 DREAM PLANNER</span>
+        <span class="dream-title">🎯 DREAM PLANNER (Opsional)</span>
       </div>
       <div class="input-row" style="margin-bottom:12px;">
         <div class="input-wrapper" style="flex:2;">
@@ -272,16 +329,18 @@ select { appearance: none; cursor: pointer; }
         <div class="input-wrapper" style="flex:1;">
           <select id="dreamMethod" style="color:var(--text-light);">
             <option value="tunai">Tunai</option>
-            <option value="kredit">Kredit</option>
+            <option value="kredit">Kredit (Cicilan)</option>
           </select>
         </div>
       </div>
-      <input type="text" id="dreamPrice" placeholder="Estimasi Harga (Rp)" style="margin-bottom: 0;">
-    </div>
+      
+      <div id="dpContainer" class="hidden" style="margin-bottom: 12px;">
+        <label class="form-label" style="color:#94a3b8;">Uang Muka (DP) %</label>
+        <input type="number" id="dpPercent" value="20" min="10" max="90" style="padding: 8px 0; font-size: 14px;">
+        <div style="font-size:10px; color:var(--text-light); margin-top:4px;">Tips: Minimal 20% agar cicilan ringan.</div>
+      </div>
 
-    <div class="form-group">
-      <label class="form-label">Target Tanggal (Opsional)</label>
-      <input type="date" id="targetDate" style="color: var(--text-muted);">
+      <input type="text" id="dreamPrice" placeholder="Estimasi Harga Cash (Rp)" style="margin-bottom: 0;">
     </div>
 
     <button class="btn-main" id="btn-calc" onclick="hitung()">
@@ -302,13 +361,25 @@ select { appearance: none; cursor: pointer; }
     <div class="chart-wrapper"><canvas id="chart"></canvas></div>
 
     <div id="detail-container" class="hidden">
-      <!-- 1. Advice -->
-      <div id="advice-wrapper"></div>
+      <!-- GAMIFICATION -->
+      <div id="gamification-wrapper" class="info-box" style="background:var(--info-bg); border-color:var(--info);">
+        <div class="info-header">
+          <div class="info-title" style="color:var(--info);">Progres Perjalanan Finansial</div>
+          <span class="info-tag" style="background:var(--info); color:white;">Level Up</span>
+        </div>
+        <div style="font-size:12px; margin-bottom:4px;">Target: <span id="prog-target">Rp 0</span> | Terkumpul: <span id="prog-current">Rp 0</span></div>
+        <div class="progress-container">
+          <div class="progress-track"><div class="progress-fill" id="prog-bar"></div></div>
+        </div>
+        <div style="text-align:center; font-size:11px; font-weight:700; color:var(--text-main); margin-top:8px;">
+          Jarak ke target: <span id="prog-percent">0%</span>
+        </div>
+      </div>
 
-      <!-- 2. Dream Result -->
+      <!-- DREAM RESULT -->
       <div id="dream-result-wrapper"></div>
 
-      <!-- 3. Analisa Bulanan -->
+      <!-- ANALISA BULANAN -->
       <div class="info-box" id="monthly-analysis-card">
         <div class="info-header">
           <div class="info-title" style="color:var(--info);">Analisa Bulanan</div>
@@ -329,7 +400,10 @@ select { appearance: none; cursor: pointer; }
         </div>
       </div>
 
-      <!-- 4. Detailed Cards Grid -->
+      <!-- STRATEGI CERDAS -->
+      <div id="strategy-wrapper"></div>
+
+      <!-- DETAILED CARDS -->
       <div class="info-grid" style="margin-top:16px;">
         
         <!-- Card A: Penyangga -->
@@ -339,20 +413,19 @@ select { appearance: none; cursor: pointer; }
             <span class="info-tag tag-warning">Wajib Tunai</span>
           </div>
           <div class="info-price" id="buffer-price">Rp 0</div>
-          <div class="info-desc">Uang tunai ini wajib ada di rekening. Ini adalah sabuk pengaman keuanganmu. Jika penghasilan berhenti (sakit/cuti/resign), uang ini menutup kebutuhan makan & sewa selama 3 bulan.</div>
+          <div class="info-desc">Uang tunai ini wajib ada di rekening. Ini adalah sabuk pengaman keuanganmu.</div>
         </div>
 
-        <!-- Card B: Kebutuhan Dana Besar -->
+        <!-- Card B: Kebutuhan Dana Besar (10 Items) -->
         <div class="info-box">
           <div class="info-header">
             <div class="info-title">Kebutuhan Dana Besar</div>
             <span class="info-tag" id="lifestyle-tag-detail">Standar</span>
           </div>
           <div class="info-price" id="target-price-detail">Rp 0</div>
+          <div id="inflation-alert"></div>
           <div class="info-desc">Estimasi biaya realistis dengan gaya hidup <span id="lifestyle-text">Standar</span>.</div>
-          <ul class="budget-list" id="budget-list-items">
-            <!-- List items injected here -->
-          </ul>
+          <ul class="budget-list" id="budget-list-items"></ul>
         </div>
 
         <!-- Card C: Dana Siap Dikunci -->
@@ -362,14 +435,14 @@ select { appearance: none; cursor: pointer; }
             <span class="info-tag tag-success">Bisa di Emas</span>
           </div>
           <div class="info-price" style="color: var(--success-dark);" id="safe-price-detail">Rp 0</div>
-          <div class="info-desc">Ini adalah sisa dana dari total kebutuhan yang aman untuk dikunci (diinvestasikan) dalam bentuk emas.</div>
+          <div class="info-desc">Ini adalah sisa dana dari total kebutuhan yang aman untuk dikunci.</div>
           <div style="margin-top:12px; font-size:12px; font-weight:700; color:var(--success-dark);">Setara emas: <span id="gram-detail">0</span> gram</div>
           <div style="font-size:12px; color:var(--success-dark);">Harga emas: <span id="gold-price-detail">Rp 0</span> / gram</div>
         </div>
 
       </div>
 
-      <!-- 5. Target Plan (Tanggal) -->
+      <!-- TARGET PLAN -->
       <div id="target-plan-card" class="info-box" style="margin-top:16px; background: white; border: 2px solid var(--primary);">
         <div class="info-header">
           <div class="info-title" style="color:var(--primary-dark);">Target Tanggal</div>
@@ -396,33 +469,41 @@ select { appearance: none; cursor: pointer; }
               <div style="font-size:14px; font-weight:800; color:#92400e;" id="plan-weekly">Rp 0</div>
             </div>
           </div>
-          <div style="font-size:11px; color:#b45309; font-style:italic; text-align:center;" id="plan-context">Setara dengan 1 botol air minum.</div>
+          <div style="font-size:11px; color:#b45309; font-style:italic; text-align:center;" id="plan-context">Hemat dari pengeluaran rutin.</div>
         </div>
 
-        <div style="border-top:1px dashed var(--border); padding-top:8px; text-align:right;">
+        <div style="border-top:1px dashed var(--border); padding-top:12px; text-align:right;">
           <span style="font-size:13px; color:var(--text-muted);">Total Bulanan:</span>
           <div style="font-size:18px; font-weight:900; color:var(--text-main);" id="plan-monthly">Rp 0 / bln</div>
-          <div style="font-size:11px; color:var(--text-muted); font-style:italic;">*Bandingkan dengan Kemampuanmu (<span id="plan-compare">Rp 0</span>).</div>
+          
+          <div id="plan-comparison-box" style="margin-top:8px; padding:8px; border-radius:6px; font-size:12px; line-height:1.4;"></div>
         </div>
       </div>
 
-      <!-- 6. Locked Monetization -->
+      <!-- EXECUTIVE SUMMARY -->
+      <div id="executive-summary" class="info-box" style="margin-top:16px; background:var(--info-bg); border-color:var(--info);">
+        <div class="info-header">
+          <div class="info-title" style="color:var(--info);">📝 Kesimpulan & Aksi</div>
+        </div>
+        <ul class="summary-list" id="summary-list-content"></ul>
+      </div>
+
+      <!-- NASAHAH HARIAN -->
+      <div id="advice-wrapper" class="advice-card">
+        <div class="advice-title">💡 Nasehat Harianmu (5 Tips)</div>
+        <ul class="advice-list" id="advice-list-content"></ul>
+      </div>
+
+      <!-- LOCKED / DONATE -->
       <div class="locked-section">
-        <div style="font-size:24px; margin-bottom:8px;">🔒</div>
-        <h4 style="margin:0 0 4px 0; color:var(--text-main);">Mode Premium Terkunci</h4>
-        <p style="font-size:13px; color:var(--text-muted); margin:0 0 16px 0;">Dapatkan akses template Excel & E-Book.</p>
+        <div style="font-size:24px; margin-bottom:8px;">💙</div>
+        <h4 style="margin:0 0 4px 0; color:var(--text-main);">Dukung Pengembang</h4>
+        <p style="font-size:13px; color:var(--text-muted); margin:0 0 16px 0;">Bantu aplikasi ini terus berjalan gratis untuk semua.</p>
         
-        <div class="product-grid">
-          <a href="#" id="wa-excel" class="product-card" target="_blank">
-            <div style="font-size:24px;">📂</div>
-            <div style="font-weight:700; margin-top:4px;">Template Excel</div>
-            <div class="product-price">Rp 49.000</div>
-          </a>
-          <a href="#" id="wa-ebook" class="product-card" target="_blank">
-            <div style="font-size:24px;">📘</div>
-            <div style="font-weight:700; margin-top:4px;">Panduan Emas (PDF)</div>
-            <div class="product-price">Rp 29.000</div>
-          </a>
+        <a href="#" id="wa-donate" class="btn-donate">❤️ Donasi Pengembang</a>
+        
+        <div style="margin-top:20px;">
+           <a href="#" id="wa-feedback" style="font-size:12px; color:var(--text-muted); text-decoration:underline;">Kirim Kritik & Saran</a>
         </div>
       </div>
 
@@ -451,7 +532,7 @@ const setupFormatter = (id) => {
     e.target.value=v?parseInt(v).toLocaleString("id-ID"):"";
   });
 };
-['gajiPokok','sideHustle','debt','dreamPrice'].forEach(setupFormatter);
+['gajiPokok','sideHustle','debt','dreamPrice','currentSavings'].forEach(setupFormatter);
 
 // --- GOLD API LOGIC ---
 let chartInstance = null;
@@ -480,7 +561,7 @@ async function getHargaEmas() {
     console.log(err);
     badgeText.innerText = "OFFLINE"; dot.classList.remove('online');
     const cached = JSON.parse(localStorage.getItem(cacheKey));
-    return cached ? cached.price : 2652000; // Fallback
+    return cached ? cached.price : 2652000; // Fallback harga default
   }
 }
 
@@ -506,7 +587,22 @@ function renderChart(aman, buffer) {
   });
 }
 
-// --- LOCKING MECHANISM ---
+// --- DP INPUT TOGGLE ---
+document.getElementById('dreamMethod').addEventListener('change', (e) => {
+  const dpContainer = document.getElementById('dpContainer');
+  if(e.target.value === 'kredit') {
+    dpContainer.classList.remove('hidden');
+  } else {
+    dpContainer.classList.add('hidden');
+  }
+});
+
+// --- LOAD DATA ---
+window.onload = async () => { 
+  await getHargaEmas();
+};
+
+// --- LOCKING ---
 function unlockForm() {
   document.getElementById('input-section').classList.remove('hidden');
   document.getElementById('unlock-btn').classList.add('hidden');
@@ -519,22 +615,41 @@ function unlockForm() {
 async function hitung() {
   const income = getRawVal('gajiPokok') + getRawVal('sideHustle');
   const debt = getRawVal('debt');
+  const currentSavings = getRawVal('currentSavings');
   const dreamPrice = getRawVal('dreamPrice');
   
-  if(!income) { alert("Mohon isi penghasilan Anda"); return; }
+  if(!income) { alert("Mohon isi Gaji Pokok Anda"); return; }
 
   // Loading State
   const btn = document.getElementById('btn-calc');
   const btnText = document.getElementById('btn-text');
   btn.disabled = true; btnText.innerText = "MENGHITUNG...";
 
-  // Logic Algoritma
+  // --- DEFINISI VARIABEL DI AWAL (PENTING) ---
   const lifestyleFactor = { 'hemat': 0.8, 'standar': 1.0, 'mewah': 1.5 };
   const baseMult = { 'nikah':6, 'hamil':4, 'anak':3 };
   const statusVal = document.getElementById('status').value;
   const lifestyleVal = document.getElementById('lifestyle').value;
+  const useInflation = document.getElementById('inflationToggle').checked;
+  
+  // Default perMonth agar tidak error jika tanggal kosong
+  let perMonth = 0; 
 
-  const target = Math.ceil(income * baseMult[statusVal] * lifestyleFactor[lifestyleVal]);
+  let target = Math.ceil(income * baseMult[statusVal] * lifestyleFactor[lifestyleVal]);
+  let inflationHTML = "";
+  
+  if (useInflation) {
+    const dateInput = document.getElementById('targetDate').value;
+    if(dateInput) {
+      const years = Math.ceil((new Date(dateInput) - new Date()) / (1000 * 60 * 60 * 24 * 365));
+      if(years > 0) {
+        const inflatedTarget = Math.ceil(target * Math.pow(1.06, years));
+        inflationHTML = `<div style="font-size:11px; color:var(--danger); background:var(--danger-bg); padding:4px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">⚠️ Dengan Inflasi: <strong>Rp ${formatIDR(inflatedTarget)}</strong></div>`;
+        target = inflatedTarget; 
+      }
+    }
+  }
+
   const buffer = Math.ceil(income * 0.7 * 3);
   const aman = Math.max(0, target - buffer);
   
@@ -545,42 +660,128 @@ async function hitung() {
   document.getElementById('emas').innerText = gram.toFixed(2) + " gram";
   renderChart(aman, buffer);
 
-  // --- RENDER ADVICE ---
+  // --- RENDER ADVICE (5 TIPS) ---
+  const adviceWrapper = document.getElementById('advice-wrapper');
+  const tipsDB = {
+    nikah: [
+      "Utamakan Mahar dalam bentuk Emas Logam Mulia. Ini lebih bermanfaat sebagai investasi awal keluarga.",
+      "Gunakan undangan digital (WhatsApp/Story) untuk menghemat biaya cetak hingga Rp 1 juta.",
+      "Tips Catering: Nasi box dengan lauk enak seringkali lebih disukai daripada prasmanan mahah.",
+      "Sewa dekorasi daripada membeli. Pilih vendor dekorasi 'Backdrop Only' untuk menghemat biaya.",
+      "Jangan terburu-buru membeli perlengkapan rumah tangga baru semuanya. Beli yang esensial dulu."
+    ],
+    hamil: [
+      "Cek fasilitas kelas 3 BPJS di RS terdekat. Fasilitasnya seringkali sudah sangat baik dan gratis.",
+      "Stok Pampers: Saat ada promo 'Beli 2 Gratis 1', belilah ukuran S/NB. Ukuran kecil habis paling cepat.",
+      "Vitamin dan Nutrisi ibu adalah prioritas utama. Jangan kurangi pos ini untuk gaya hidup.",
+      "Tips Hemat Susu: Beri ASI eksklusif jika memungkinkan, ini menghemat ratusan ribu per bulan.",
+      "Jangan terlalu sering USG kosmetik jika budget ketat. Ikuti jadwal rutin bidan/dokter."
+    ],
+    anak: [
+      "Mainan edukasi (Puzzle/Buku) jauh lebih baik dan tahan lama daripada mainan elektronik.",
+      "Bekal makan dari rumah untuk sekolah agar anak tidak minta jajan snack kantin setiap hari.",
+      "Susu UHT plain (tanpa rasa) lebih baik untuk gigi dan harganya lebih murah dari susu rasa.",
+      "Tips Hemat Baju: Mainkan tukar baju dengan saudara sepupu seumur. Anak cepat besar.",
+      "Les Privat: Bimbing belajar di rumah sendiri (oleh orang tua) gratis dan lebih bonding."
+    ]
+  };
+  const shuffledTips = (tipsDB[statusVal] || []).sort(() => 0.5 - Math.random());
+  adviceWrapper.innerHTML = `<div class="advice-title">💡 Nasehat Harianmu (${statusVal.toUpperCase()})</div><ul class="advice-list">${shuffledTips.slice(0, 5).map(t=>`<li>${t}</li>`).join('')}</ul>`;
+
+  // --- RENDER GAMIFICATION ---
   const needsMonthly = Math.ceil(income * 0.7);
   const savingsMonthly = income - needsMonthly - debt;
   const isDeficit = (needsMonthly + debt) > income;
-  const adviceWrapper = document.getElementById('advice-wrapper');
-  let adviceText = "";
+  const gamificationWrapper = document.getElementById('gamification-wrapper');
+  
+  if(currentSavings > 0 && target > 0) {
+    const percent = Math.min(100, Math.round((currentSavings / target) * 100));
+    document.getElementById('prog-target').innerText = formatIDR(target);
+    document.getElementById('prog-current').innerText = formatIDR(currentSavings);
+    document.getElementById('prog-percent').innerText = percent + "%";
+    setTimeout(() => { document.getElementById('prog-bar').style.width = percent + "%"; }, 100);
+    gamificationWrapper.style.display = 'block';
+  } else {
+    gamificationWrapper.style.display = 'none';
+  }
 
-  if (statusVal === 'anak' && isDeficit) adviceText = "Jangan kurangi biaya sekolah/makan anak. Solusi wajib: Cari Side Hustle.";
-  else if (statusVal === 'hamil' && isDeficit) adviceText = "Prioritas vitamin/ibu. Jangan kurangi tabungan.";
-  else if (statusVal === 'nikah' && isDeficit) adviceText = "Solusi: Tunda tanggal atau Kurangi gaya hidup.";
-  else if (statusVal === 'nikah') adviceText = "Jangan buru beli barang dekorasi mahal hari ini. Nabung Rp 50rb untuk mahar atau beli logam mulia lebih penting untuk masa depanmu.";
-  else adviceText = "Keuangan stabil. Lanjutkan komitmen tabunganmu.";
+  // --- STRATEGI CERDAS ---
+  const strategyWrapper = document.getElementById('strategy-wrapper');
+  const savingsPercent = Math.round((savingsMonthly / income) * 100);
+  let strategyTitle = "";
+  let strategyContent = "";
+  let strategyColor = "";
+  let strategyIcon = "";
+  let debtAdvice = "";
+  let hustleTips = ["Freelance Umum", "Jualan Online", "Admin Sosmed", "Private Tutor", "Sewa Barang"]; // Default 5 Hustles
 
-  adviceWrapper.innerHTML = `<div class="advice-card"><div class="advice-title">💡 Nasehat Harianmu</div><div class="advice-text">${adviceText}</div></div>`;
+  if (savingsPercent < 10) {
+    strategyTitle = "Level Pemula";
+    strategyIcon = "🌱";
+    strategyContent = "Konsistensi lebih penting dari jumlah. Mulailah dari Rp 50rb saja dulu.";
+    strategyColor = "var(--info-bg)";
+  } else if (savingsPercent >= 30) {
+    strategyTitle = "Level Sultan";
+    strategyIcon = "🚀";
+    strategyContent = "Luar biasa! Kamu mengikuti standar Gold Standard.";
+    strategyColor = "var(--success-bg)";
+  } else {
+    strategyTitle = "Level Aman";
+    strategyIcon = "📈";
+    strategyContent = "Jalur yang benar. Coba tantang diri menaikkan tabungan 5% lagi.";
+    strategyColor = "#fffbeb";
+  }
 
-  // --- RENDER DREAM PLANNER ---
+  if (debt > 0 && aman > debt) {
+    debtAdvice = `<div style="margin-top:8px; padding:8px; background:white; border-radius:6px; font-size:12px; color:#b91c1c; border-left:3px solid #ef4444;">💡 <strong>DEBT DESTROYER:</strong> Lunasi utang sekarang hemat jutaan bunga!</div>`;
+  }
+
+  let hustleHTML = `<div style="margin-top:10px;"><div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Ide Side Hustle (Relevan):</div><div class="hustle-container">${hustleTips.map(t=>`<span class="hustle-tag">${t}</span>`).join('')}</div></div>`;
+
+  strategyWrapper.innerHTML = `
+    <div class="info-box" style="background:${strategyColor}; border-color:transparent; margin-top:16px;">
+      <div class="info-header">
+        <div class="info-title">Strategi Keuanganmu</div>
+        <div style="font-size:12px; font-weight:800; color:#64748b;">${savingsPercent}% Tabungan</div>
+      </div>
+      <div style="font-size:18px; font-weight:800; margin:4px 0;">${strategyIcon} ${strategyTitle}</div>
+      <div class="info-desc" style="font-size:13px; line-height:1.5;">${strategyContent}</div>
+      ${debtAdvice}
+      ${hustleHTML}
+    </div>
+  `;
+
+  // --- DREAM PLANNER ---
   const dreamWrapper = document.getElementById('dream-result-wrapper');
-  const dreamType = document.getElementById('dreamType').value;
   const dreamMethod = document.getElementById('dreamMethod').value;
+  const dpInput = document.getElementById('dpPercent').value;
+  const dreamType = document.getElementById('dreamType').value;
   let dreamHTML = "";
 
   if(dreamType !== 'none' && dreamPrice > 0) {
-    let needed = dreamMethod === 'kredit' ? dreamPrice * 0.2 : dreamPrice;
+    let dpPercent = 20; 
+    let kreditAdvice = "";
+
+    if(dreamMethod === 'kredit') {
+      dpPercent = parseInt(dpInput) || 20;
+      kreditAdvice = `<div style="font-size:11px; color:var(--primary); margin-top:8px; font-style:italic;">Tips: Cicilan aman jika < 30% Gaji (Rp ${formatIDR(income * 0.3)}).</div>`;
+    }
+
+    let needed = (dreamMethod === 'tunai') ? dreamPrice : (dreamPrice * dpPercent / 100);
     let status = aman >= needed;
     let label = status ? 'CUKUP AMAN' : 'BELUM CUKUP';
-    let msg = status ? `Selamat! Dana Amanmu (${formatIDR(aman)}) cukup untuk ${dreamType} ini.` : `Kurang Rp ${formatIDR(Math.abs(aman - needed))}. Tingkatkan tabungan!`;
+    let msg = status ? `Selamat! Dana Amanmu (${formatIDR(aman)}) cukup.` : `Kurang Rp ${formatIDR(Math.abs(aman - needed))}. Tingkatkan tabungan!`;
 
     dreamHTML = `
     <div class="dream-result-card">
-      <div class="info-header"><div class="info-title">🏆 Cek Mimpi: ${dreamType.toUpperCase()}</div><span class="info-tag">${dreamMethod.toUpperCase()}</span></div>
-      <div style="font-size:14px; color:var(--text-muted); margin-top:4px;">Harga Perkiraan</div>
+      <div class="info-header"><div class="info-title">🏆 Cek Mimpi: ${dreamType.toUpperCase()}</div><span class="info-tag">${dreamMethod.toUpperCase()} ${dreamMethod==='kredit'?`(${dpPercent}% DP)`:''}</span></div>
+      <div style="font-size:14px; color:var(--text-muted); margin-top:4px;">Harga Cash</div>
       <div style="font-size:22px; font-weight:800; color:var(--text-main);">Rp ${formatIDR(dreamPrice)}</div>
-      <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">Kebutuhan Dana Tunai (DP/Lunas)</div>
+      <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">Kebutuhan Dana Tunai ${dreamMethod==='kredit'?'(DP)':'(Lunas)'}</div>
       <div style="font-size:16px; font-weight:700; color:var(--text-main); margin-bottom:8px;">Rp ${formatIDR(needed)}</div>
       <div class="dream-status-badge ${status?'status-success':'status-fail'}">${label}</div>
       <div style="font-size:13px; color:var(--text-muted); text-align:center; margin-top:8px;">${msg}</div>
+      ${kreditAdvice}
     </div>`;
   }
   dreamWrapper.innerHTML = dreamHTML;
@@ -591,17 +792,17 @@ async function hitung() {
   document.getElementById('cash-debt').innerText = formatIDR(debt) + ` (${Math.round((debt/income)*100)}%)`;
   document.getElementById('cash-save').innerText = formatIDR(savingsMonthly) + ` (${100 - Math.round((needsMonthly/income)*100) - Math.round((debt/income)*100)}%)`;
 
-  // --- RENDER DETAILED CARDS (GRID) ---
+  // --- RENDER DETAILED CARDS ---
   document.getElementById('buffer-price').innerText = "Rp " + formatIDR(buffer);
   document.getElementById('target-price-detail').innerText = "Rp " + formatIDR(target);
+  document.getElementById('inflation-alert').innerHTML = inflationHTML;
   document.getElementById('lifestyle-tag-detail').innerText = lifestyleVal.charAt(0).toUpperCase() + lifestyleVal.slice(1);
   document.getElementById('lifestyle-text').innerText = lifestyleVal.charAt(0).toUpperCase() + lifestyleVal.slice(1);
   
-  // List Items (Sesuai Permintaan)
   const reasonLists = {
-    nikah: ["Biaya KUA & Legalitas Dokumen", "Mahar/Seserahan", "Biaya Akad & Pesta Sederhana", "Pindahan & Uang Muka Tempat Tinggal", "Perlengkapan Rumah Tangga", "Biaya Hidup Bulan Pertama", "Dana Cadangan Tak Terduga"],
-    hamil: ["Biaya Kontrol Rutin & USG", "Suplemen & Nutrisi Ibu", "Biaya Persalinan & RS", "Biaya Dokter Spesialis", "Perlengkapan Bayi Baru", "Biaya Perawatan Pasca Melahirkan", "Dana Darurat Komplikasi"],
-    anak: ["Biaya Rutin Susu & Makanan", "Imunisasi & Kesehatan", "Perlengkapan Anak", "Biaya Pendidikan Awal", "Transportasi & Aktivitas", "Biaya Hidup Tambahan", "Dana Sakit Anak"]
+    nikah: ["Biaya KUA & Legalitas", "Mahar/Seserahan", "Dekorasi & Catering", "Busana & MUA", "Gedung/Tenda", "Dokumentasi", "Kado Tamu", "Sumbangan/Uang Amplop", "Pindahan Rumah", "Dana Darurat Pesta"],
+    hamil: ["Kontrol & USG", "Suplemen & Vitamin", "Biaya Persalinan RS", "Dokter Spesialis", "Stok Perlengkapan Bayi", "Stok Popok", "Stok Susu", "Perawatan Ibu", "Dana Sakit Komplikasi", "Dana Darurat"],
+    anak: ["Susu Formula", "Makanan Pendamping", "Pampers/Popok", "Imunisasi", "Dokter Anak", "Sekolah/Daycare", "Transportasi", "Pakaian", "Mainan Edukasi", "Dana Sakit Anak"]
   };
   const listHTML = reasonLists[statusVal].map(item => `<li>${item}</li>`).join('');
   document.getElementById('budget-list-items').innerHTML = listHTML;
@@ -617,14 +818,16 @@ async function hitung() {
   if(dateInput) {
     planCard.style.display = 'block';
     const diffMonths = Math.ceil((new Date(dateInput) - new Date()) / (1000 * 60 * 60 * 24 * 30));
-    const perMonth = Math.ceil(aman / diffMonths);
+    perMonth = Math.ceil(aman / diffMonths); // Update perMonth di sini agar tidak error di summary
     const daily = Math.ceil(perMonth / 30);
     const weekly = Math.ceil(perMonth / 4);
     
     let contextText = "";
-    if (daily < 25000) contextText = "Setara dengan 1 botol air minum.";
-    else if (daily < 50000) contextText = "Setara dengan 1x jajan snack kecil.";
-    else contextText = "Hemat sedikit saja dari uang jajan/harian.";
+    if (daily < 10000) contextText = "Setara dengan biaya isi pulsa reguler.";
+    else if (daily < 25000) contextText = "Setara dengan 1 bungkus rokok ringan.";
+    else if (daily < 50000) contextText = "Setara dengan 1x jajan kopi susu.";
+    else if (daily < 100000) contextText = "Setara dengan biaya bensin motor seminggu.";
+    else contextText = "Hemat dari biaya makan siang.";
 
     document.getElementById('plan-date').innerText = new Date(dateInput).toLocaleDateString('id-ID');
     document.getElementById('plan-months').innerText = diffMonths + " Bulan";
@@ -632,18 +835,51 @@ async function hitung() {
     document.getElementById('plan-weekly').innerText = "Rp " + formatIDR(weekly);
     document.getElementById('plan-context').innerText = contextText;
     document.getElementById('plan-monthly').innerText = "Rp " + formatIDR(perMonth) + " / bln";
-    document.getElementById('plan-compare').innerText = "Rp " + formatIDR(savingsMonthly);
+    
+    // LOGIC PERBANDINGAN
+    const compBox = document.getElementById('plan-comparison-box');
+    if (perMonth <= savingsMonthly) {
+        const surplus = savingsMonthly - perMonth;
+        compBox.innerHTML = `<div style="color:var(--success-dark); font-weight:700; display:flex; align-items:center; gap:6px;">✅ TARGET SANTAI</div><div style="font-size:11px; color:#065f46;">Sisa uang jajan: <strong>Rp ${formatIDR(surplus)}/bln</strong>.</div>`;
+        compBox.style.background = "var(--success-bg)"; compBox.style.border = "1px solid #a7f3d0";
+    } else {
+        const deficit = perMonth - savingsMonthly;
+        compBox.innerHTML = `<div style="color:var(--danger); font-weight:700; display:flex; align-items:center; gap:6px;">⚠️ PERLU KERJA LEBIH KERAS</div><div style="font-size:11px; color:#991b1b;">Kurang: <strong>Rp ${formatIDR(deficit)}/bln</strong>.</div>`;
+        compBox.style.background = "var(--danger-bg)"; compBox.style.border = "1px solid #fecaca";
+    }
+
   } else {
     planCard.style.display = 'none';
   }
 
-  // --- WA LINKS (MONETIZATION) ---
-  const summary = `HONORER DIGITAL REPORT\nStatus: ${statusVal}\nGaji: Rp ${formatIDR(income)}\nTarget: Rp ${formatIDR(target)}`;
-  const baseWA = "https://wa.me/6285123882845?text=" + encodeURIComponent(summary + "\n\nSaya ingin membeli: ");
-  document.getElementById('wa-excel').href = baseWA + "Template Excel (Rp 49rb)";
-  document.getElementById('wa-ebook').href = baseWA + "E-Book Emas (Rp 29rb)";
+  // --- EXECUTIVE SUMMARY (FIXED LOGIC) ---
+  const summaryBox = document.getElementById('executive-summary');
+  const summaryList = document.getElementById('summary-list-content');
+  let bullets = [];
+  
+  bullets.push(`Fokus utama Anda adalah mempersiapkan biaya <span class="summary-highlight">${statusVal.toUpperCase()}</span>.`);
+  
+  // Logika Summary agar tidak error
+  if(debt > 0) bullets.push("Tindakan Prioritas: Fokuskan 50% tabungan untuk <span class='summary-highlight'>Melunasi Utang</span>.");
+  else if(dateInput && perMonth > savingsMonthly) bullets.push("Tindakan Prioritas: Ada defisit. Solusi: <span class='summary-highlight'>Cari Penghasilan Tambahan</span>.");
+  else bullets.push("Tindakan Prioritas: Mulai <span class='summary-highlight'>Otomatisasi Nabung</span> emas sekarang juga.");
+  
+  if(lifestyleVal === 'mewah') bullets.push("Tips: Pertimbangkan turunkan ke 'Standar' untuk mempercepat akumulasi asetmu.");
+  else bullets.push("Tips: Jaga gaya hidup, jangan naik kelas hanya karena gaji naik sedikit.");
+  
+  bullets.push("Aplikasi ini dirancang untuk membantu Honorer merencanakan masa depan.");
+  bullets.push("Bagikan hasil ini ke teman yang butuh agar mereka juga terbantu.");
 
-  // --- TRANSITION UI ---
+  summaryList.innerHTML = bullets.map(b => `<li>${b}</li>`).join('');
+  summaryBox.style.display = 'block';
+
+  // --- WA LINKS ---
+  const summaryText = `HONORER DIGITAL V2.4 REPORT\nStatus: ${statusVal}\nGaji: Rp ${formatIDR(income)}\nTarget: Rp ${formatIDR(target)}`;
+  const baseWA = "https://wa.me/6285123882845?text=" + encodeURIComponent(summaryText + "\n\n");
+  document.getElementById('wa-donate').href = baseWA + "Halo Admin, saya ingin donasi pengembangan aplikasi. Terima kasih.";
+  document.getElementById('wa-feedback').href = baseWA + "Halo Admin, saya ingin memberikan masukan/kritik untuk aplikasi:";
+
+  // --- TRANSITION UI (PENTING AGAR SEMUA MUNCUL) ---
   document.getElementById('input-section').classList.add('hidden');
   document.getElementById('unlock-btn').classList.remove('hidden');
   document.getElementById('btn-calc').classList.add('hidden');
