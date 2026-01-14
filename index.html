@@ -1,666 +1,987 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalkulator Keamanan – HONORER DIGITAL</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Font Premium: Plus Jakarta Sans -->
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-<style>
-/* ===== VARS (DESIGN TOKENS) ===== */
-:root {
-  --primary: #fbbf24;      /* Kuning Emas - Tombol & Aksen */
-  --primary-dark: #d97706; /* Amber Gelap - Hover */
-  --success: #10b981;      /* Hijau - Aman */
-  --success-dark: #047857; /* Hijau Gelap - Teks Aman */
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HONORER DIGITAL - Kalkulator Keamanan Finansial</title>
+  <meta name="description" content="Kalkulator keamanan finansial untuk masa depan yang lebih baik">
   
-  /* Neutrals */
-  --bg-body: #f1f5f9; /* Latar Belakang Utama (Abu-abu muda kebiruan) */
-  --bg-card: #ffffff;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --border: #e2e8f0;
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
   
-  /* Spacing & Radius */
-  --radius: 20px;
-  --radius-sm: 12px;
-  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-}
+  <!-- React & ReactDOM via CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Framer Motion via CDN -->
+  <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+  
+  <!-- Recharts -->
+  <script src="https://unpkg.com/recharts@2.10.1/umd/Recharts.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
-/* ===== RESET ===== */
-*{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-body{
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  background: var(--bg-body);
-  /* Background pola grid halus agar modern tapi tetap ringan */
-  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-  background-size: 24px 24px;
-  margin:0;
-  padding:40px 20px;
-  color:var(--text-main);
-  min-height: 100vh;
-}
-
-/* ===== HEADER ===== */
-.header-wrapper {
-  text-align: center;
-  margin-bottom: 40px;
-  animation: fadeIn 0.8s ease-out;
-}
-.header-wrapper h1 {
-  font-size: 34px;
-  font-weight: 800;
-  color: var(--text-main);
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: -1px;
-}
-.header-wrapper span { color: var(--primary-dark); }
-
-/* ===== LAYOUT ===== */
-.app{
-  max-width:980px;
-  margin:0 auto;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:32px;
-}
-
-/* ===== CARDS ===== */
-.card{
-  background: var(--bg-card);
-  padding: 36px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-soft);
-  border: 1px solid rgba(255,255,255,0.8);
-  position: relative;
-  overflow: hidden;
-}
-/* Animasi halus saat kartu muncul */
-.card { animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; transform: translateY(20px); }
-.card:nth-child(2) { animation-delay: 0.1s; }
-
-/* ===== TYPOGRAPHY ===== */
-h2 {
-  margin-top:0; margin-bottom:32px; 
-  font-size: 20px; 
-  color: var(--text-main); 
-  font-weight: 700; 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center;
-}
-
-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-  display: block;
-  margin-top: 24px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* ===== FORM ELEMENTS ===== */
-input, select {
-  width:100%;
-  padding: 18px;
-  font-size: 16px;
-  font-family: inherit;
-  color: var(--text-main);
-  background: #f8fafc;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  outline: none;
-  font-weight: 500;
-}
-input:focus, select:focus {
-  background: #fff;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2);
-  transform: translateY(-2px);
-}
-
-/* ===== BUTTONS ===== */
-button {
-  width: 100%;
-  padding: 18px;
-  margin-top: 40px;
-  font-size: 16px;
-  font-weight: 700;
-  border-radius: var(--radius-sm);
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  letter-spacing: 0.5px;
-  transition: all 0.2s ease;
-}
-
-#btn-calc {
-  background: linear-gradient(135deg, var(--primary) 0%, #f59e0b 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-#btn-calc:hover { 
-  transform: translateY(-3px); 
-  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4); 
-}
-#btn-calc:active { transform: translateY(-1px); }
-#btn-calc:disabled { 
-  background: #cbd5e1; 
-  color: #94a3b8;
-  cursor: not-allowed; 
-  transform: none; 
-  box-shadow: none; 
-}
-
-/* Loading Spinner */
-.spinner {
-  width: 20px; height: 20px; 
-  border: 3px solid rgba(255,255,255,0.3); 
-  border-radius: 50%; 
-  border-top-color: #fff;
-  animation: spin 0.8s linear infinite; 
-  display: none; 
-  margin-right: 10px; 
-  vertical-align: middle;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* CTA Buttons (Bottom) */
-.cta-group {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 24px;
-}
-.cta { 
-  background: var(--text-main); 
-  color: #fff; 
-  padding: 14px;
-  margin-top: 0;
-  font-size: 14px;
-  border-radius: 12px;
-  text-align: center;
-}
-.cta:hover { background: black; }
-.cta.wa {
-  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-}
-.cta.save {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-}
-
-/* ===== RESULT AREA ===== */
-.result-wrapper {
-  text-align: center;
-  margin-bottom: 35px;
-  padding-bottom: 35px;
-  border-bottom: 1px solid var(--border);
-  animation: fadeIn 1s ease-out;
-}
-
-.big-label { 
-  font-size: 11px; 
-  text-transform: uppercase; 
-  letter-spacing: 1.5px; 
-  color: var(--text-muted); 
-  font-weight: 800; 
-  margin-bottom: 12px;
-}
-.big-value {
-  font-size: 42px; 
-  font-weight: 800; 
-  color: var(--success-dark); 
-  margin: 0; 
-  line-height: 1.1;
-}
-.sub-value {
-  font-size: 13px; color: var(--text-muted); margin-top: 8px; font-weight: 500;
-}
-
-#chart-container { 
-  position: relative; 
-  height: 220px; 
-  width: 100%; 
-  margin-bottom: 30px; 
-  animation: fadeIn 1.2s ease-out;
-}
-
-#detail {
-  font-size: 14px; 
-  line-height: 1.6;
-  color: var(--text-main); 
-  display:none;
-}
-
-/* Detail Boxes */
-.section-box {
-  background: #f8fafc;
-  padding: 24px;
-  border-radius: 16px;
-  margin-bottom: 20px;
-  border: 1px solid var(--border);
-  /* Staggered Animation via JS class toggle */
-  opacity: 0; 
-  animation: slideUpFade 0.6s ease forwards;
-}
-
-.section-title {
-  font-weight: 700; font-size: 15px; margin-bottom: 6px; color: var(--text-main);
-  display: flex; justify-content: space-between; align-items: center;
-}
-.section-tag {
-  font-size: 10px; padding: 4px 10px; border-radius: 20px; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.tag-yellow { background: #fffbeb; color: #b45309; border: 1px solid #fcd34d; }
-.tag-green { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-
-.section-price {
-  font-size: 24px; font-weight: 800; color: var(--text-main); margin: 8px 0 12px 0; letter-spacing: -0.5px;
-}
-.section-desc {
-  font-size: 13px; color: var(--text-muted); margin-bottom: 0; line-height: 1.6;
-}
-
-/* Plan Box (The one user liked) */
-.plan-box {
-  background: #ffffff; 
-  border-radius: 12px; 
-  padding: 20px; 
-  margin-top: 16px;
-  border: 1px solid #e2e8f0;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-}
-.plan-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; color: #475569; }
-.plan-row.highlight { font-size: 17px; font-weight: 800; color: var(--success-dark); border-top: 1px dashed #cbd5e1; padding-top: 12px; margin-top: 10px; margin-bottom: 0; }
-
-.footnote {
-  font-size: 11px; color: #64748b; margin-top: 12px; line-height: 1.5; font-style: italic;
-}
-
-/* API STATUS & ANIMATION */
-.api-status {
-  font-size: 10px; padding: 4px 10px; border-radius: 20px; background: #f1f5f9; color: #64748b;
-  font-weight: 700; text-transform: uppercase; transition: all 0.3s;
-}
-.api-status.status-online {
-  background: #d1fae5; color: #047857;
-  animation: pulse-green 2s infinite;
-}
-@keyframes pulse-green {
-  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-  70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-}
-
-/* ===== ANIMATIONS ===== */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { 
-  from { opacity: 0; transform: translateY(20px); } 
-  to { opacity: 1; transform: translateY(0); } 
-}
-@keyframes slideUpFade {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ===== MOBILE ===== */
-@media(max-width:768px){
-  .app{grid-template-columns:1fr;}
-  .header-wrapper h1{ font-size: 28px; }
-  .big-value { font-size: 36px; }
-  .card { padding: 28px 24px; }
-  .section-price { font-size: 22px; }
-  .cta-group { grid-template-columns: 1fr; }
-}
-</style>
-</head>
-
-<body>
-
-<!-- HEADER -->
-<div class="header-wrapper">
-  <h1>HONORER <span>DIGITAL</span></h1>
-</div>
-
-<div class="app">
-
-<!-- LEFT CARD: INPUT -->
-<div class="card">
-<h2>
-  <span>Rencana Keuangan</span>
-  <span class="api-status" id="apiStatus">Checking...</span>
-</h2>
-
-<label>Status saat ini</label>
-<select id="status">
-  <option value="nikah">Akan Menikah</option>
-  <option value="hamil">Hamil / Persalinan</option>
-  <option value="anak">Sudah Punya Anak</option>
-</select>
-
-<label>Penghasilan bulanan</label>
-<div class="input-group">
-  <input id="income" type="text" placeholder="Contoh: 3.000.000" autocomplete="off">
-</div>
-
-<label>Target Tercapai Tanggal (Opsional)</label>
-<div class="input-group">
-  <input id="targetDate" type="date">
-  <div style="font-size:12px; color:#94a3b8; margin-top:8px; line-height:1.4;">Contoh: Tanggal rencana nikah / HPL</div>
-</div>
-
-<button id="btn-calc" onclick="hitung()">
-  <span class="spinner" id="btn-spinner"></span>
-  <span id="btn-text">Hitung Keamanan</span>
-</button>
-</div>
-
-<!-- RIGHT CARD: RESULT -->
-<div class="card">
-<h2>Hasil Analisis</h2>
-
-<div class="result-wrapper">
-  <div class="big-label">Total Aset Aman Tercatat</div>
-  <div class="big-value" id="emas">0 gram</div>
-  <div class="sub-value">Dana yang bisa dikunci ke emas</div>
-</div>
-
-<div id="chart-container">
-  <canvas id="chart"></canvas>
-</div>
-
-<!-- Detail Content -->
-<div id="detail"></div>
-
-<!-- CTA Buttons -->
-<div class="cta-group" id="btn-container" style="display:none;">
-  <button class="cta wa" id="waBtn">🔒 Kunci Dana di Emas</button>
-  <button class="cta save" id="shareBtn">💾 Simpan Analisa</button>
-</div>
-
-<div style="font-size: 12px; color: #94a3b8; text-align: center; margin-top: 25px; line-height: 1.5;">
-  Data harga emas diupdate realtime (Logam Mulia)<br>
-  <strong>Catatan:</strong> Ini adalah dana tujuan, bukan dana darurat.
-</div>
-</div>
-
-</div>
-
-<script>
-let chart;
-let animationFrameId; 
-
-function formatIDR(x){return x.toLocaleString("id-ID");}
-
-// Input Formatter
-document.getElementById("income").addEventListener("input",e=>{
-  let v=e.target.value.replace(/[^0-9]/g,"");
-  e.target.value=v?parseInt(v).toLocaleString("id-ID"):"";
-});
-
-// Animation Logic (Optimized)
-function animateValue(obj, start, end, duration) {
-  if (animationFrameId) cancelAnimationFrame(animationFrameId);
-  let startTimestamp = null;
-  const step = (timestamp) => {
-    if (!startTimestamp) startTimestamp = timestamp;
-    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-    obj.innerHTML = (progress * (end - start) + start).toFixed(2) + " gram";
-    if (progress < 1) {
-      animationFrameId = window.requestAnimationFrame(step);
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
     }
-  };
-  animationFrameId = window.requestAnimationFrame(step);
-}
-
-/* ===== SYSTEM LOGIC ===== */
-function getCachedHarga(){
-  const c=localStorage.getItem("harga_emas_cache");
-  if(!c) return null;
-  const o=JSON.parse(c);
-  if(Date.now()-o.time>15*60*1000) return null;
-  return o.price;
-}
-function setCachedHarga(p){
-  localStorage.setItem("harga_emas_cache",JSON.stringify({time:Date.now(),price:p}));
-}
-async function getHargaEmas(){
-  const cached=getCachedHarga();
-  // Tampilkan status UI
-  const badge = document.getElementById("apiStatus");
-  
-  if(cached) {
-    badge.innerText = "LIVE"; 
-    badge.classList.add("status-online");
-    return cached;
-  }
-  
-  badge.innerText = "Updating...";
-  try{
-    const r=await fetch("https://logam-mulia-api.vercel.app/api/antam");
-    const d=await r.json();
-    setCachedHarga(d.buy);
-    // Jika sukses: Berkedip Hijau
-    badge.innerText = "LIVE";
-    badge.classList.add("status-online");
-    return d.buy;
-  }catch(err){
-    console.log("API Error:", err);
-    // Jika gagal: Offline
-    badge.innerText = "OFFLINE";
-    badge.classList.remove("status-online");
-    return getCachedHarga()||2652000; 
-  }
-}
-
-window.onload=async ()=>{
-  await getHargaEmas();
-};
-
-async function hitung(){
-  const incomeStr = document.getElementById("income").value;
-  const income=Number(incomeStr.replace(/[^0-9]/g,""));
-  const status=document.getElementById("status").value;
-  const targetDateInput = document.getElementById("targetDate").value;
-  
-  if(!income || income === 0) {
-    alert("Mohon isi penghasilan dengan benar.");
-    document.getElementById("income").focus();
-    return;
-  }
-
-  // Loading State
-  const btn = document.getElementById("btn-calc");
-  const btnText = document.getElementById("btn-text");
-  const btnSpinner = document.getElementById("btn-spinner");
-  btn.disabled = true;
-  btnText.innerText = "Menganalisis...";
-  btnSpinner.style.display = "inline-block";
-
-  const mult={nikah:6,hamil:4,anak:3};
-  const reason={
-    nikah:["Biaya KUA & Legalitas Dokumen","Mahar/Seserahan","Biaya Akad & Pesta Sederhana","Pindahan & Uang Muka Tempat Tinggal","Perlengkapan Rumah Tangga","Biaya Hidup Bulan Pertama","Dana Cadangan Tak Terduga"],
-    hamil:["Biaya Kontrol Rutin & USG","Suplemen & Nutrisi Ibu","Biaya Persalinan & RS","Biaya Dokter Spesialis","Perlengkapan Bayi Baru","Biaya Perawatan Pasca Melahirkan","Dana Darurat Komplikasi"],
-    anak:["Biaya Rutin Susu & Makanan","Imunisasi & Kesehatan","Perlengkapan Anak","Biaya Pendidikan Awal","Transportasi & Aktivitas","Biaya Hidup Tambahan","Dana Sakit Anak"]
-  };
-
-  const target=income*mult[status]; 
-  const buffer=income*0.7*3; 
-  const aman=Math.max(0,target-buffer); 
-
-  const harga=await getHargaEmas();
-  const gram=aman/harga;
-
-  animateValue(document.getElementById("emas"), 0, gram, 1000);
-
-  const list=reason[status].map(x=>"<li>"+x+"</li>").join("");
-
-  // Logic Tanggal
-  let targetPlanHTML = "";
-  if (targetDateInput) {
-    const targetDate = new Date(targetDateInput);
-    const now = new Date();
-    const diffTime = targetDate - now;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-    const diffMonths = Math.ceil(diffDays / 30);
-
-    if (diffMonths <= 0) {
-       targetPlanHTML = `<div class="plan-box" style="background:#fee2e2; border-color:#fca5a5;">
-         <div style="color:#b91c1c; font-weight:bold;">Waktu Terlampaui</div>
-         <div style="font-size:12px; color:#991b1b;">Tanggal target sudah lewat.</div>
-       </div>`;
-    } else {
-       const tabunganPerBulan = Math.ceil(aman / diffMonths);
-       
-       targetPlanHTML = `
-       <div class="plan-box">
-         <div class="plan-row"><span>Target Tanggal:</span> <strong>${targetDate.toLocaleDateString('id-ID')}</strong></div>
-         <div class="plan-row"><span>Sisa Waktu:</span> <strong>${diffMonths} Bulan</strong></div>
-         <div class="plan-row highlight">
-           <span>Tabungan Emas:</span> <span>Rp ${formatIDR(tabunganPerBulan)} / bln</span>
-         </div>
-         <div class="footnote">
-           *Angka ini hanya untuk penguncian emas (Dana Aman). Sisanya (${formatIDR(buffer)}) adalah dana tunai yang dianggap tercicil dari gaji bulanan.
-         </div>
-       </div>`;
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
     }
-  } else {
-    const cicil6=aman/6;
-    const cicil12=aman/12;
-    targetPlanHTML = `
-    <div class="plan-box" style="background:#f8fafc; border-color:#e2e8f0;">
-      <div style="font-size:12px; color:#64748b; margin-bottom:8px; font-weight:600;">Simulasi Tabungan Emas (Umum)</div>
-      <div class="plan-row"><span>6 Bulan:</span> <strong>Rp ${formatIDR(Math.ceil(cicil6))} / bln</strong></div>
-      <div class="plan-row"><span>12 Bulan:</span> <strong>Rp ${formatIDR(Math.ceil(cicil12))} / bln</strong></div>
-    </div>`;
-  }
-
-  document.getElementById("detail").style.display = "block";
-  
-  // HTML Layout (Disesuaikan permintaan user)
-  document.getElementById("detail").innerHTML=`
-<div class="section-box" style="animation-delay: 0.1s;">
-  <div class="section-title">
-    Kebutuhan Dana Besar
-    <span class="section-tag tag-yellow">Yang Wajib Dianggarkan</span>
-  </div>
-  <div class="section-price">Rp ${formatIDR(target)}</div>
-  <div class="section-desc">
-    Total biaya yang dibutuhkan saat kejadian tersebut terjadi. 
-    <ul style="margin: 10px 0 0 0; padding-left: 16px; color: var(--text-muted); font-size: 13px;">${list}</ul>
-  </div>
-</div>
-
-<div class="section-box" style="animation-delay: 0.2s;">
-  <div class="section-title">
-    Dana Penyangga Hidup
-    <span class="section-tag tag-yellow">Wajib Tunai</span>
-  </div>
-  <div class="section-price" style="color:var(--primary-dark);">Rp ${formatIDR(buffer)}</div>
-  <div class="section-desc">
-    Uang tunai yang wajib ada di rekening. Gunanya sebagai sabuk pengaman jika penghasilan berhenti, agar kebutuhan dasar tetap aman.
-  </div>
-</div>
-
-<div class="section-box" style="animation-delay: 0.3s; background: #fff; border: 1px solid #d1fae5;">
-  <div class="section-title">
-    Dana Siap Dikunci
-    <span class="section-tag tag-green">Bisa di Emas</span>
-  </div>
-  <div class="section-price" style="color:var(--success-dark);">Rp ${formatIDR(aman)}</div>
-  <div class="section-desc">
-    Ini adalah sisa dana dari total kebutuhan yang aman untuk dikunci (diinvestasikan) dalam bentuk emas.
-    <br><br>
-    <strong>Setara emas:</strong> ${gram.toFixed(2)} gram<br>
-    <strong>Harga emas:</strong> Rp ${formatIDR(harga)} / gram
-  </div>
-  ${targetPlanHTML}
-</div>
-`;
-
-  // Chart Logic (Warna Hijau & Kuning Screenshot)
-  const data=[aman,buffer];
-  if(chart) chart.destroy();
-  
-  const ctx = document.getElementById('chart').getContext('2d');
-  chart=new Chart(ctx,{
-    type:"doughnut",
-    data:{
-      labels:["Aman","Penyangga"],
-      datasets:[{
-        data:data,
-        backgroundColor: ["#10b981", "#fbbf24"], // HIJAU & KUNING
-        borderWidth:0,
-        hoverOffset: 6
-      }]
-    },
-    options: {
-      cutout: '78%',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { 
-        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: {size: 12, family: 'Plus Jakarta Sans'} } } 
-      },
-      animation: {
-        animateScale: true,
-        animateRotate: true,
-        duration: 1500,
-        easing: 'easeOutQuart'
+    ::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 4px;
+    }
+    
+    /* Toast animation */
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
       }
     }
-  });
+    
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+    
+    .toast-slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    .toast-fade-out {
+      animation: fadeOut 0.3s ease-out forwards;
+    }
+  </style>
+</head>
 
-  localStorage.setItem("honorer_kalkulasi",JSON.stringify({status,income,targetDate:targetDateInput,target,buffer,aman,gram,harga}));
+<body class="antialiased bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 min-h-screen">
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px] pointer-events-none"></div>
 
-  // Show Buttons
-  document.getElementById("btn-container").style.display = "grid";
+  <!-- App Container -->
+  <div id="app" class="container mx-auto px-4 py-8 max-w-7xl">
+  </div>
 
-  // PREPARE DETAILED WA MESSAGES
-  const fullWaText = encodeURIComponent(
-`HONORER DIGITAL - PERENCANAAN KEAMANAN
+  <script>
+    // App State
+    const state = {
+      formData: {
+        gajiPokok: '',
+        sideHustle: '',
+        status: 'nikah',
+        lifestyle: 'standar',
+        debt: '0',
+        dreamType: 'none',
+        dreamMethod: 'tunai',
+        dreamPrice: '',
+        targetDate: '',
+        emergencyExpense: '0'
+      },
+      result: null,
+      isCalculating: false,
+      hargaEmas: 2652000,
+      isInputLocked: false
+    };
 
-DATA PERENCANAAN:
-Status: ${status.charAt(0).toUpperCase() + status.slice(1)}
-Penghasilan: Rp ${formatIDR(income)}
+    // Utility Functions
+    const formatIDR = (x) => {
+      return x.toLocaleString('id-ID');
+    };
 
-1. KEBUTUHAN DANA BESAR: Rp ${formatIDR(target)}
-   (Sekali bayar saat kejadian)
+    const parseNumber = (value) => {
+      return Number(value.toString().replace(/[^0-9]/g, ''));
+    };
 
-2. DANA PENYANGGA: Rp ${formatIDR(buffer)}
-   (Wajib Tunai - Safety Buffer)
+    const formatInput = (value) => {
+      const num = parseNumber(value);
+      return num ? num.toLocaleString('id-ID') : '';
+    };
 
-3. DANA AMAN (BUAT EMAS): Rp ${formatIDR(aman)}
-   Setara Emas: ${gram.toFixed(2)} gram
-   Harga Emas: Rp ${formatIDR(harga)}/gr
+    const showToast = (title, description, variant = 'destructive') => {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const bgColor = variant === 'destructive' 
+        ? 'bg-red-500' 
+        : 'bg-green-500';
+      
+      toast.className = `mb-3 p-4 rounded-lg shadow-lg ${bgColor} text-white pointer-events-auto toast-slide-in`;
+      toast.innerHTML = `
+        <div class="font-bold mb-1">${title}</div>
+        <div class="text-sm">${description}</div>
+      `;
+      
+      container.appendChild(toast);
+      
+      // Auto remove after 3 seconds
+      setTimeout(() => {
+        toast.classList.remove('toast-slide-in');
+        toast.classList.add('toast-fade-out');
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 300);
+      }, 3000);
+    };
 
-RENCANA TABUNGAN:
-- Target Tanggal: ${targetDateInput ? new Date(targetDateInput).toLocaleDateString('id-ID') : '-'}
-- Tabungan Emas: Rp ${targetDateInput ? formatIDR(Math.ceil(aman/Math.ceil((new Date(targetDateInput)-new Date())/(1000*60*60*24*30)))) : '-'} / bln
+    const getDailyAdvice = (result) => {
+      if (result.isDeficit) {
+        return '⚠️ KRISIS: Pengeluaranmu melebihi gaji. Segera cari penghasilan tambahan (Side Hustle) atau kurangi pengeluaran segera!';
+      }
 
-Mohon bantu penguncian.`
-  );
+      if (result.isTargetUnreachable && result.monthlyTarget) {
+        return '⚠️ TARGET BERAT: Tabungan bulananmu belum cukup untuk target tanggal yang dipilih. Tunda target atau kurangi pengeluaran bulanan.';
+      }
 
-  // Tombol WA Admin
-  document.getElementById("waBtn").onclick=()=>window.open("https://wa.me/6285123882845?text="+fullWaText);
-  
-  // Tombol Simpan/Send ke Sendiri
-  document.getElementById("shareBtn").onclick=()=>window.open("https://wa.me/?text="+encodeURIComponent("Simpan Analisa Keuangan Saya:\n\n"+fullWaText));
+      if (result.dreamResult && !result.dreamResult.feasible && result.dreamResult.diff < 0) {
+        const short = Math.abs(result.dreamResult.diff);
+        return `💭 MIMPI TERALU: Dana aman kamu kurang Rp ${formatIDR(short)} untuk mimpi ini. Tetap fokus tabung untuk mimpi atau sesuaikan target harganya.`;
+      }
 
-  // Reset Button
-  btn.disabled = false;
-  btnText.innerText = "Hitung Keamanan";
-  btnSpinner.style.display = "none";
-}
-</script>
+      if (result.savingsMonthly < 100000) {
+        return '💰 TABUNGAN MINIM: Kemampuan menabung di bawah Rp 100rb/bulan. Coba kurangi pengeluaran kecil (jajan, subscribe, dll) untuk mulai menabung.';
+      }
+
+      if (result.savingsMonthly < 300000) {
+        return '📈 PELUANG PERTUMBUHAN: Tabunganmu masih terbatas. Mulai dari yang kecil: kurangi 1-2 pengeluaran bulanan, lalu naikkan pelan-pelan.';
+      }
+
+      if (parseNumber(state.formData.emergencyExpense) > 0) {
+        return '🚨 FOKUS DARURAT: Kamu punya pengeluaran darurat bulanan. Pastikan dana penyangga (3x gaji) cukup sebelum berinvestasi ke emas.';
+      }
+
+      if (result.dreamResult && result.dreamResult.feasible) {
+        return '🎉 MIMPI REALISTIS: Dana kamu cukup untuk mimpi ini! Mulai kumpulkan DP secara bertahap, jangan menunggu hingga penuh.';
+      }
+
+      if (result.savingsMonthly >= result.aman * 0.1) {
+        return '💎 TABUNGAN OKE: Kamu bisa mencapai dana aman dalam 10 bulan! Bagi investasi: 30% emas, 40% deposito, 30% obligasi untuk diversifikasi.';
+      }
+
+      switch (state.formData.status) {
+        case 'nikah':
+          return 'Jangan buru-buru beli barang dekorasi mahal hari ini. Nabung Rp 50rb untuk mahar atau beli logam mulia lebih penting.';
+        case 'hamil':
+          return 'Nutrisi dan vitamin Ibu adalah prioritas. Jangan ambil dari tabungan emas. Hemat jajan kecil untuk vitaminnya.';
+        case 'anak':
+          return 'Mainan anak tidak harus selalu baru. Kualitas waktu mainkan mereka lebih berharga. Nabungkan Rp 20rb hari ini.';
+        default:
+          return 'Terus tingkatkan kemampuan menabungmu. Setiap Rp 50rb per hari = Rp 1.5jt per tahun!';
+      }
+    };
+
+    const getTargetDateLabel = (status) => {
+      switch (status) {
+        case 'nikah':
+          return 'Kapan Ingin Nikah? (Target Dana Pernikahan)';
+        case 'hamil':
+          return 'Kapan Persalinan/HPL? (Target Dana Melahirkan)';
+        case 'anak':
+          return 'Kapan Target Dana Keamanan Tercapai?';
+        default:
+          return 'Kapan Target Dana Keamanan Tercapai?';
+      }
+    };
+
+    const getReasonList = (status) => {
+      const reasons = {
+        nikah: [
+          'Biaya KUA & Legalitas Dokumen',
+          'Mahar/Seserahan',
+          'Biaya Akad & Pesta Sederhana',
+          'Pindahan & Uang Muka Tempat Tinggal',
+          'Perlengkapan Rumah Tangga',
+          'Biaya Hidup Bulan Pertama',
+          'Dana Cadangan Tak Terduga'
+        ],
+        hamil: [
+          'Biaya Kontrol Rutin & USG',
+          'Suplemen & Nutrisi Ibu',
+          'Biaya Persalinan & RS',
+          'Biaya Dokter Spesialis',
+          'Perlengkapan Bayi Baru',
+          'Biaya Perawatan Pasca Melahirkan',
+          'Dana Darurat Komplikasi'
+        ],
+        anak: [
+          'Biaya Rutin Susu & Makanan',
+          'Imunisasi & Kesehatan',
+          'Perlengkapan Anak',
+          'Biaya Pendidikan Awal',
+          'Transportasi & Aktivitas',
+          'Biaya Hidup Tambahan',
+          'Dana Sakit Anak'
+        ]
+      };
+      return reasons[status] || [];
+    };
+
+    const calculate = async () => {
+      const income = parseNumber(state.formData.gajiPokok) + parseNumber(state.formData.sideHustle);
+      
+      if (!income || income === 0) {
+        showToast('Validasi Gagal', 'Mohon isi penghasilan dengan benar.');
+        return;
+      }
+
+      state.isCalculating = true;
+      render();
+
+      const debt = parseNumber(state.formData.debt);
+      const emergencyExpense = parseNumber(state.formData.emergencyExpense);
+      const incomeNum = income;
+      
+      const baseMult = { nikah: 6, hamil: 4, anak: 3 };
+      const lifestyleFactor = { hemat: 0.8, standar: 1.0, mewah: 1.5 };
+
+      const target = Math.ceil(incomeNum * baseMult[state.formData.status] * lifestyleFactor[state.formData.lifestyle]);
+      const buffer = Math.ceil(incomeNum * 0.7 * 3);
+      const aman = Math.max(0, target - buffer);
+
+      const needsMonthly = Math.ceil(incomeNum * 0.7);
+      const savingsMonthly = incomeNum - needsMonthly - debt - emergencyExpense;
+
+      let dreamResult = null;
+      if (state.formData.dreamType !== 'none' && state.formData.dreamPrice) {
+        const dreamPrice = parseNumber(state.formData.dreamPrice);
+        const requiredCash = state.formData.dreamMethod === 'tunai' ? dreamPrice : dreamPrice * 0.2;
+        const diff = aman - requiredCash;
+
+        let advice = '';
+        if (state.formData.dreamMethod === 'kredit') {
+          if (state.formData.dreamType === 'rumah') {
+            advice = 'KPR dianggap halal untuk kebutuhan primer. Pastikan DP sudah aman dan tenor pendek.';
+          } else if (state.formData.dreamType === 'gadget') {
+            advice = 'Membeli barang habis pakai (HP/Laptop) dengan kredit bunga sangat merugikan finansial. Disarankan menabung dulu.';
+          } else {
+            advice = 'Pastikan angsuran ringan (maks 30% gaji) dan jangan sampai terlilit utang.';
+          }
+        } else {
+          advice = 'Belanja Tunai (Cash) adalah cara terbaik. Tidak ada beban di masa depan.';
+        }
+
+        dreamResult = {
+          requiredCash,
+          diff,
+          feasible: diff >= 0,
+          advice
+        };
+      }
+
+      let diffMonths = null;
+      let dailyTarget = null;
+      let weeklyTarget = null;
+      let monthlyTarget = null;
+      
+      if (state.formData.targetDate) {
+        diffMonths = Math.ceil((new Date(state.formData.targetDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30));
+        if (diffMonths > 0) {
+          monthlyTarget = Math.ceil(aman / diffMonths);
+          dailyTarget = Math.ceil(monthlyTarget / 30);
+          weeklyTarget = Math.ceil(monthlyTarget / 4);
+        }
+      }
+
+      state.result = {
+        income: incomeNum,
+        target,
+        buffer,
+        aman,
+        gram: aman / state.hargaEmas,
+        hargaEmas: state.hargaEmas,
+        needsMonthly,
+        savingsMonthly,
+        diff: savingsMonthly,
+        diffMonths,
+        dailyTarget,
+        weeklyTarget,
+        monthlyTarget,
+        dreamResult,
+        isDeficit: (needsMonthly + debt + emergencyExpense) > incomeNum,
+        isTargetUnreachable: monthlyTarget ? monthlyTarget > savingsMonthly : false,
+        dailyAdvice: getDailyAdvice({
+          ...state.result,
+          income: incomeNum,
+          target,
+          buffer,
+          aman,
+          gram: aman / state.hargaEmas,
+          hargaEmas: state.hargaEmas,
+          needsMonthly,
+          savingsMonthly,
+          diff: savingsMonthly,
+          diffMonths,
+          dailyTarget,
+          weeklyTarget,
+          monthlyTarget,
+          dreamResult,
+          isDeficit: (needsMonthly + debt + emergencyExpense) > incomeNum,
+          isTargetUnreachable: monthlyTarget ? monthlyTarget > savingsMonthly : false
+        })
+      };
+
+      state.isCalculating = false;
+      state.isInputLocked = true;
+      
+      setTimeout(() => {
+        render();
+      }, 1500);
+    };
+
+    const resetForm = () => {
+      state.isInputLocked = false;
+      state.result = null;
+      render();
+    };
+
+    const openWhatsApp = (message) => {
+      const encoded = encodeURIComponent(message);
+      window.open(`https://wa.me/6285123882845?text=${encoded}`, '_blank');
+    };
+
+    const handleInputChange = (field, value) => {
+      if (state.isInputLocked) return;
+      
+      if (['gajiPokok', 'sideHustle', 'debt', 'dreamPrice', 'emergencyExpense'].includes(field)) {
+        state.formData[field] = formatInput(value);
+      } else {
+        state.formData[field] = value;
+      }
+    };
+
+    // Render Function
+    const render = () => {
+      const app = document.getElementById('app');
+      
+      app.innerHTML = `
+        <div class="text-center mb-12">
+          <h1 class="text-4xl md:text-5xl font-extrabold text-green-900 mb-4">
+            HONORER <span class="bg-gradient-to-r from-yellow-500 to-amber-500 bg-clip-text text-transparent">DIGITAL</span>
+          </h1>
+          <p class="text-gray-600 text-lg md:text-xl font-medium">
+            Kalkulator Keamanan Finansial Masa Depanmu
+          </p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-8">
+          <!-- Input Card -->
+          <div class="bg-white shadow-2xl border border-white/50 backdrop-blur-sm rounded-2xl">
+            <div class="p-6 border-b border-gray-200">
+              <div class="flex justify-between items-center text-2xl font-bold">
+                <span>Rencana Keuangan</span>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold ${state.hargaEmas ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}">
+                  ${state.hargaEmas ? 'LIVE' : 'OFFLINE'}
+                </span>
+              </div>
+            </div>
+            
+            <div class="p-6 space-y-6 ${state.isInputLocked ? 'opacity-50 pointer-events-none' : ''}">
+              <!-- Income Section -->
+              <div class="space-y-4">
+                <div class="grid sm:grid-cols-2 gap-4">
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">Gaji Pokok (Tetap)</label>
+                    <input 
+                      type="text"
+                      id="gajiPokok"
+                      placeholder="Contoh: 3.000.000"
+                      value="${state.formData.gajiPokok}"
+                      oninput="window.handleInputChange('gajiPokok', this.value)"
+                      ${state.isInputLocked ? 'disabled' : ''}
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  </div>
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">Side Hustle (Bonus)</label>
+                    <input 
+                      type="text"
+                      id="sideHustle"
+                      placeholder="Contoh: 1.000.000"
+                      value="${state.formData.sideHustle}"
+                      oninput="window.handleInputChange('sideHustle', this.value)"
+                      ${state.isInputLocked ? 'disabled' : ''}
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  </div>
+                </div>
+
+                <div class="space-y-2">
+                  <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">Status saat ini</label>
+                  <div class="relative">
+                    <button 
+                      onclick="window.openStatusDropdown()"
+                      ${state.isInputLocked ? 'disabled' : ''}
+                      class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <span>${state.formData.status === 'nikah' ? 'Akan Menikah' : state.formData.status === 'hamil' ? 'Hamil / Persalinan' : 'Sudah Punya Anak (Sudah Nikah)'}</span>
+                      <span>▼</span>
+                    </button>
+                    <div id="status-dropdown" class="hidden absolute z-50 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1">
+                      <div class="py-1" onclick="window.selectStatus('nikah')">Akan Menikah</div>
+                      <div class="py-1" onclick="window.selectStatus('hamil')">Hamil / Persalinan</div>
+                      <div class="py-1" onclick="window.selectStatus('anak')">Sudah Punya Anak (Sudah Nikah)</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4">
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">Gaya Hidup</label>
+                    <button 
+                      onclick="window.openLifestyleDropdown()"
+                      ${state.isInputLocked ? 'disabled' : ''}
+                      class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <span>${state.formData.lifestyle === 'hemat' ? 'Hemat (Frugal)' : state.formData.lifestyle === 'standar' ? 'Standar' : 'Mewah'}</span>
+                      <span>▼</span>
+                    </button>
+                    <div id="lifestyle-dropdown" class="hidden absolute z-50 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1">
+                      <div class="py-1" onclick="window.selectLifestyle('hemat')">Hemat (Frugal)</div>
+                      <div class="py-1" onclick="window.selectLifestyle('standar')">Standar</div>
+                      <div class="py-1" onclick="window.selectLifestyle('mewah')">Mewah</div>
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">Cicilan Utang/Bln</label>
+                    <input 
+                      type="text"
+                      id="debt"
+                      placeholder="0"
+                      value="${state.formData.debt}"
+                      oninput="window.handleInputChange('debt', this.value)"
+                      ${state.isInputLocked ? 'disabled' : ''}
+                      class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-6 border-gray-200">
+
+              <!-- Dream Planner -->
+              <div class="space-y-4 bg-orange-50 p-4 rounded-2xl">
+                <div class="flex justify-between items-center">
+                  <label class="text-orange-700 font-bold">🎯 Mimpi Besarmu?</label>
+                  <span class="px-2 py-1 bg-orange-100 text-orange-700 border border-orange-300 rounded text-xs font-semibold">
+                    Opsional
+                  </span>
+                </div>
+                <p class="text-xs text-orange-600 font-medium">
+                  Hitung kebutuhan untuk Rumah, Motor, atau Haji.
+                </p>
+
+                <div class="grid sm:grid-cols-2 gap-4">
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">Jenis Aset</label>
+                    <button 
+                      onclick="window.openDreamTypeDropdown()"
+                      ${state.isInputLocked ? 'disabled' : ''}
+                      class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <span>${state.formData.dreamType === 'none' ? '-- Tidak Ada --' : state.formData.dreamType === 'rumah' ? 'Rumah' : state.formData.dreamType === 'motor' ? 'Motor' : state.formData.dreamType === 'mobil' ? 'Mobil' : state.formData.dreamType === 'haji' ? 'Haji' : state.formData.dreamType === 'gadget' ? 'Gadget (HP/Kamera/Laptop)' : 'Liburan'}</span>
+                      <span>▼</span>
+                    </button>
+                    <div id="dreamtype-dropdown" class="hidden absolute z-50 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1">
+                      <div class="py-1" onclick="window.selectDreamType('none')">-- Tidak Ada --</div>
+                      <div class="py-1" onclick="window.selectDreamType('rumah')">Rumah</div>
+                      <div class="py-1" onclick="window.selectDreamType('motor')">Motor</div>
+                      <div class="py-1" onclick="window.selectDreamType('mobil')">Mobil</div>
+                      <div class="py-1" onclick="window.selectDreamType('haji')">Haji</div>
+                      <div class="py-1" onclick="window.selectDreamType('gadget')">Gadget (HP/Kamera/Laptop)</div>
+                      <div class="py-1" onclick="window.selectDreamType('liburan')">Liburan</div>
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">Metode Bayar</label>
+                    <button 
+                      onclick="window.openDreamMethodDropdown()"
+                      ${state.isInputLocked ? 'disabled' : ''}
+                      class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <span>${state.formData.dreamMethod === 'tunai' ? '100% Tunai' : 'Kredit / KPR (DP 20%)'}</span>
+                      <span>▼</span>
+                    </button>
+                    <div id="dreammethod-dropdown" class="hidden absolute z-50 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1">
+                      <div class="py-1" onclick="window.selectDreamMethod('tunai')">100% Tunai</div>
+                      <div class="py-1" onclick="window.selectDreamMethod('kredit')">Kredit / KPR (DP 20%)</div>
+                    </div>
+                  </div>
+                </div>
+
+                ${state.formData.dreamType !== 'none' ? `
+                <div class="space-y-2">
+                  <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">Estimasi Harga (Rp)</label>
+                  <input 
+                    type="text"
+                    id="dreamPrice"
+                    placeholder="Contoh: 200.000.000"
+                    value="${state.formData.dreamPrice}"
+                    oninput="window.handleInputChange('dreamPrice', this.value)"
+                    ${state.isInputLocked ? 'disabled' : ''}
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
+                ` : ''}
+              </div>
+
+              <hr class="my-6 border-gray-200">
+
+              <!-- Target Date -->
+              <div class="space-y-2">
+                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">${getTargetDateLabel(state.formData.status)}</label>
+                <input 
+                  type="date"
+                  id="targetDate"
+                  value="${state.formData.targetDate}"
+                  oninput="window.handleInputChange('targetDate', this.value)"
+                  ${state.isInputLocked ? 'disabled' : ''}
+                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                <p class="text-xs text-gray-500 font-medium">
+                  Tanggal target untuk mencapai dana aman yang bisa dikunci ke emas (Total Aset Aman)
+                </p>
+              </div>
+
+              <hr class="my-6 border-gray-200">
+
+              <!-- Emergency Expense -->
+              <div class="space-y-3 bg-red-50 p-4 rounded-2xl">
+                <div class="flex justify-between items-center">
+                  <label class="text-red-700 font-bold">🤝 Pengeluaran Darurat</label>
+                  <span class="px-2 py-1 bg-red-100 text-red-700 border border-red-300 rounded text-xs font-semibold">
+                    Opsional
+                  </span>
+                </div>
+                <p class="text-xs text-red-600 font-medium">
+                  Ada pengeluaran darurat bulanan? (servis motor, biaya kesehatan, dll)
+                </p>
+
+                <div class="space-y-2">
+                  <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">Biaya Bulanan (Rp)</label>
+                  <input 
+                    type="text"
+                    id="emergencyExpense"
+                    placeholder="Contoh: 500.000"
+                    value="${state.formData.emergencyExpense}"
+                    oninput="window.handleInputChange('emergencyExpense', this.value)"
+                    ${state.isInputLocked ? 'disabled' : ''}
+                    class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                  <p class="text-xs text-red-600 font-medium">
+                    Total biaya darurat yang dialokasikan setiap bulan (jika ada)
+                  </p>
+                </div>
+              </div>
+
+              <!-- Calculate Button -->
+              <button 
+                onclick="window.calculate()"
+                ${state.isCalculating || state.isInputLocked ? 'disabled' : ''}
+                class="w-full h-14 text-lg font-bold bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 shadow-lg hover:shadow-xl transition-all duration-300 text-white rounded-lg flex items-center justify-center"
+              >
+                ${state.isCalculating 
+                  ? '<div class="inline-block w-5 h-5 border-2 border-t-white/30 rounded-full animate-spin"></div> Menganalisis...' 
+                  : 'Hitung Keamanan'
+                }
+              </button>
+            </div>
+          </div>
+
+          <!-- Unlock Button -->
+          ${state.isInputLocked ? `
+          <div class="mt-4">
+            <button 
+              onclick="window.resetForm()"
+              class="w-full h-12 font-bold border-2 border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+            >
+              ✎ Edit Data Ulang
+            </button>
+          </div>
+          ` : ''}
+
+          <!-- Result Card -->
+          <div class="bg-white shadow-2xl border border-white/50 backdrop-blur-sm rounded-2xl">
+            <div class="p-6 border-b border-gray-200">
+              <h2 class="text-2xl font-bold">
+                Hasil Analisis
+              </h2>
+            </div>
+            
+            <div class="p-6">
+              ${!state.result ? `
+              <div class="text-center py-20 text-gray-400">
+                <p class="text-5xl mb-4">📊</p>
+                <p class="text-lg font-medium">Isi data di samping untuk melihat hasil analisis</p>
+              </div>
+              ` : `
+              <div class="space-y-6">
+                <!-- Total Asset -->
+                <div class="text-center p-6 bg-gradient-to-br from-green-100 to-emerald-200 rounded-2xl border-2 border-green-300 shadow-md">
+                  <p class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">
+                    Total Aset Aman Tercatat
+                  </p>
+                  <p class="text-5xl font-black text-green-800 mb-2">
+                    ${state.result.gram.toFixed(2)} gram
+                  </p>
+                  <p class="text-sm text-gray-700">
+                    Dana yang bisa dikunci ke emas
+                  </p>
+                </div>
+
+                <!-- Chart -->
+                <div class="h-56 bg-white rounded-lg p-4">
+                  <div class="flex items-center justify-center h-full">
+                    <svg viewBox="0 0 200 200" class="w-full h-full">
+                      <circle cx="100" cy="100" r="80" fill="none" stroke="#fbbf24" stroke-width="20"/>
+                      <circle cx="100" cy="100" r="${Math.min(70, (state.result.aman / (state.result.aman + state.result.buffer)) * 70)}" fill="#10b981" stroke-width="20"/>
+                      <text x="100" y="100" text-anchor="middle" dy="0.3em" fill="#374151" class="text-sm font-semibold">${formatIDR(state.result.aman)} (${(state.result.aman / (state.result.aman + state.result.buffer) * 100).toFixed(1)}%)</text>
+                    </svg>
+                  </div>
+                  <div class="flex justify-center gap-6 mt-4">
+                    <div class="flex items-center gap-2">
+                      <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                      <span class="text-sm text-gray-700">Aman (Emas)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="w-3 h-3 bg-yellow-500 rounded-full"></span>
+                      <span class="text-sm text-gray-700">Penyangga (Tunai)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Daily Advice -->
+                <div class="bg-gradient-to-br from-emerald-400 to-green-500 text-white border-0 shadow-lg rounded-xl p-4">
+                  <p class="font-bold text-base text-yellow-100 mb-2">💡 Nasehat Harianmu</p>
+                  <p class="text-sm font-medium">${state.result.dailyAdvice}</p>
+                </div>
+
+                <!-- Deficit Warning -->
+                ${state.result.isDeficit ? `
+                <div class="bg-red-50 border-red-300 text-red-900 rounded-xl p-4">
+                  <p class="font-bold mb-2">⚠️ KRISIS PENGHASILAN</p>
+                  <p class="text-sm">
+                    Pengeluaranmu (Rp ${formatIDR(state.result.needsMonthly + parseNumber(state.formData.debt) + parseNumber(state.formData.emergencyExpense))}) melebihi gaji (Rp ${formatIDR(state.result.income)}).
+                  </p>
+                  <p class="font-bold mt-2">SOLUSI WAJIB:</p>
+                  <p class="text-sm">Segera cari penghasilan tambahan (Side Hustle).</p>
+                </div>
+                ` : ''}
+
+                <!-- Target Warning -->
+                ${state.result.isTargetUnreachable && state.formData.targetDate ? `
+                <div class="bg-yellow-50 border-yellow-300 text-yellow-900 rounded-xl p-4">
+                  <p class="font-bold mb-2">⚠️ TARGET TERLALU BERAT</p>
+                  <p class="text-sm">
+                    Targetmu (Rp ${formatIDR(state.result.monthlyTarget)}) > Kemampuanmu (Rp ${formatIDR(state.result.savingsMonthly)}).
+                  </p>
+                  <p class="font-bold mt-2">Solusi:</p>
+                  <p class="text-sm">Tunda target atau kurangi gaya hidup.</p>
+                </div>
+                ` : ''}
+
+                <!-- Dream Result -->
+                ${state.result.dreamResult ? `
+                <div class="p-4 bg-orange-50 rounded-2xl">
+                  <div class="flex justify-between items-center mb-3">
+                    <span class="font-bold text-orange-700">
+                      🏆 Cek Mimpi: ${state.formData.dreamType.toUpperCase()}
+                    </span>
+                    <span class="px-2 py-1 ${state.result.dreamResult.feasible ? 'bg-green-100 text-green-700 border-green-300' : 'bg-red-100 text-red-700 border-red-300'} rounded text-xs font-semibold">
+                      ${state.result.dreamResult.feasible ? 'CUKUP AMAN' : 'KURANG'}
+                    </span>
+                  </div>
+                  <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                      <span>Kebutuhan ${state.formData.dreamMethod === 'tunai' ? '100% Tunai' : 'DP 20%'}:</span>
+                      <span class="font-bold">Rp ${formatIDR(state.result.dreamResult.requiredCash)}</span>
+                    </div>
+                    ${!state.result.dreamResult.feasible ? `
+                    <div class="text-red-600 font-bold">
+                      Selisih: Rp ${formatIDR(Math.abs(state.result.dreamResult.diff))}
+                    </div>
+                    ` : ''}
+                    <p class="text-gray-600 text-xs italic mt-2 bg-white/50 p-2 rounded-lg">
+                      ${state.result.dreamResult.advice}
+                    </p>
+                    <p class="text-orange-600 text-xs mt-2 font-medium bg-orange-100/50 p-2 rounded-lg">
+                      * Cek Mimpi ini tidak mempengaruhi cash flow bulanan. Hanya mengecek apakah dana aman Anda cukup untuk membeli aset impian.
+                    </p>
+                  </div>
+                </div>
+                ` : ''}
+
+                <!-- Monthly Analysis -->
+                <div class="p-4 bg-slate-50 rounded-2xl">
+                  <div class="flex justify-between items-center mb-4">
+                    <span class="font-bold text-gray-800">Analisa Bulanan</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-700 border-blue-300 rounded text-xs font-semibold">
+                      Cash Flow
+                    </span>
+                  </div>
+                  <div class="space-y-3">
+                    <p class="text-sm text-gray-600 font-medium">
+                      Total Gaji: <span class="text-gray-900 font-bold">Rp ${formatIDR(state.result.income)}</span> (Gaji Pokok + Side Hustle)
+                    </p>
+                    <div class="space-y-2">
+                      <div class="flex justify-between text-sm font-semibold">
+                        <span class="text-blue-700">Kebutuhan Hidup</span>
+                        <span>${formatIDR(state.result.needsMonthly)} (${Math.round((state.result.needsMonthly / state.result.income) * 100)}%)</span>
+                      </div>
+                      <div class="flex justify-between text-sm font-semibold">
+                        <span class="text-red-700">Cicilan / Utang</span>
+                        <span>${formatIDR(parseNumber(state.formData.debt))} (${Math.round((parseNumber(state.formData.debt) / state.result.income) * 100)}%)</span>
+                      </div>
+                      ${parseNumber(state.formData.emergencyExpense) > 0 ? `
+                      <div class="flex justify-between text-sm font-semibold">
+                        <span class="text-orange-700">Pengeluaran Darurat</span>
+                        <span>${formatIDR(parseNumber(state.formData.emergencyExpense))} (${Math.round((parseNumber(state.formData.emergencyExpense) / state.result.income) * 100)}%)</span>
+                      </div>
+                      ` : ''}
+                      <div class="flex justify-between text-sm font-semibold">
+                        <span class="text-green-700">Kemampuan Menabung (Nyata)</span>
+                        <span>${formatIDR(state.result.savingsMonthly)} (${100 - Math.round((state.result.needsMonthly / state.result.income) * 100) - Math.round((parseNumber(state.formData.debt) / state.result.income) * 100) - Math.round((parseNumber(state.formData.emergencyExpense) / state.result.income) * 100)}%)</span>
+                      </div>
+                    </div>
+                    <div class="h-3 overflow-hidden rounded-full bg-gray-200 flex mt-3">
+                      <div class="h-full bg-blue-500 transition-all duration-500" style="width: ${Math.round((state.result.needsMonthly / state.result.income) * 100)}%"></div>
+                      <div class="h-full bg-red-500 transition-all duration-500" style="width: ${Math.round((parseNumber(state.formData.debt) / state.result.income) * 100)}%"></div>
+                      ${parseNumber(state.formData.emergencyExpense) > 0 ? `
+                      <div class="h-full bg-orange-500 transition-all duration-500" style="width: ${Math.round((parseNumber(state.formData.emergencyExpense) / state.result.income) * 100)}%"></div>
+                      ` : ''}
+                      <div class="h-full bg-green-500 transition-all duration-500" style="width: ${100 - Math.round((state.result.needsMonthly / state.result.income) * 100) - Math.round((parseNumber(state.formData.debt) / state.result.income) * 100) - Math.round((parseNumber(state.formData.emergencyExpense) / state.result.income) * 100)}%"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Buffer Fund -->
+                <div class="p-4 bg-gradient-to-br from-amber-100 to-yellow-200 rounded-2xl">
+                  <div class="flex justify-between items-center mb-3">
+                    <span class="font-bold text-gray-800">Dana Penyangga Hidup</span>
+                    <span class="px-2 py-1 bg-yellow-100 text-yellow-700 border-yellow-300 rounded text-xs font-semibold">
+                      Wajib Tunai
+                    </span>
+                  </div>
+                  <p class="text-3xl font-black text-yellow-700 mb-2">
+                    Rp ${formatIDR(state.result.buffer)}
+                  </p>
+                  <p class="text-sm text-gray-700">
+                    Uang tunai wajib di rekening. Sabuk pengaman jika penghasilan berhenti.
+                  </p>
+                </div>
+
+                <!-- Large Fund Needs -->
+                <div class="p-4 bg-gradient-to-br from-gray-100 to-slate-200 rounded-2xl">
+                  <div class="flex justify-between items-center mb-3">
+                    <span class="font-bold text-gray-800">Kebutuhan Dana Besar</span>
+                    <span class="px-2 py-1 bg-purple-100 text-purple-700 border-purple-300 rounded text-xs font-semibold">
+                      Gaya Hidup ${state.formData.lifestyle.charAt(0).toUpperCase() + state.formData.lifestyle.slice(1)}
+                    </span>
+                  </div>
+                  <p class="text-3xl font-black text-gray-900 mb-3">
+                    Rp ${formatIDR(state.result.target)}
+                  </p>
+                  <p class="text-sm text-gray-700">
+                    Estimasi biaya realistis dengan gaya hidup <strong>${state.formData.lifestyle.charAt(0).toUpperCase() + state.formData.lifestyle.slice(1)}</strong>.
+                  </p>
+                  <ul class="space-y-1 text-sm text-gray-700 list-disc list-inside">
+                    ${getReasonList(state.formData.status).map(item => `<li>${item}</li>`).join('')}
+                  </ul>
+                </div>
+
+                <!-- Lockable Fund -->
+                <div class="p-4 bg-gradient-to-br from-green-100 to-emerald-200 rounded-2xl">
+                  <div class="flex justify-between items-center mb-3">
+                    <span class="font-bold text-gray-800">Dana Siap Dikunci</span>
+                    <span class="px-2 py-1 bg-green-100 text-green-700 border-green-300 rounded text-xs font-semibold">
+                      Bisa di Emas
+                    </span>
+                  </div>
+                  <p class="text-3xl font-black text-green-800 mb-3">
+                    Rp ${formatIDR(state.result.aman)}
+                  </p>
+                  <p class="text-sm text-gray-700">
+                    Sisa dana aman untuk dikunci (diinvestasikan) dalam bentuk emas.
+                  </p>
+                  <div class="text-sm space-y-1 bg-green-50 p-3 rounded-lg">
+                    <div class="font-semibold text-green-800">Setara emas: <span class="text-black">${state.result.gram.toFixed(2)} gram</span></div>
+                    <div class="font-semibold text-green-800">Harga emas: <span class="text-black">Rp ${formatIDR(state.hargaEmas)} / gram</span></div>
+                    <div class="font-semibold text-green-800">Total: <span class="text-black">Rp ${formatIDR(state.result.aman)}</span></div>
+                  </div>
+
+                  <!-- Target Plan -->
+                  ${state.formData.targetDate && state.result.diffMonths && state.result.diffMonths > 0 ? `
+                  <div class="mt-4 p-3 bg-gradient-to-r from-orange-100 to-amber-100 rounded-xl border border-orange-200">
+                    <div class="font-bold text-orange-800 text-sm mb-3">
+                      🔥 Langkah Nyata Harian
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                      <div class="bg-white/60 p-2 rounded-lg text-center">
+                        <div class="text-xs font-bold text-orange-700 mb-1">Harian</div>
+                        <div class="text-lg font-black text-orange-800">Rp ${formatIDR(state.result.dailyTarget)}</div>
+                      </div>
+                      <div class="bg-white/60 p-2 rounded-lg text-center">
+                        <div class="text-xs font-bold text-orange-700 mb-1">Mingguan</div>
+                        <div class="text-lg font-black text-orange-800">Rp ${formatIDR(state.result.weeklyTarget)}</div>
+                      </div>
+                    </div>
+                    <div class="border-t-2 border-dashed border-orange-300 pt-3">
+                      <div class="flex justify-between items-center text-base font-black text-orange-800">
+                        <span>Total Bulanan:</span>
+                        <span>Rp ${formatIDR(state.result.monthlyTarget)} / bln</span>
+                      </div>
+                    </div>
+                    <p class="text-xs text-orange-700 italic mt-2 bg-orange-100/50 p-2 rounded-lg">
+                      ${state.result.dailyTarget && state.result.dailyTarget < 25000
+                        ? 'Setara dengan 1 botol air mineral.'
+                        : state.result.dailyTarget < 50000
+                        ? 'Setara dengan 1 kali jajan kecil.'
+                        : 'Setara dengan 1 kali jajan standar.'}
+                    </p>
+                    <div class="text-xs text-gray-600">
+                      *Kemampuanmu: Rp ${formatIDR(state.result.savingsMonthly)} / bln
+                    </div>
+                  </div>
+                  ` : ''}
+
+                  ${state.formData.targetDate && state.result.diffMonths && state.result.diffMonths <= 0 ? `
+                  <div class="mt-4 p-3 bg-red-50 border border-red-300 rounded-lg">
+                    <div class="font-bold text-red-700">Waktu Terlampau</div>
+                  </div>
+                  ` : ''}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                  <button 
+                    onclick="window.openWhatsApp(\`Halo, saya ingin order "Template Excel Pengatur Keuangan Keluarga" (Rp 49.000).\\n\\nBerikut data analisa saya:\\nStatus: ${state.formData.status}\\nTotal Penghasilan: Rp ${formatIDR(state.result.income)}\\nGaya Hidup: ${state.formData.lifestyle}\\nCicilan: Rp ${formatIDR(parseNumber(state.formData.debt))}\\nDana Besar: Rp ${formatIDR(state.result.target)}\\nDana Penyangga: Rp ${formatIDR(state.result.buffer)}\\nDana Emas: Rp ${formatIDR(state.result.aman)} (${state.result.gram.toFixed(2)} gram)\`)"
+                    class="w-full h-12 font-bold border-2 border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                  >
+                    📥 Download Excel
+                  </button>
+                  <button 
+                    onclick="window.openWhatsApp('Halo, saya ingin order "Panduan Beli Emas (E-Book)" (Rp 29.000).\\n\\nMohon infonya.')"
+                    class="w-full h-12 font-bold border-2 border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                  >
+                    📘 Panduan Emas (PDF)
+                  </button>
+                </div>
+
+                <!-- Development Donation -->
+                <div class="p-4 bg-gradient-to-br from-amber-50 to-yellow-100 rounded-2xl">
+                  <p class="font-bold text-amber-700 text-sm mb-3">❤️ Dukung Pengembangan</p>
+                  <p class="text-sm text-amber-600 mb-3">
+                    Bantu pengembangan aplikasi agar bisa membantu lebih banyak orang.
+                  </p>
+                  <button 
+                    onclick="window.openWhatsApp('Assalamualaikum, saya ingin sedekah untuk pengembangan aplikasi HONORER DIGITAL. Mohon info nomor rekening.')"
+                    class="w-full h-12 font-bold bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white rounded-lg"
+                  >
+                    ❤️ Donasi Pengembangan
+                  </button>
+                </div>
+
+                <!-- Footer Note -->
+                <div class="text-center text-xs text-gray-500 space-y-1 mt-6">
+                  <p>Data harga emas diupdate realtime (Logam Mulia)</p>
+                  <p>
+                    <strong>Catatan:</strong> Ini adalah dana tujuan, bukan dana darurat.
+                  </p>
+                </div>
+              </div>
+              `}
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-sm text-gray-500 py-6">
+          <p class="font-semibold">HONORER DIGITAL © 2024</p>
+          <p class="text-xs mt-1">Kalkulator Keamanan Finansial untuk Masa Depan yang Lebih Baik</p>
+        </footer>
+      `;
+    };
+
+    // Dropdown handlers
+    window.openStatusDropdown = () => {
+      const dropdown = document.getElementById('status-dropdown');
+      dropdown.classList.toggle('hidden');
+    };
+
+    window.selectStatus = (status) => {
+      handleInputChange('status', status);
+      document.getElementById('status-dropdown').classList.add('hidden');
+    };
+
+    window.openLifestyleDropdown = () => {
+      const dropdown = document.getElementById('lifestyle-dropdown');
+      dropdown.classList.toggle('hidden');
+    };
+
+    window.selectLifestyle = (lifestyle) => {
+      handleInputChange('lifestyle', lifestyle);
+      document.getElementById('lifestyle-dropdown').classList.add('hidden');
+    };
+
+    window.openDreamTypeDropdown = () => {
+      const dropdown = document.getElementById('dreamtype-dropdown');
+      dropdown.classList.toggle('hidden');
+    };
+
+    window.selectDreamType = (type) => {
+      handleInputChange('dreamType', type);
+      document.getElementById('dreamtype-dropdown').classList.add('hidden');
+    };
+
+    window.openDreamMethodDropdown = () => {
+      const dropdown = document.getElementById('dreammethod-dropdown');
+      dropdown.classList.toggle('hidden');
+    };
+
+    window.selectDreamMethod = (method) => {
+      handleInputChange('dreamMethod', method);
+      document.getElementById('dreammethod-dropdown').classList.add('hidden');
+    };
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      const statusDropdown = document.getElementById('status-dropdown');
+      const lifestyleDropdown = document.getElementById('lifestyle-dropdown');
+      const dreamTypeDropdown = document.getElementById('dreamtype-dropdown');
+      const dreamMethodDropdown = document.getElementById('dreammethod-dropdown');
+      
+      if (e.target.closest('button')) return;
+      
+      const target = e.target;
+      const button = target?.closest('button');
+      if (button && statusDropdown && !button.contains(statusDropdown) && !statusDropdown.contains(target)) {
+        statusDropdown.classList.add('hidden');
+      }
+      if (button && lifestyleDropdown && !button.contains(lifestyleDropdown) && !lifestyleDropdown.contains(target)) {
+        lifestyleDropdown.classList.add('hidden');
+      }
+      if (button && dreamTypeDropdown && !button.contains(dreamTypeDropdown) && !dreamTypeDropdown.contains(target)) {
+        dreamTypeDropdown.classList.add('hidden');
+      }
+      if (button && dreamMethodDropdown && !button.contains(dreamMethodDropdown) && !dreamMethodDropdown.contains(target)) {
+        dreamMethodDropdown.classList.add('hidden');
+      }
+    });
+
+    // Initial render
+    render();
+  </script>
 </body>
 </html>
