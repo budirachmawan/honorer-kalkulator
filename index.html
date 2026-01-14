@@ -1159,893 +1159,137 @@ input:checked + .switch-slider:before {
 </div>
 
 <script>
-// ========== GLOBAL VARIABLES ==========
+// ================= GLOBAL =================
 let currentPeriod = 6;
 let goldPrice = 1000000;
-let goldChart = null;
 let financeChart = null;
 let lineChart = null;
-let goldUpdateInterval = null;
 
-// ========== FORMATTING FUNCTIONS ==========
-function formatRupiah(amount) {
-    if (!amount || isNaN(amount)) return 'Rp 0';
-    return 'Rp ' + amount.toLocaleString('id-ID');
+// ================= FORMAT =================
+function formatRupiah(n){
+  if(!n || isNaN(n)) return "Rp 0";
+  return "Rp " + Math.round(n).toLocaleString("id-ID");
+}
+function parseRupiah(v){
+  if(!v) return 0;
+  return parseInt(v.toString().replace(/[^0-9]/g,""))||0;
 }
 
-function parseRupiah(input) {
-    if (!input) return 0;
-    const numericString = input.toString().replace(/[^0-9]/g, '');
-    return parseInt(numericString) || 0;
-}
-
-// ========== GOLD PRICE API (BINANCE + EXCHANGE RATE) ==========
-async function updateGoldPrice() {
-    const goldPriceElement = document.getElementById('gold-price');
-    const apiStatus = document.getElementById('api-status');
-    
-    try {
-        goldPriceElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...';
-        apiStatus.innerHTML = '<span class="status-dot"></span> Memuat harga emas...';
-        
-        // 1. Get PAXG price from Binance
-        const goldRes = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT');
-        const goldData = await goldRes.json();
-        const priceInUSD = parseFloat(goldData.price);
-        
-        // 2. Get USD to IDR exchange rate
-        const rateRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-        const rateData = await rateRes.json();
-        const usdToIdr = rateData.rates.IDR;
-        
-        // 3. Convert to price per gram (1 oz = 31.1035 grams)
-        goldPrice = Math.round((priceInUSD * usdToIdr) / 31.1035);
-        
-        // Update UI
-        goldPriceElement.textContent = formatRupiah(goldPrice);
-        apiStatus.innerHTML = '<span class="status-dot online"></span> Harga emas real-time';
-        
-        // Save cache
-        localStorage.setItem('gold_cache', JSON.stringify({
-            price: goldPrice,
-            timestamp: Date.now(),
-            source: 'Binance PAXG'
-        }));
-        
-        return goldPrice;
-        
-    } catch (error) {
-        console.error('Error fetching gold price:', error);
-        
-        // Try cache
-        const cache = localStorage.getItem('gold_cache');
-        if (cache) {
-            const cacheData = JSON.parse(cache);
-            const cacheAge = Date.now() - cacheData.timestamp;
-            
-            if (cacheAge < 24 * 60 * 60 * 1000) { // 24 hours
-                goldPrice = cacheData.price;
-                goldPriceElement.textContent = formatRupiah(goldPrice);
-                apiStatus.innerHTML = '<span class="status-dot"></span> Harga emas (data cache)';
-                return goldPrice;
-            }
-        }
-        
-        // Fallback
-        goldPrice = 1000000;
-        goldPriceElement.textContent = formatRupiah(goldPrice);
-        apiStatus.innerHTML = '<span class="status-dot"></span> Harga emas default';
-        return goldPrice;
-    }
-}
-
-// ========== TOGGLE INFLASI ==========
-document.getElementById('inflation-toggle').addEventListener('change', function() {
-    const statusElement = document.getElementById('toggle-status');
-    
-    if (this.checked) {
-        statusElement.textContent = 'ON - Inflasi 6% per tahun';
-        statusElement.className = 'toggle-status on';
-    } else {
-        statusElement.textContent = 'OFF - Tanpa inflasi';
-        statusElement.className = 'toggle-status off';
-    }
-    
-    localStorage.setItem('inflation_toggle', this.checked);
-});
-
-// ========== PERIODE TABUNGAN ==========
-document.querySelectorAll('.period-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        // Update UI
-        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        
-        // Update variable
-        currentPeriod = parseInt(this.dataset.period);
-        document.getElementById('line-chart-period').textContent = currentPeriod + ' Bulan';
-        
-        // Save to localStorage
-        localStorage.setItem('selected_period', currentPeriod);
-        
-        // Update line chart if exists
-        if (window.lastCalculation) {
-            createLineChart(
-                window.lastCalculation.monthlySave,
-                window.lastCalculation.aman,
-                currentPeriod
-            );
-        }
-    });
-});
-
-// ========== KREDIT INPUT FORMATTING ==========
-document.getElementById('kewajiban-bulanan').addEventListener('input', function() {
-    // Format input
-    const value = parseRupiah(this.value);
-    this.value = value.toLocaleString('id-ID');
-    
-    // Save to localStorage
-    localStorage.setItem('kewajiban_amount', value);
-});
-
-// ========== DREAM PLANNER TOGGLE & AUTO-FILL ==========
-document.getElementById('dream-method').addEventListener('change', function() {
-    const creditOptions = document.getElementById('credit-options');
-    const creditInfoBox = document.getElementById('credit-info-box');
-    
-    if (this.value === 'kredit') {
-        creditOptions.classList.remove('hidden');
-        creditInfoBox.classList.remove('hidden');
-    } else {
-        creditOptions.classList.add('hidden');
-        creditInfoBox.classList.add('hidden');
-    }
-});
-
-// CREDIT SIMULATION DATABASE
-const creditSimulations = {
-    mobil: {
-        defaultDP: 20,
-        defaultInterest: 9,
-        defaultTenor: 5,
-        description: "DP 20-30%, bunga 6-9%/tahun, tenor 1-7 tahun. Cicilan termasuk asuransi."
-    },
-    motor: {
-        defaultDP: 20,
-        defaultInterest: 8,
-        defaultTenor: 3,
-        description: "DP 10-30%, bunga 6-9%/tahun, tenor 1-3 tahun."
-    },
-    rumah: {
-        defaultDP: 20,
-        defaultInterest: 8.5,
-        defaultTenor: 15,
-        description: "KPR DP 10-30%, bunga fixed 2-5 tahun lalu floating."
-    },
-    gadget: {
-        defaultDP: 0,
-        defaultInterest: 3,
-        defaultTenor: 1,
-        description: "0% DP, bunga 0-6%/bulan flat, tenor 6-24 bulan."
-    },
-    liburan: {
-        defaultDP: 10,
-        defaultInterest: 2.5,
-        defaultTenor: 1,
-        description: "DP 10-30%, bunga bervariasi, tenor 3-12 bulan."
-    },
-    haji: {
-        defaultDP: 30,
-        defaultInterest: 7,
-        defaultTenor: 5,
-        description: "Pembiayaan syariah, DP 20-40%, margin 7-12%/tahun."
-    }
+// ================= DATABASE BIAYA RIIL =================
+const costDatabase = {
+  nikah:{
+    akad:3000000, mahar:8000000, catering:12000000, tenda:7000000,
+    busana:4000000, dokumentasi:3000000, pindahan:5000000,
+    perabot:6000000, bulan_awal:6000000, konflik:6000000
+  },
+  hamil:{
+    kontrol:2500000, vitamin:1500000, persalinan:8000000, dokter:3000000,
+    perlengkapan:4000000, popok:2000000, susu:3000000,
+    perawatan:3000000, darurat:4000000
+  },
+  anak:{
+    susu:3000000, pampers:2500000, imunisasi:2000000, dokter:2000000,
+    sekolah:4000000, transport:2000000, pakaian:2000000,
+    mainan:1000000, darurat:3000000
+  }
 };
 
-// AUTO-FILL FUNCTION
-document.getElementById('dream-type').addEventListener('change', function() {
-    const product = this.value;
-    const creditInfoBox = document.getElementById('credit-info-box');
-    
-    if (product !== 'none' && creditSimulations[product]) {
-        const defaults = creditSimulations[product];
-        
-        // Auto-fill values
-        document.getElementById('dp-percent').value = defaults.defaultDP;
-        document.getElementById('interest-rate').value = defaults.defaultInterest;
-        document.getElementById('tenor-years').value = defaults.defaultTenor;
-        
-        // Show info box
-        creditInfoBox.innerHTML = `<strong>Info Kredit ${product.toUpperCase()}:</strong> ${defaults.description}`;
-        creditInfoBox.classList.remove('hidden');
-    } else {
-        creditInfoBox.classList.add('hidden');
-    }
-});
-
-// ========== INPUT FORMATTING ==========
-const numericInputs = ['gaji-pokok', 'side-job', 'kewajiban-bulanan', 'dream-price', 'tabungan-saat-ini'];
-numericInputs.forEach(id => {
-    const input = document.getElementById(id);
-    if (input) {
-        input.addEventListener('input', function() {
-            const value = parseRupiah(this.value);
-            this.value = value.toLocaleString('id-ID');
-        });
-    }
-});
-
-// ========== CALCULATION FUNCTIONS ==========
-function calculateFinancials() {
-    // Get input values
-    const gajiPokok = parseRupiah(document.getElementById('gaji-pokok').value);
-    const sideJob = parseRupiah(document.getElementById('side-job').value);
-    const kewajiban = parseRupiah(document.getElementById('kewajiban-bulanan').value);
-    const tabunganSaatIni = parseRupiah(document.getElementById('tabungan-saat-ini').value);
-    
-    const totalIncome = gajiPokok + sideJob;
-    
-    if (gajiPokok <= 0) {
-        alert('Masukkan gaji pokok yang valid');
-        return null;
-    }
-    
-    // Status and lifestyle multipliers
-    const baseMult = { 'nikah':6, 'hamil':4, 'anak':3 };
-    const lifestyleFactor = { 'hemat': 0.8, 'standar': 1.0, 'mewah': 1.5 };
-    
-    const statusVal = document.getElementById('status').value;
-    const lifestyleVal = document.getElementById('lifestyle').value;
-    const useInflation = document.getElementById('inflation-toggle').checked;
-    
-    // Calculate target (estimasi biaya)
-    let target = Math.ceil(gajiPokok * baseMult[statusVal] * lifestyleFactor[lifestyleVal]);
-    
-    // Apply inflation if enabled
-    if (useInflation) {
-        const dateInput = document.getElementById('target-date').value;
-        if (dateInput) {
-            const targetDate = new Date(dateInput);
-            const today = new Date();
-            const years = Math.max(0, Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24 * 365)));
-            
-            if (years > 0) {
-                target = Math.ceil(target * Math.pow(1.06, years));
-            }
-        }
-    }
-    
-    // Calculate operational 3 months (70% rule)
-    const operationalMonthly = Math.ceil(gajiPokok * 0.7);
-    const operational3Months = operationalMonthly * 3;
-    
-    // Calculate safe fund for investment
-    const safeFund = Math.max(0, target - operational3Months);
-    
-    // Calculate monthly breakdown
-    const monthlyNeeds = operationalMonthly;
-    const monthlyDebt = kewajiban;
-    const monthlySavings = gajiPokok - monthlyNeeds - monthlyDebt;
-    
-    // Calculate gold equivalent
-    const goldGrams = (safeFund / goldPrice).toFixed(2);
-    
-    // Accounting summary
-    const totalAssets = tabunganSaatIni + operational3Months;
-    const totalLiabilities = target + (kewajiban * 12);
-    const netWorth = totalAssets - totalLiabilities;
-    const financialRatio = totalLiabilities > 0 ? (totalAssets / totalLiabilities).toFixed(1) : '∞';
-    
-    return {
-        totalIncome,
-        gajiPokok,
-        monthlyNeeds,
-        monthlyDebt,
-        monthlySavings,
-        operational3Months,
-        target,
-        safeFund: Math.round(safeFund),
-        goldGrams,
-        tabunganSaatIni,
-        totalAssets: Math.round(totalAssets),
-        totalLiabilities: Math.round(totalLiabilities),
-        netWorth: Math.round(netWorth),
-        financialRatio,
-        statusVal,
-        lifestyleVal,
-        useInflation
-    };
+// ================= GOLD PRICE =================
+async function updateGoldPrice(){
+  try{
+    const r1 = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT");
+    const d1 = await r1.json();
+    const r2 = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
+    const d2 = await r2.json();
+    goldPrice = Math.round((parseFloat(d1.price)*d2.rates.IDR)/31.1035);
+  }catch(e){ goldPrice=1000000; }
+  document.getElementById("gold-price").innerText=formatRupiah(goldPrice);
+  document.getElementById("gold-price-detail").innerText=formatRupiah(goldPrice);
 }
 
-// ========== DREAM PLANNER CALCULATION ==========
-function calculateDreamPlan(results) {
-    const dreamType = document.getElementById('dream-type').value;
-    const dreamMethod = document.getElementById('dream-method').value;
-    const dreamPrice = parseRupiah(document.getElementById('dream-price').value);
-    
-    if (dreamType === 'none' || dreamPrice <= 0) {
-        return '';
-    }
-    
-    let dreamHTML = '';
-    
-    if (dreamMethod === 'kredit') {
-        // Kredit calculation
-        const dpPercent = parseInt(document.getElementById('dp-percent').value) || 20;
-        const tenorYears = parseInt(document.getElementById('tenor-years').value) || 5;
-        const interestRate = parseInt(document.getElementById('interest-rate').value) || 12;
-        
-        const dpAmount = dreamPrice * (dpPercent / 100);
-        const loanAmount = dreamPrice - dpAmount;
-        const interest = interestRate / 100;
-        const totalInterest = loanAmount * interest * tenorYears;
-        const totalPayment = loanAmount + totalInterest;
-        const monthlyPayment = totalPayment / (tenorYears * 12);
-        
-        // Risk assessment
-        const monthlyIncome = results.gajiPokok;
-        const paymentRatio = (monthlyPayment / monthlyIncome) * 100;
-        const isRisky = paymentRatio > 30;
-        
-        dreamHTML = `
-            <div class="info-card mt-24">
-                <div class="info-header">
-                    <div class="info-title"><i class="fas fa-home"></i> Simulasi Kredit ${dreamType.toUpperCase()}</div>
-                    <div class="info-badge" style="background: ${isRisky ? 'var(--danger-bg)' : 'var(--success-bg)'}; 
-                                                    color: ${isRisky ? 'var(--danger)' : 'var(--success)'};">
-                        ${isRisky ? 'Risiko Tinggi' : 'Aman'}
-                    </div>
-                </div>
-                
-                <div style="margin: 16px 0;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="color: var(--text-muted);">DP (${dpPercent}%)</span>
-                        <span style="font-weight: 600;">${formatRupiah(dpAmount)}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="color: var(--text-muted);">Pokok Pinjaman</span>
-                        <span>${formatRupiah(loanAmount)}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="color: var(--text-muted);">Total Bunga</span>
-                        <span style="color: var(--danger); font-weight: 600;">${formatRupiah(totalInterest)}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                        <span style="color: var(--text-muted);">Total Bayar</span>
-                        <span style="font-weight: 700;">${formatRupiah(totalPayment)}</span>
-                    </div>
-                    <div style="padding: 12px; background: var(--gray-100); border-radius: var(--radius-md);">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span style="font-weight: 600;">Cicilan per Bulan</span>
-                            <span style="font-size: 18px; font-weight: 800; color: var(--primary);">
-                                ${formatRupiah(Math.ceil(monthlyPayment))}
-                            </span>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-                            (${tenorYears} tahun, ${paymentRatio.toFixed(1)}% dari penghasilan)
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    } else {
-        // Tunai calculation
-        const canAfford = results.safeFund >= dreamPrice;
-        
-        dreamHTML = `
-            <div class="info-card mt-24">
-                <div class="info-header">
-                    <div class="info-title"><i class="fas fa-home"></i> Pembelian Tunai ${dreamType.toUpperCase()}</div>
-                    <div class="info-badge" style="background: ${canAfford ? 'var(--success-bg)' : 'var(--danger-bg)'}; 
-                                                    color: ${canAfford ? 'var(--success)' : 'var(--danger)'};">
-                        ${canAfford ? 'Cukup' : 'Kurang'}
-                    </div>
-                </div>
-                
-                <div style="text-align: center; padding: 16px 0;">
-                    <div style="font-size: 32px; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">
-                        ${formatRupiah(dreamPrice)}
-                    </div>
-                    <div style="font-size: 14px; color: var(--text-muted);">
-                        Dana Investasi: ${formatRupiah(results.safeFund)}
-                    </div>
-                    ${!canAfford ? `
-                        <div style="margin-top: 12px; padding: 12px; background: var(--danger-bg); border-radius: var(--radius-md);">
-                            <div style="font-weight: 600; color: var(--danger);">Kurang ${formatRupiah(dreamPrice - results.safeFund)}</div>
-                            <div style="font-size: 12px; color: var(--danger); margin-top: 4px;">
-                                Butuh ${Math.ceil((dreamPrice - results.safeFund) / results.monthlySavings)} bulan menabung
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-            </div>
-        `;
-    }
-    
-    return dreamHTML;
+// ================= CORE =================
+function calculateAll(){
+  const gaji = parseRupiah(gajiPokok.value);
+  const side = parseRupiah(sideJob.value);
+  const debt = parseRupiah(kewajibanBulanan.value);
+  const tabungan = parseRupiah(tabunganSaatIni.value);
+
+  const status = document.getElementById("status").value;
+  const lifestyle = document.getElementById("lifestyle").value;
+  const inflasi = document.getElementById("inflation-toggle").checked;
+
+  if(gaji<=0){alert("Masukkan gaji valid");return;}
+
+  // 1. Target dari biaya riil
+  let target=0;
+  Object.values(costDatabase[status]).forEach(v=>target+=v);
+  const lifestyleFactor={hemat:1,standar:1.3,mewah:1.7};
+  target*=lifestyleFactor[lifestyle];
+
+  // inflasi
+  const date=document.getElementById("target-date").value;
+  if(inflasi && date){
+    const years=Math.ceil((new Date(date)-new Date())/(1000*60*60*24*365));
+    if(years>0) target*=Math.pow(1.06,years);
+  }
+
+  // 2. Dana hidup
+  const monthlyNeeds=gaji*0.7;
+  const danaHidup=monthlyNeeds*3;
+
+  // 3. Dana wajib
+  const danaWajib=target+danaHidup;
+
+  // 4. Gap
+  const gap=Math.max(0,danaWajib-tabungan);
+
+  // 5. Arus kas
+  const income=gaji+side;
+  const save=income-monthlyNeeds-debt;
+
+  // 6. Emas
+  const gram=(gap/goldPrice).toFixed(2);
+
+  // ===== UPDATE UI =====
+  goldGrams.innerText=gram+" gram";
+  cashIncome.innerText=formatRupiah(income);
+  cashNeeds.innerText=formatRupiah(monthlyNeeds);
+  cashDebt.innerText=formatRupiah(debt);
+  cashSave.innerText=formatRupiah(save);
+
+  emergencyFund.innerText=formatRupiah(danaHidup);
+  targetPriceDetail.innerText=formatRupiah(target);
+  safePriceDetail.innerText=formatRupiah(gap);
+  gramDetail.innerText=gram;
+
+  // list biaya
+  budgetListItems.innerHTML=Object.entries(costDatabase[status])
+    .map(([k,v])=>`<li>${k.replace("_"," ")} — ${formatRupiah(v)}</li>`).join("");
+
+  createLine(save,gap,currentPeriod);
 }
 
-// ========== CREATE CHARTS ==========
-function createCharts(results) {
-    // Doughnut Chart
-    const chartCanvas = document.getElementById('finance-chart');
-    
-    if (financeChart) {
-        financeChart.destroy();
-    }
-    
-    financeChart = new Chart(chartCanvas, {
-        type: "doughnut",
-        data: {
-            labels: ["Dana Investasi", "Operasional 3 Bulan"],
-            datasets: [{
-                data: [results.safeFund, results.operational3Months],
-                backgroundColor: ["#10b981", "#fbbf24"],
-                borderWidth: 0,
-                hoverOffset: 8
-            }]
-        },
-        options: {
-            cutout: '70%',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 20
-                    }
-                }
-            }
-        }
-    });
-    
-    // Line Chart
-    createLineChart(results.monthlySavings, results.safeFund, currentPeriod);
+// ================= LINE CHART =================
+function createLine(monthly, target, period){
+  if(monthly<=0) return;
+  const labels=[],acc=[],tar=[];
+  let sum=0;
+  for(let i=1;i<=period;i++){labels.push("Bulan "+i);sum+=monthly;acc.push(sum);tar.push(target);}
+  if(lineChart) lineChart.destroy();
+  lineChart=new Chart(document.getElementById("line-chart-ketabrak"),{
+    type:"line",
+    data:{labels:labels,datasets:[
+      {label:"Target",data:tar,borderColor:"#dc2626",borderDash:[6,6],fill:false},
+      {label:"Tabungan",data:acc,borderColor:"#047857",fill:true}
+    ]}
+  });
 }
 
-function createLineChart(monthlySave, targetAmount, period) {
-    const lineCanvas = document.getElementById('line-chart-ketabrak');
-    const container = document.getElementById('line-chart-container');
-    
-    if (!monthlySave || monthlySave <= 0 || !targetAmount || targetAmount <= 0) {
-        container.classList.add('hidden');
-        return;
-    }
-    
-    container.classList.remove('hidden');
-    
-    if (lineChart) {
-        lineChart.destroy();
-    }
-    
-    // Prepare data
-    const labels = [];
-    const accumulatedData = [];
-    const targetData = [];
-    
-    let accumulated = 0;
-    for (let i = 1; i <= period; i++) {
-        labels.push(`Bulan ${i}`);
-        accumulated += monthlySave;
-        accumulatedData.push(accumulated);
-        targetData.push(targetAmount);
-    }
-    
-    lineChart = new Chart(lineCanvas, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Target Dana Investasi',
-                    data: targetData,
-                    borderColor: '#dc2626',
-                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                    borderWidth: 3,
-                    borderDash: [10, 5],
-                    fill: false,
-                    tension: 0
-                },
-                {
-                    label: 'Akumulasi Tabungan',
-                    data: accumulatedData,
-                    borderColor: '#047857',
-                    backgroundColor: 'rgba(4, 120, 87, 0.2)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.3
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 15
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            if (value >= 1000000) {
-                                return 'Rp ' + (value / 1000000).toFixed(0) + 'jt';
-                            }
-                            return 'Rp ' + value.toLocaleString('id-ID');
-                        }
-                    }
-                }
-            }
-        }
-    });
-    
-    // "Ketabrak" effect if accumulated >= target
-    if (accumulatedData[period-1] >= targetAmount) {
-        setTimeout(() => {
-            lineCanvas.style.boxShadow = '0 0 0 4px rgba(4, 120, 87, 0.3)';
-            setTimeout(() => {
-                lineCanvas.style.boxShadow = 'none';
-            }, 1000);
-        }, 2000);
-    }
-}
-
-// ========== UPDATE UI FUNCTIONS ==========
-function updateUI(results) {
-    // Update main results
-    document.getElementById('gold-grams').textContent = results.goldGrams + ' gram';
-    document.getElementById('cash-income').textContent = formatRupiah(results.totalIncome);
-    document.getElementById('cash-needs').textContent = formatRupiah(results.monthlyNeeds) + ' (70%)';
-    document.getElementById('cash-debt').textContent = formatRupiah(results.monthlyDebt) + ` (${Math.round((results.monthlyDebt/results.totalIncome)*100)}%)`;
-    document.getElementById('cash-save').textContent = formatRupiah(results.monthlySavings) + ` (${Math.round((results.monthlySavings/results.totalIncome)*100)}%)`;
-    
-    // Update info cards
-    document.getElementById('emergency-fund').textContent = formatRupiah(results.operational3Months);
-    document.getElementById('target-price-detail').textContent = formatRupiah(results.target);
-    document.getElementById('safe-price-detail').textContent = formatRupiah(results.safeFund);
-    document.getElementById('gram-detail').textContent = results.goldGrams + ' gram';
-    document.getElementById('gold-price-detail').textContent = formatRupiah(goldPrice);
-    
-    // Update lifestyle tag
-    const lifestyleText = results.lifestyleVal.charAt(0).toUpperCase() + results.lifestyleVal.slice(1);
-    document.getElementById('lifestyle-tag-detail').textContent = lifestyleText;
-    document.getElementById('lifestyle-text').textContent = lifestyleText;
-    
-    // Update inflation alert
-    const inflationAlert = document.getElementById('inflation-alert');
-    if (results.useInflation) {
-        inflationAlert.innerHTML = `
-            <div style="font-size:12px; color:var(--danger); background:var(--danger-bg); padding:8px 12px; border-radius:6px; display:inline-block; margin-bottom:8px;">
-                <i class="fas fa-chart-line"></i> Dengan Inflasi 6%
-            </div>`;
-    } else {
-        inflationAlert.innerHTML = '';
-    }
-    
-    // Update budget list
-    const reasonLists = {
-        nikah: ["Biaya KUA & Legalitas", "Mahar/Seserahan", "Dekorasi & Catering", "Busana & MUA", "Gedung/Tenda", "Dokumentasi", "Souvenir", "Amplop", "Pindahan", "Dana Darurat"],
-        hamil: ["Kontrol & USG", "Suplemen & Vitamin", "Biaya Persalinan RS", "Dokter Spesialis", "Stok Perlengkapan Bayi", "Stok Popok", "Stok Susu", "Biaya Perawatan Ibu", "Dana Darurat"],
-        anak: ["Susu Formula", "Makanan Pendamping", "Pampers", "Imunisasi", "Dokter Anak", "Sekolah", "Transportasi", "Pakaian", "Mainan", "Dana Sakit"]
-    };
-    
-    const listHTML = (reasonLists[results.statusVal] || []).map(item => `<li>${item}</li>`).join('');
-    document.getElementById('budget-list-items').innerHTML = listHTML;
-    
-    // Update accounting
-    document.getElementById('total-assets').textContent = formatRupiah(results.totalAssets);
-    document.getElementById('total-liabilities').textContent = formatRupiah(results.totalLiabilities);
-    
-    const netWorthElement = document.getElementById('net-worth');
-    netWorthElement.textContent = formatRupiah(results.netWorth);
-    netWorthElement.className = results.netWorth >= 0 ? 'accounting-value positive' : 'accounting-value negative';
-    
-    document.getElementById('financial-ratio').textContent = results.financialRatio;
-    
-    // Ratio explanation
-    let ratioExplanation = "";
-    if (results.financialRatio === "∞") {
-        ratioExplanation = "Tidak ada kewajiban - posisi sangat sehat";
-    } else if (parseFloat(results.financialRatio) >= 2) {
-        ratioExplanation = "Sangat sehat (aset 2x lipat kewajiban)";
-    } else if (parseFloat(results.financialRatio) >= 1) {
-        ratioExplanation = "Sehat (aset cukup untuk kewajiban)";
-    } else if (parseFloat(results.financialRatio) >= 0.5) {
-        ratioExplanation = "Perhatian (aset hanya setengah kewajiban)";
-    } else {
-        ratioExplanation = "Bahaya (aset kurang dari setengah kewajiban)";
-    }
-    document.getElementById('ratio-explanation').textContent = ratioExplanation;
-    
-    // Update progress tracking
-    if (results.tabunganSaatIni > 0 && results.target > 0) {
-        const percent = Math.min(100, Math.round((results.tabunganSaatIni / results.target) * 100));
-        const gapPercent = 100 - percent;
-        
-        document.getElementById('prog-target').textContent = formatRupiah(results.target);
-        document.getElementById('prog-current').textContent = formatRupiah(results.tabunganSaatIni);
-        document.getElementById('prog-percent').textContent = percent + "%";
-        document.getElementById('prog-gap').textContent = `Kurang ${gapPercent}% untuk mencapai target`;
-        
-        setTimeout(() => {
-            document.getElementById('prog-bar').style.width = percent + "%";
-        }, 100);
-    }
-    
-    // Update target plan
-    const dateInput = document.getElementById('target-date').value;
-    if (dateInput) {
-        const targetDate = new Date(dateInput);
-        const today = new Date();
-        const diffMonths = Math.max(0, Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24 * 30)));
-        const perMonth = diffMonths > 0 ? Math.ceil(results.safeFund / diffMonths) : 0;
-        const daily = Math.ceil(perMonth / 30);
-        const weekly = Math.ceil(perMonth / 4);
-        
-        document.getElementById('plan-date').textContent = targetDate.toLocaleDateString('id-ID', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        document.getElementById('plan-months').textContent = diffMonths + " Bulan";
-        document.getElementById('plan-daily').textContent = formatRupiah(daily);
-        document.getElementById('plan-weekly').textContent = formatRupiah(weekly);
-        document.getElementById('plan-monthly').textContent = formatRupiah(perMonth) + " / bulan";
-        
-        const compBox = document.getElementById('plan-comparison-box');
-        if (perMonth <= results.monthlySavings) {
-            const surplus = results.monthlySavings - perMonth;
-            compBox.innerHTML = `<div style="color:var(--success-dark); font-weight:800; display:flex; align-items:center; gap:8px; font-size:14px;"><i class="fas fa-check-circle"></i> TARGET TERJANGKAU (Sisa: ${formatRupiah(surplus)}/bln)</div>`;
-            compBox.style.background = "var(--success-bg)";
-            compBox.style.border = "2px solid #a7f3d0";
-        } else {
-            const deficit = perMonth - results.monthlySavings;
-            compBox.innerHTML = `<div style="color:var(--danger); font-weight:800; display:flex; align-items:center; gap:8px; font-size:14px;"><i class="fas fa-exclamation-triangle"></i> PERLU EKSTRA (Kurang: ${formatRupiah(deficit)}/bln)</div>`;
-            compBox.style.background = "var(--danger-bg)";
-            compBox.style.border = "2px solid #fecaca";
-        }
-    }
-    
-    // Update advice
-    const adviceDB = {
-        nikah: [
-            "Utamakan Mahar dalam bentuk Emas sebagai investasi.",
-            "Gunakan undangan digital untuk menghemat biaya.",
-            "Catering nasi box lebih hemat dan tetap enak.",
-            "Sewa dekorasi 'Backdrop Only' untuk efisiensi.",
-            "Beli perlengkapan secukupnya, jangan semuanya baru."
-        ],
-        hamil: [
-            "Cek fasilitas kelas 3 BPJS untuk persalinan.",
-            "Stok popok saat promo besar-besaran.",
-            "Vitamin dan nutrisi ibu adalah prioritas utama.",
-            "ASI eksklusif bisa menghemat biaya susu formula.",
-            "USG hanya saat diperlukan, hindari yang kosmetik."
-        ],
-        anak: [
-            "Mainan edukasi lebih baik dari mainan mahal.",
-            "Bekal makan dari rumah lebih sehat dan hemat.",
-            "Susu UHT plain lebih baik untuk kesehatan gigi.",
-            "Tukar baju dengan saudara untuk menghemat.",
-            "Bimbing belajar sendiri lebih efektif dan gratis."
-        ]
-    };
-    
-    const tips = adviceDB[results.statusVal] || [
-        "Prioritaskan kebutuhan dasar sebelum keinginan.",
-        "Hindari utang konsumtif yang tidak produktif.",
-        "Sisihkan minimal 10% dari penghasilan untuk tabungan.",
-        "Evaluasi pengeluaran bulanan secara rutin.",
-        "Buat rencana keuangan jangka pendek dan panjang."
-    ];
-    
-    const shuffledTips = [...new Set(tips)].sort(() => 0.5 - Math.random()).slice(0, 5);
-    const adviceHTML = shuffledTips.map(t => `<li><i class="fas fa-check" style="color:var(--success);"></i> ${t}</li>`).join('');
-    document.getElementById('advice-list-content').innerHTML = adviceHTML;
-    
-    // Update solutions
-    const solutionList = document.getElementById('solution-list-content');
-    let solutions = [];
-    
-    if (parseFloat(results.financialRatio) >= 2 || results.totalLiabilities === 0) {
-        solutions.push(`<li style="margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;"><i class="fas fa-check-circle" style="color: var(--success);"></i> <span><strong>Posisi Sangat Kuat:</strong> Aset 2x kewajiban. Pertimbangkan investasi.</span></li>`);
-    } else if (parseFloat(results.financialRatio) >= 1) {
-        solutions.push(`<li style="margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;"><i class="fas fa-check-circle" style="color: var(--success);"></i> <span><strong>Posisi Sehat:</strong> Aset cukup untuk kewajiban. Tingkatkan tabungan.</span></li>`);
-    } else {
-        const deficit = results.totalLiabilities - results.totalAssets;
-        solutions.push(`<li style="margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;"><i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> <span><strong>Perlu Perhatian:</strong> Kurang <strong>${formatRupiah(deficit)}</strong> untuk menutup kewajiban.</span></li>`);
-    }
-    
-    // Debt advice
-    if (results.monthlyDebt > 0) {
-        const debtToIncomeRatio = (results.monthlyDebt / results.gajiPokok) * 100;
-        if (debtToIncomeRatio > 30) {
-            solutions.push(`<li style="margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;"><i class="fas fa-exclamation-circle" style="color: var(--danger);"></i> <span><strong>Utang Tinggi:</strong> Cicilan ${Math.round(debtToIncomeRatio)}% dari gaji. Prioritaskan pelunasan.</span></li>`);
-        }
-    }
-    
-    // Savings rate advice
-    const savingsRate = (results.monthlySavings / results.gajiPokok) * 100;
-    if (savingsRate < 10) {
-        solutions.push(`<li style="margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;"><i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i> <span><strong>Tabungan Rendah:</strong> Hanya ${Math.round(savingsRate)}% dari gaji. Targetkan 20%.</span></li>`);
-    }
-    
-    solutionList.innerHTML = solutions.join('');
-    
-    // Side hustle recommendations
-    const sideHustleRecommendations = {
-        lowSkill: [
-            { name: "Ojek Online", earning: "Rp 100-200rb/hari", note: "Flexible waktu, modal motor" },
-            { name: "Jualan Pulsa/Data", earning: "Rp 500-800rb/bulan", note: "Modal kecil, untung konsisten" },
-            { name: "Admin Media Sosial", earning: "Rp 1-2jt/bulan", note: "Kerja remote, fleksibel" },
-            { name: "Jasa Titip Belanja", earning: "Rp 300-500rb/bulan", note: "Dari rumah, modal aplikasi" },
-            { name: "Jual Makanan Ringan", earning: "Rp 500rb-1jt/bulan", note: "Modal < Rp 500k" }
-        ],
-        mediumSkill: [
-            { name: "Freelance Desain", earning: "Rp 2-5jt/project", note: "Butuh skill desain" },
-            { name: "Tutor Privat", earning: "Rp 50-100rb/jam", note: "Mata pelajaran sekolah" },
-            { name: "Jasa Service HP", earning: "Rp 500rb-2jt/bulan", note: "Butuh alat dan skill" },
-            { name: "Konten Kreator", earning: "Rp 1-10jt/bulan", note: "Butuh konsistensi" },
-            { name: "Dropshipper", earning: "Rp 1-3jt/bulan", note: "Tanpa stok barang" }
-        ]
-    };
-    
-    const hustles = results.totalIncome <= 5000000 ? sideHustleRecommendations.lowSkill : sideHustleRecommendations.mediumSkill;
-    const hustleHTML = `
-        <div style="margin-top: 20px; border-top: 2px solid var(--border); padding-top: 16px;">
-            <div style="font-weight: 800; color: var(--primary-dark); margin-bottom: 12px; font-size: 15px; display:flex; align-items:center; gap:8px;">
-                <i class="fas fa-briefcase"></i> 5 Ide Tambah Penghasilan:
-            </div>
-            <div style="display: grid; gap: 10px;">
-                ${hustles.slice(0, 5).map((h, i) => `
-                    <div style="display: flex; justify-content: space-between; align-items: center; 
-                                padding: 12px; background: white; border-radius: 8px; border-left: 4px solid var(--primary); border: 1px solid var(--border);">
-                        <div>
-                            <strong style="font-size: 14px;">${i+1}. ${h.name}</strong>
-                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">${h.note}</div>
-                        </div>
-                        <div style="font-size: 13px; font-weight: 800; color: var(--success); background: var(--success-bg); padding: 6px 10px; border-radius: 6px;">
-                            ${h.earning}
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('side-hustle-recommendations').innerHTML = hustleHTML;
-}
-
-// ========== MAIN CALCULATION FUNCTION ==========
-function calculateAll() {
-    // Validate input
-    const gajiPokok = parseRupiah(document.getElementById('gaji-pokok').value);
-    if (gajiPokok < 1000000) {
-        alert('Masukkan gaji pokok minimal Rp 1.000.000');
-        return;
-    }
-    
-    // Show loading
-    const calculateBtn = document.getElementById('calculate-btn');
-    const originalText = calculateBtn.innerHTML;
-    calculateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghitung...';
-    calculateBtn.disabled = true;
-    
-    setTimeout(() => {
-        // Calculate
-        const results = calculateFinancials();
-        if (!results) {
-            calculateBtn.innerHTML = originalText;
-            calculateBtn.disabled = false;
-            return;
-        }
-        
-        // Save for line chart updates
-        window.lastCalculation = {
-            monthlySave: results.monthlySavings,
-            aman: results.safeFund,
-            displayPeriod: currentPeriod
-        };
-        
-        // Update UI
-        updateUI(results);
-        
-        // Create charts
-        createCharts(results);
-        
-        // Dream planner result
-        const dreamResult = calculateDreamPlan(results);
-        document.getElementById('dream-result').innerHTML = dreamResult;
-        
-        // Switch views
-        document.getElementById('initial-message').classList.add('hidden');
-        document.getElementById('detailed-results').classList.remove('hidden');
-        document.getElementById('edit-btn').classList.remove('hidden');
-        
-        // Scroll to results on mobile
-        if (window.innerWidth < 768) {
-            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        // Restore button
-        calculateBtn.innerHTML = originalText;
-        calculateBtn.disabled = false;
-        
-    }, 1000);
-}
-
-// ========== EVENT LISTENERS ==========
-document.getElementById('calculate-btn').addEventListener('click', calculateAll);
-
-document.getElementById('edit-btn').addEventListener('click', function() {
-    document.getElementById('detailed-results').classList.add('hidden');
-    document.getElementById('initial-message').classList.remove('hidden');
-    this.classList.add('hidden');
-    document.getElementById('input-section').scrollIntoView({ behavior: 'smooth' });
-});
-
-document.getElementById('back-btn').addEventListener('click', function() {
-    document.getElementById('detailed-results').classList.add('hidden');
-    document.getElementById('initial-message').classList.remove('hidden');
-    document.getElementById('input-section').scrollIntoView({ behavior: 'smooth' });
-});
-
-// ========== SCROLL TO TOP ==========
-const scrollTopBtn = document.getElementById('scroll-top');
-
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        scrollTopBtn.classList.add('visible');
-    } else {
-        scrollTopBtn.classList.remove('visible');
-    }
-});
-
-scrollTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-// ========== INITIALIZATION ==========
-document.addEventListener('DOMContentLoaded', async function() {
-    // Load gold price
-    await updateGoldPrice();
-    
-    // Start auto-update every 2 minutes
-    goldUpdateInterval = setInterval(updateGoldPrice, 2 * 60 * 1000);
-    
-    // Load saved settings
-    const savedPeriod = localStorage.getItem('selected_period');
-    if (savedPeriod) {
-        currentPeriod = parseInt(savedPeriod);
-        document.querySelectorAll('.period-btn').forEach(btn => {
-            if (parseInt(btn.dataset.period) === currentPeriod) {
-                btn.classList.add('active');
-                document.getElementById('line-chart-period').textContent = currentPeriod + ' Bulan';
-            }
-        });
-    }
-    
-    const savedInflation = localStorage.getItem('inflation_toggle');
-    if (savedInflation !== null) {
-        document.getElementById('inflation-toggle').checked = savedInflation === 'true';
-        document.getElementById('inflation-toggle').dispatchEvent(new Event('change'));
-    }
-    
-    const savedKewajiban = localStorage.getItem('kewajiban_amount');
-    if (savedKewajiban) {
-        document.getElementById('kewajiban-bulanan').value = parseInt(savedKewajiban).toLocaleString('id-ID');
-    }
-});
+// ================= EVENTS =================
+document.getElementById("calculate-btn").onclick=calculateAll;
+document.addEventListener("DOMContentLoaded",updateGoldPrice);
 </script>
+
 </body>
 </html>
+
