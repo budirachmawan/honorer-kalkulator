@@ -2,339 +2,447 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalkulator Keamanan – HONORER DIGITAL</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>HONORER DIGITAL - Financial Calculator</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-/* ===== VARS ===== */
+/* ===== DESIGN SYSTEM & VARIABLES ===== */
 :root {
+  /* Palette Warna */
   --primary: #fbbf24;
-  --primary-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); 
+  --primary-dark: #b45309;
+  --primary-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
   --success: #10b981;
-  --success-dark: #065f46;
+  --success-bg: #ecfdf5;
+  --success-dark: #064e3b;
   --danger: #ef4444;
-  --warning: #f59e0b;
+  --danger-bg: #fef2f2;
   --info: #3b82f6;
+  --info-bg: #eff6ff;
+  --warning: #f59e0b;
   
-  --bg-body: #f0fdf4;
+  /* Backgrounds & Text */
+  --bg-body: #f8fafc;
   --bg-card: #ffffff;
-  --text-main: #1f2937;
+  --text-main: #0f172a;
   --text-muted: #64748b;
-  --border: #d1fae5;
+  --text-light: #94a3b8;
+  --border: #e2e8f0;
   
-  --radius: 24px;
-  --radius-sm: 14px;
-  --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  --shadow-button: 0 10px 20px -5px rgba(245, 158, 11, 0.4);
+  /* Shapes */
+  --radius-xl: 24px;
+  --radius-lg: 16px;
+  --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  --shadow-float: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
 }
 
-*{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
 
-body{
+body {
   font-family: 'Plus Jakarta Sans', sans-serif;
   background-color: var(--bg-body);
-  background-image: radial-gradient(#a7f3d0 1px, transparent 1px), radial-gradient(#a7f3d0 1px, transparent 1px);
-  background-size: 20px 20px;
-  background-position: 0 0, 10px 10px;
-  margin:0; padding:40px 20px; color:var(--text-main); min-height: 100vh;
+  color: var(--text-main);
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* HEADER */
-.header-wrapper { text-align: center; margin-bottom: 40px; animation: fadeIn 0.8s ease-out; }
-.header-wrapper h1 {
-  font-size: 36px; font-weight: 800; color: var(--success-dark); margin: 0; text-transform: uppercase; letter-spacing: -1px; text-shadow: 2px 2px 0px rgba(16, 185, 129, 0.1);
+.app-container {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
 }
-.header-wrapper span { color: var(--primary); }
 
-/* LAYOUT */
-.app{ max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr 1.2fr; gap:40px; }
-
-/* CARDS */
-.card{
-  background: var(--bg-card); padding: 35px; border-radius: var(--radius);
-  box-shadow: var(--shadow-card); border: 1px solid #ffffff; position: relative; overflow: hidden;
+/* Desktop Grid */
+@media (min-width: 768px) {
+  .app-container { grid-template-columns: 400px 1fr; align-items: start; }
 }
-.card { animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; transform: translateY(30px); }
-.card:nth-child(2) { animation-delay: 0.15s; }
 
-/* TYPOGRAPHY */
-h2 { margin-top:0; margin-bottom:25px; font-size: 18px; color: var(--text-main); font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
-label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+/* ===== HEADER & NAV ===== */
+header { text-align: center; margin-bottom: 20px; animation: fadeInDown 0.6s ease-out; }
+.brand-title { font-size: 28px; font-weight: 800; letter-spacing: -0.05em; color: var(--text-main); margin: 0; }
+.brand-gold { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.api-badge {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 50px;
+  font-size: 11px; font-weight: 700; color: var(--text-muted); margin-top: 12px; box-shadow: var(--shadow-soft);
+}
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-light); transition: background 0.3s; }
+.status-dot.online { background-color: var(--success); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--bg-card); border-radius: var(--radius-xl); padding: 28px;
+  box-shadow: var(--shadow-soft); border: 1px solid rgba(255,255,255,0.8);
+  position: relative; overflow: hidden;
+}
+.slide-up { animation: slideUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; transform: translateY(20px); }
+
+/* ===== INPUTS ===== */
+.form-group { margin-bottom: 24px; position: relative; }
+.form-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px; display: block; }
+.input-wrapper { position: relative; }
 input, select {
-  width:100%; padding: 14px 16px; font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif;
-  color: var(--text-main); background: #f8fafc; border: 2px solid #e2e8f0; border-radius: var(--radius-sm);
-  transition: all 0.3s ease; outline: none; font-weight: 600;
+  width: 100%; padding: 12px 4px; font-size: 16px; font-family: inherit;
+  color: var(--text-main); background: transparent; border: none;
+  border-bottom: 2px solid var(--border); border-radius: 0;
+  transition: all 0.3s ease;
 }
-input:focus, select:focus { background: #fff; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.15); transform: scale(1.01); }
+input:focus, select:focus { border-bottom-color: var(--primary); background: linear-gradient(to top, rgba(251, 191, 36, 0.05), transparent); }
+select { appearance: none; cursor: pointer; }
+.select-arrow { position: absolute; right: 0; top: 12px; pointer-events: none; color: var(--primary); font-size: 12px; }
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-/* BUTTONS */
-button {
-  width: 100%; padding: 18px; margin-top: 30px; font-size: 16px; font-weight: 800; border-radius: var(--radius-sm);
-  border: none; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: 0.5px; transition: all 0.2s ease;
+/* DREAM CARD DARK THEME */
+.dream-card {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;
+  padding: 24px; border-radius: var(--radius-lg); margin-bottom: 24px;
+  box-shadow: var(--shadow-float); border: 1px solid #334155;
 }
-#btn-calc { background: var(--primary-gradient); color: white; box-shadow: var(--shadow-button); text-transform: uppercase; }
-#btn-calc:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(245, 158, 11, 0.5); }
-#btn-calc:disabled { background: #cbd5e1; color: #fff; cursor: not-allowed; transform: none; box-shadow: none; }
-#unlock-btn { display: none; margin-top: 20px; font-size: 14px; font-weight: 700; color: var(--text-muted); background: #f1f5f9; padding: 12px; border-radius: 12px; width: 100%; border: none; cursor: pointer; text-align: center; transition:0.2s; }
-#unlock-btn:hover { background: #e2e8f0; color: var(--text-main); }
-
-.spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; display: none; margin-right: 10px; vertical-align: middle; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* CTA GROUPS */
-.cta-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-.cta { background: #1e293b; color: #fff; padding: 12px; margin-top: 0; font-size: 13px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border:none; cursor:pointer; transition:0.2s; }
-.cta:hover { background: black; transform: translateY(-2px); }
-.cta.donate { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-.cta.help { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
-
-/* RESULT WRAPPER */
-.result-wrapper { text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px dashed #e2e8f0; animation: fadeIn 1s ease-out; }
-.big-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 800; margin-bottom: 12px; }
-.big-value { font-size: 40px; font-weight: 900; color: var(--success-dark); margin: 0; line-height: 1; background: -webkit-linear-gradient(#064e3b, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.sub-value { font-size: 13px; color: var(--text-muted); margin-top: 8px; font-weight: 600; }
-
-#chart-container { position: relative; height: 200px; width: 100%; margin-bottom: 20px; animation: fadeIn 1.2s ease-out; }
-#detail { font-size: 14px; line-height: 1.5; color: var(--text-main); display:none; }
-
-/* SECTIONS & BOXES */
-.section-box {
-  background: #f8fafc; padding: 16px; border-radius: 16px; margin-bottom: 16px; border: 1px solid var(--border);
-  opacity: 0; animation: slideUpFade 0.6s ease forwards;
+.dream-card label { color: #94a3b8; }
+.dream-card input, .dream-card select {
+  background: rgba(255,255,255,0.05); border-bottom-color: rgba(255,255,255,0.2); color: white;
 }
-.section-box.danger-box { background: #fef2f2; border-color: #fee2e2; }
-.section-box.warning-box { background: #fffbeb; border-color: #fcd34d; }
-.section-box.dream-box { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 20px; border: 1px solid #e2e8f0; }
-
-.section-title { font-weight: 800; font-size: 15px; margin-bottom: 8px; color: var(--text-main); display: flex; justify-content: space-between; align-items: center; }
-.section-tag { font-size: 9px; padding: 4px 10px; border-radius: 50px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-.tag-yellow { background: #fffbeb; color: #b45309; border: 1px solid #fcd34d; }
-.tag-green { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-.tag-blue { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
-.tag-red { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
-
-.section-price { font-size: 22px; font-weight: 800; color: var(--text-main); margin: 8px 0 12px 0; letter-spacing: -1px; }
-.section-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 0; line-height: 1.5; }
-.section-box.dream-box .section-desc { color: #e2e8f0; }
-.section-box.dream-box .section-title { color: white; }
-.section-box.dream-box input { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white; }
-.section-box.dream-box select { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white; }
-.section-box.dream-box label { color: #94a3b8; }
-
-.progress-bar-container { margin-top: 10px; background: #e2e8f0; border-radius: 8px; height: 10px; overflow: hidden; display: flex; }
-.progress-segment { height: 100%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: rgba(0,0,0,0.5); }
-.seg-hidup { background: #3b82f6; }
-.seg-utang { background: #ef4444; }
-.seg-sisa { background: #10b981; }
-
-/* ACTION PLAN BOX */
-.action-plan-box {
-  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
-  border: 1px solid #fed7aa;
-  padding: 12px; border-radius: 10px; margin-top: 10px;
+.dream-card input:focus, .dream-card select:focus {
+  background: rgba(255,255,255,0.1); border-bottom-color: var(--primary);
 }
-.action-header { font-size: 11px; font-weight: 800; color: #c2410c; text-transform: uppercase; margin-bottom: 8px; display: block; }
-.action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-.action-item { background: rgba(255,255,255,0.6); padding: 8px; border-radius: 6px; text-align: center; }
-.action-label { font-size: 10px; color: #9a3412; font-weight: 600; display: block; margin-bottom: 2px; }
-.action-val { font-size: 14px; font-weight: 800; color: #9a3412; display: block; }
-.action-tip { font-size: 11px; color: #7c2d12; line-height: 1.3; font-style: italic; background: rgba(255,255,255,0.5); padding: 6px; border-radius: 4px; }
+.dream-title { font-weight: 700; color: var(--primary); font-size: 14px; margin-bottom: 16px; display: block; }
 
-.advice-box {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;
-  padding: 16px; border-radius: 16px; margin-bottom: 20px; font-size: 13px; line-height: 1.5;
-  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+/* ===== BUTTONS ===== */
+.btn-main {
+  width: 100%; padding: 18px; border: none; border-radius: var(--radius-lg);
+  background: var(--primary-gradient); color: white; font-size: 16px; font-weight: 800;
+  font-family: inherit; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 20px -5px rgba(217, 119, 6, 0.4);
+  display: flex; justify-content: center; align-items: center;
 }
+.btn-main:hover { transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(217, 119, 6, 0.5); }
+.btn-secondary {
+  width: 100%; padding: 14px; background: white; color: var(--text-muted);
+  border: 2px solid var(--border); border-radius: var(--radius-lg); font-weight: 700;
+  cursor: pointer; margin-top: 12px; transition: 0.2s;
+}
+.btn-secondary:hover { border-color: var(--text-main); color: var(--text-main); }
 
-.plan-box { background: #ffffff; border-radius: 12px; padding: 16px; margin-top: 16px; border: 2px solid #e2e8f0; }
-.plan-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; color: #475569; font-weight: 500; }
-.plan-row.highlight { font-size: 16px; font-weight: 800; color: var(--success-dark); border-top: 2px dashed #cbd5e1; padding-top: 10px; margin-top: 10px; margin-bottom: 0; }
+/* ===== RESULT SECTION ===== */
+.result-hero { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px dashed var(--border); }
+.hero-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 8px; font-weight: 700; }
+.hero-value { font-size: 42px; font-weight: 900; color: var(--text-main); line-height: 1; letter-spacing: -1.5px; }
+.hero-sub { font-size: 14px; color: var(--success); font-weight: 600; margin-top: 8px; display: inline-block; background: var(--success-bg); padding: 4px 12px; border-radius: 20px; }
 
-.footnote { font-size: 11px; color: #64748b; margin-top: 10px; line-height: 1.3; font-style: italic; background: #f1f5f9; padding: 8px; border-radius: 6px; }
+.chart-wrapper { position: relative; height: 200px; width: 100%; margin-bottom: 24px; }
 
-.api-status { font-size: 10px; padding: 4px 10px; border-radius: 50px; background: #f1f5f9; color: #64748b; font-weight: 800; text-transform: uppercase; border: 1px solid #e2e8f0; transition: all 0.3s; }
-.api-status.status-online { background: #d1fae5; color: #059669; border-color: #10b981; animation: pulse-green 2s infinite; }
-@keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+.info-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.info-box {
+  background: #f8fafc; padding: 16px; border-radius: var(--radius-lg);
+  border: 1px solid transparent; transition: 0.2s;
+}
+.info-box:hover { border-color: var(--border); background: white; }
+.info-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.info-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+.info-tag { font-size: 10px; padding: 4px 8px; border-radius: 4px; font-weight: 700; background: rgba(0,0,0,0.05); }
+.info-price { font-size: 20px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; margin-top:4px; }
+.info-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-top: 4px; }
 
-/* DREAM GRID */
-.dream-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
-.dream-feasibility { text-align: center; font-size: 20px; font-weight: 800; color: #fbbf24; margin: 10px 0 5px 0; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px; }
+.tag-warning { background: #fffbeb; color: var(--warning); border: 1px solid #fcd34d; }
+.tag-success { background: var(--success-bg); color: var(--success); }
+.tag-info { background: var(--info-bg); color: var(--info); }
 
-/* PROBLEM SOLVER */
-.help-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
-.help-btn-sm { background: rgba(255,255,255,0.1); border: 1px solid #bfdbfe; padding: 8px; border-radius: 6px; text-align: center; font-size: 10px; font-weight: 700; color: #60a5fa; cursor: pointer; transition: 0.2s; }
-.help-btn-sm:hover { background: #fff; transform: translateY(-2px); }
+/* List Styling */
+.budget-list { list-style: none; padding: 0; margin: 10px 0 0 0; }
+.budget-list li { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; padding-left: 12px; position: relative; }
+.budget-list li::before { content: "•"; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+/* Advice Section */
+.advice-card {
+  background: #fff; border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-lg);
+  margin-bottom: 16px; box-shadow: var(--shadow-soft);
+}
+.advice-title { font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.advice-text { font-size: 13px; line-height: 1.6; color: var(--text-main); font-weight: 500; }
+
+/* Dream Result Specifics */
+.dream-result-card {
+  background: white; border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-lg);
+  margin-bottom: 16px; box-shadow: var(--shadow-soft);
+}
+.dream-status-badge {
+  display: inline-block; padding: 6px 12px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 12px; margin-top: 10px; width: 100%; text-align: center;
+}
+.status-success { background: var(--success-bg); color: var(--success); }
+.status-fail { background: var(--danger-bg); color: var(--danger); }
+
+/* Locked Content */
+.locked-section {
+  margin-top: 24px; padding: 24px; border: 2px dashed var(--border);
+  background: #fff; border-radius: var(--radius-xl); text-align: center;
+}
+.product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+.product-card {
+  background: white; border: 1px solid var(--border); padding: 16px;
+  border-radius: var(--radius-lg); text-decoration: none; color: inherit;
+  display: block; transition: 0.2s;
+}
+.product-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: var(--shadow-soft); }
+.product-price { color: var(--primary-dark); font-weight: 800; font-size: 12px; margin-top: 4px; }
+
+.hidden { display: none !important; }
+
+@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideUpFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-/* RESPONSIVE */
-@media(max-width:768px){
-  .app{grid-template-columns:1fr;}
-  .header-wrapper h1{ font-size: 28px; }
-  .big-value { font-size: 34px; }
-  .card { padding: 30px 24px; }
-  .section-price { font-size: 20px; }
-  .cta-group { grid-template-columns: 1fr; }
-  .dream-grid { grid-template-columns: 1fr; }
-}
 </style>
 </head>
-
 <body>
 
-<div class="header-wrapper">
-  <h1>HONORER <span>DIGITAL</span></h1>
-</div>
-
-<div class="app">
-
-<!-- LEFT CARD: INPUT -->
-<div class="card" id="input-section">
-<h2>
-  <span>Rencana Keuangan</span>
-  <span class="api-status" id="apiStatus">Checking...</span>
-</h2>
-
-<!-- INPUT SUMBER DANA -->
-<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-  <div>
-    <label>Gaji Pokok</label>
-    <input id="gajiPokok" type="text" placeholder="Contoh: 3.000.000" autocomplete="off">
-  </div>
-  <div>
-    <label>Side Hustle (Bonus)</label>
-    <input id="sideHustle" type="text" placeholder="Contoh: 1.000.000" autocomplete="off">
-  </div>
-</div>
-
-<label>Status saat ini</label>
-<select id="status">
-  <option value="nikah">Akan Menikah</option>
-  <option value="hamil">Hamil / Persalinan</option>
-  <option value="anak">Sudah Punya Anak (Sudah Nikah)</option>
-</select>
-
-<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-  <div>
-    <label>Gaya Hidup</label>
-    <select id="lifestyle">
-      <option value="hemat">Hemat (Frugal)</option>
-      <option value="standar" selected>Standar</option>
-      <option value="mewah">Mewah</option>
-    </select>
-  </div>
-  <div>
-    <label>Cicilan Utang/Bln</label>
-    <input id="debt" type="text" placeholder="0" autocomplete="off">
-  </div>
-</div>
-
-<!-- DREAM PLANNER INPUT (FITUR BARU) -->
-<div class="section-box dream-box" style="opacity:1; animation:none;">
-  <div class="section-title" style="color:white;">
-    <span style="color:#fbbf24;">🎯 Mimpi Besarmu?</span>
-    <span class="section-tag" style="background:rgba(255,255,255,0.2); border-color:white; color:white;">Opsional</span>
-  </div>
-  <div style="font-size:11px; color:#e2e8f0; margin-bottom:12px;">
-    Cek kecukupan dana untuk Rumah, Haji, Motor, dll.
-  </div>
-  <div class="dream-grid">
-    <div>
-      <select id="dreamType" style="padding:12px;">
-        <option value="none">-- Pilih Aset --</option>
-        <option value="rumah">Rumah (DP/Tunai)</option>
-        <option value="motor">Motor</option>
-        <option value="mobil">Mobil</option>
-        <option value="haji">Daftar Haji</option>
-        <option value="gadget">HP / Kamera / Laptop</option>
-        <option value="liburan">Liburan</option>
-      </select>
+<div class="app-container">
+  
+  <!-- LEFT COLUMN: INPUT -->
+  <div class="card slide-up" id="input-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+      <h3 style="margin:0; font-size:18px; font-weight:800;">Data Keuangan</h3>
+      <div id="apiStatus" class="api-badge"><span class="status-dot"></span> <span id="api-text">Checking...</span></div>
     </div>
-    <div>
-      <select id="dreamMethod" style="padding:12px;">
-        <option value="tunai">100% Tunai</option>
-        <option value="kredit">Kredit / KPR (DP 20%)</option>
-      </select>
+
+    <div class="input-row form-group">
+      <div>
+        <label class="form-label">Gaji Pokok</label>
+        <input type="text" id="gajiPokok" placeholder="0" autocomplete="off">
+      </div>
+      <div>
+        <label class="form-label">Side Hustle</label>
+        <input type="text" id="sideHustle" placeholder="0" autocomplete="off">
+      </div>
     </div>
-  </div>
-  <div class="dream-grid">
-    <div>
-      <input id="dreamPrice" type="text" placeholder="Estimasi Harga (Rp)" style="padding:12px;">
+
+    <div class="form-group">
+      <label class="form-label">Status Saat Ini</label>
+      <div class="input-wrapper">
+        <select id="status">
+          <option value="nikah">Akan Menikah</option>
+          <option value="hamil">Persiapan Hamil</option>
+          <option value="anak">Sudah Punya Anak</option>
+        </select>
+        <span class="select-arrow">▼</span>
+      </div>
     </div>
+
+    <div class="input-row form-group">
+      <div>
+        <label class="form-label">Gaya Hidup</label>
+        <div class="input-wrapper">
+          <select id="lifestyle">
+            <option value="hemat">Hemat (Frugal)</option>
+            <option value="standar" selected>Standar</option>
+            <option value="mewah">Mewah</option>
+          </select>
+          <span class="select-arrow">▼</span>
+        </div>
+      </div>
+      <div>
+        <label class="form-label">Cicilan/Bln</label>
+        <input type="text" id="debt" placeholder="0" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="dream-card">
+      <div class="dream-header">
+        <span class="dream-title">🎯 DREAM PLANNER</span>
+      </div>
+      <div class="input-row" style="margin-bottom:12px;">
+        <div class="input-wrapper" style="flex:2;">
+          <select id="dreamType" style="color:var(--text-light);">
+            <option value="none">-- Pilih Aset --</option>
+            <option value="rumah">Rumah / KPR</option>
+            <option value="motor">Motor</option>
+            <option value="mobil">Mobil</option>
+            <option value="haji">Daftar Haji</option>
+            <option value="gadget">Gadget</option>
+            <option value="liburan">Liburan</option>
+          </select>
+        </div>
+        <div class="input-wrapper" style="flex:1;">
+          <select id="dreamMethod" style="color:var(--text-light);">
+            <option value="tunai">Tunai</option>
+            <option value="kredit">Kredit</option>
+          </select>
+        </div>
+      </div>
+      <input type="text" id="dreamPrice" placeholder="Estimasi Harga (Rp)" style="margin-bottom: 0;">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Target Tanggal (Opsional)</label>
+      <input type="date" id="targetDate" style="color: var(--text-muted);">
+    </div>
+
+    <button class="btn-main" id="btn-calc" onclick="hitung()">
+      <span id="btn-text">ANALISIS KEAMANAN SAYA</span>
+    </button>
+    <button class="btn-secondary hidden" id="unlock-btn" onclick="unlockForm()">✏️ Edit Data Ulang</button>
   </div>
-</div>
 
-<label>Target Tercapai Tanggal (Opsional)</label>
-<div class="input-group">
-  <input id="targetDate" type="date">
-  <div style="font-size:11px; color:#94a3b8; margin-top:8px; line-height:1.3; font-weight:600;">Contoh: Tanggal rencana nikah / HPL</div>
-</div>
+  <!-- RIGHT COLUMN: RESULT -->
+  <div class="card slide-up" style="animation-delay: 0.2s;" id="result-section">
+    
+    <div class="result-hero">
+      <div class="hero-label">Total Aset Aman Tercatat</div>
+      <div class="hero-value" id="emas">0 gram</div>
+      <div class="hero-sub">Dana yang bisa dikunci ke emas</div>
+    </div>
 
-<button id="btn-calc" onclick="hitung()">
-  <span class="spinner" id="btn-spinner"></span>
-  <span id="btn-text">Hitung Keamanan</span>
-</button>
+    <div class="chart-wrapper"><canvas id="chart"></canvas></div>
 
-<button id="unlock-btn" onclick="unlockForm()">✎ Edit Data Ulang</button>
-</div>
+    <div id="detail-container" class="hidden">
+      <!-- 1. Advice -->
+      <div id="advice-wrapper"></div>
 
-<!-- RIGHT CARD: RESULT -->
-<div class="card">
-<h2>Hasil Analisis</h2>
+      <!-- 2. Dream Result -->
+      <div id="dream-result-wrapper"></div>
 
-<div class="result-wrapper">
-  <div class="big-label">Total Aset Aman Tercatat</div>
-  <div class="big-value" id="emas">0 gram</div>
-  <div class="sub-value">Dana yang bisa dikunci ke emas</div>
-</div>
+      <!-- 3. Analisa Bulanan -->
+      <div class="info-box" id="monthly-analysis-card">
+        <div class="info-header">
+          <div class="info-title" style="color:var(--info);">Analisa Bulanan</div>
+          <span class="info-tag tag-info">Cash Flow</span>
+        </div>
+        <div style="font-size:13px; margin-bottom:8px; font-weight:600;">Total Penghasilan: <span id="cash-income" style="color:var(--text-main);">Rp 0</span></div>
+        <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; color:var(--text-muted);">
+          <span>Kebutuhan Hidup</span>
+          <span id="cash-needs">0 (70%)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; color:var(--text-muted);">
+          <span>Cicilan / Utang</span>
+          <span id="cash-debt">0 (0%)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:13px; margin-top:8px; border-top:1px dashed var(--border); padding-top:8px;">
+          <span style="font-weight:700;">Kemampuan Menabung (Nyata)</span>
+          <span id="cash-save" style="font-weight:800; color:var(--success);">0 (0%)</span>
+        </div>
+      </div>
 
-<div id="chart-container">
-  <canvas id="chart"></canvas>
-</div>
+      <!-- 4. Detailed Cards Grid -->
+      <div class="info-grid" style="margin-top:16px;">
+        
+        <!-- Card A: Penyangga -->
+        <div class="info-box">
+          <div class="info-header">
+            <div class="info-title">Dana Penyangga Hidup</div>
+            <span class="info-tag tag-warning">Wajib Tunai</span>
+          </div>
+          <div class="info-price" id="buffer-price">Rp 0</div>
+          <div class="info-desc">Uang tunai ini wajib ada di rekening. Ini adalah sabuk pengaman keuanganmu. Jika penghasilan berhenti (sakit/cuti/resign), uang ini menutup kebutuhan makan & sewa selama 3 bulan.</div>
+        </div>
 
-<!-- Detail Content -->
-<div id="detail"></div>
+        <!-- Card B: Kebutuhan Dana Besar -->
+        <div class="info-box">
+          <div class="info-header">
+            <div class="info-title">Kebutuhan Dana Besar</div>
+            <span class="info-tag" id="lifestyle-tag-detail">Standar</span>
+          </div>
+          <div class="info-price" id="target-price-detail">Rp 0</div>
+          <div class="info-desc">Estimasi biaya realistis dengan gaya hidup <span id="lifestyle-text">Standar</span>.</div>
+          <ul class="budget-list" id="budget-list-items">
+            <!-- List items injected here -->
+          </ul>
+        </div>
 
-<!-- CTA PRODUCTS -->
-<div class="cta-group" id="btn-container" style="display:none;">
-  <button class="cta" id="excelBtn">📥 Download Excel</button>
-  <button class="cta" id="ebookBtn">📘 Panduan Emas (PDF)</button>
-</div>
+        <!-- Card C: Dana Siap Dikunci -->
+        <div class="info-box" style="background: var(--success-bg); border-color: #a7f3d0;">
+          <div class="info-header">
+            <div class="info-title">Dana Siap Dikunci</div>
+            <span class="info-tag tag-success">Bisa di Emas</span>
+          </div>
+          <div class="info-price" style="color: var(--success-dark);" id="safe-price-detail">Rp 0</div>
+          <div class="info-desc">Ini adalah sisa dana dari total kebutuhan yang aman untuk dikunci (diinvestasikan) dalam bentuk emas.</div>
+          <div style="margin-top:12px; font-size:12px; font-weight:700; color:var(--success-dark);">Setara emas: <span id="gram-detail">0</span> gram</div>
+          <div style="font-size:12px; color:var(--success-dark);">Harga emas: <span id="gold-price-detail">Rp 0</span> / gram</div>
+        </div>
 
-<!-- BANTUAN & DONASI -->
-<div class="section-box" id="help-section" style="animation-delay: 0.5s; display:none;">
-  <div class="section-title" style="font-size:14px;">
-    <span style="color:#1e40af;">🤝 Bantuan & Sedekah</span>
+      </div>
+
+      <!-- 5. Target Plan (Tanggal) -->
+      <div id="target-plan-card" class="info-box" style="margin-top:16px; background: white; border: 2px solid var(--primary);">
+        <div class="info-header">
+          <div class="info-title" style="color:var(--primary-dark);">Target Tanggal</div>
+          <span class="info-tag" style="background:var(--primary-gradient); color:white;">Hitung Mundur</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+          <div style="font-weight:700;">Target Tanggal:</div>
+          <div id="plan-date">-</div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+          <div style="font-weight:700;">Sisa Waktu:</div>
+          <div id="plan-months" style="color:var(--danger); font-weight:800;">0 Bulan</div>
+        </div>
+        
+        <div style="background:#fffbeb; padding:12px; border-radius:8px; border:1px solid #fcd34d; margin-bottom:12px;">
+          <div style="font-size:11px; font-weight:800; color:#b45309; margin-bottom:8px; text-transform:uppercase;">🔥 Langkah Nyata Harian</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:8px;">
+            <div style="text-align:center;">
+              <div style="font-size:10px; color:#92400e;">Target Harian</div>
+              <div style="font-size:14px; font-weight:800; color:#92400e;" id="plan-daily">Rp 0</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:10px; color:#92400e;">Target Mingguan</div>
+              <div style="font-size:14px; font-weight:800; color:#92400e;" id="plan-weekly">Rp 0</div>
+            </div>
+          </div>
+          <div style="font-size:11px; color:#b45309; font-style:italic; text-align:center;" id="plan-context">Setara dengan 1 botol air minum.</div>
+        </div>
+
+        <div style="border-top:1px dashed var(--border); padding-top:8px; text-align:right;">
+          <span style="font-size:13px; color:var(--text-muted);">Total Bulanan:</span>
+          <div style="font-size:18px; font-weight:900; color:var(--text-main);" id="plan-monthly">Rp 0 / bln</div>
+          <div style="font-size:11px; color:var(--text-muted); font-style:italic;">*Bandingkan dengan Kemampuanmu (<span id="plan-compare">Rp 0</span>).</div>
+        </div>
+      </div>
+
+      <!-- 6. Locked Monetization -->
+      <div class="locked-section">
+        <div style="font-size:24px; margin-bottom:8px;">🔒</div>
+        <h4 style="margin:0 0 4px 0; color:var(--text-main);">Mode Premium Terkunci</h4>
+        <p style="font-size:13px; color:var(--text-muted); margin:0 0 16px 0;">Dapatkan akses template Excel & E-Book.</p>
+        
+        <div class="product-grid">
+          <a href="#" id="wa-excel" class="product-card" target="_blank">
+            <div style="font-size:24px;">📂</div>
+            <div style="font-weight:700; margin-top:4px;">Template Excel</div>
+            <div class="product-price">Rp 49.000</div>
+          </a>
+          <a href="#" id="wa-ebook" class="product-card" target="_blank">
+            <div style="font-size:24px;">📘</div>
+            <div style="font-weight:700; margin-top:4px;">Panduan Emas (PDF)</div>
+            <div class="product-price">Rp 29.000</div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Initial State Message -->
+    <div id="initial-msg" style="text-align:center; padding: 40px 0; color:var(--text-light);">
+      <div style="font-size:40px; margin-bottom:16px;">📊</div>
+      <p>Silakan isi data keuangan Anda di sebelah kiri untuk melihat analisa keamanan finansial.</p>
+    </div>
+
   </div>
-  <div style="font-size:11px; color:#60a5fa; margin-bottom:10px;">
-    Ada masalah mendesak atau ingin sedekah?
-  </div>
-  <div class="help-grid">
-    <div class="help-btn-sm" onclick="bantu('Laptop Rusak')">💻 Laptop Rusak</div>
-    <div class="help-btn-sm" onclick="bantu('Butuh Modal')">💼 Butuh Modal</div>
-    <div class="help-btn-sm" onclick="bantu('Sakit Keluarga')">🏥 Sakit Keluarga</div>
-  </div>
-  <button class="cta donate" onclick="donasi()" style="margin-top:12px; padding:10px;">❤️ Donasi Pengembangan</button>
-</div>
-
-<div style="font-size: 11px; color: #94a3b8; text-align: center; margin-top: 20px; line-height: 1.4;">
-  Data harga emas diupdate realtime (Logam Mulia)<br>
-  <strong>Catatan:</strong> Ini adalah dana tujuan, bukan dana darurat.
-</div>
-</div>
-
 </div>
 
 <script>
-let chart;
-let animationFrameId; 
+// --- UTILITIES ---
+const formatIDR = (x) => new Intl.NumberFormat("id-ID").format(x);
+const getRawVal = (id) => Number(document.getElementById(id).value.replace(/[^0-9]/g,"")) || 0;
 
-function formatIDR(x){return x.toLocaleString("id-ID");}
-
+// --- FORMATTER ---
 const setupFormatter = (id) => {
   const el = document.getElementById(id);
   if(!el) return;
@@ -343,498 +451,209 @@ const setupFormatter = (id) => {
     e.target.value=v?parseInt(v).toLocaleString("id-ID"):"";
   });
 };
-setupFormatter("gajiPokok");
-setupFormatter("sideHustle");
-setupFormatter("debt");
-setupFormatter("dreamPrice");
+['gajiPokok','sideHustle','debt','dreamPrice'].forEach(setupFormatter);
 
-function unlockForm() {
-  const inputSection = document.getElementById("input-section");
-  const unlockBtn = document.getElementById("unlock-btn");
-  const detailSection = document.getElementById("detail");
+// --- GOLD API LOGIC ---
+let chartInstance = null;
+
+async function getHargaEmas() {
+  const badgeText = document.getElementById('api-text');
+  const dot = document.querySelector('.status-dot');
+  const cacheKey = 'harga_emas_cache';
   
-  inputSection.classList.remove("hidden-section");
-  unlockBtn.style.display = "none";
-  detailSection.style.display = "none"; // Reset view
-}
-
-function animateValue(obj, start, end, duration) {
-  if (animationFrameId) cancelAnimationFrame(animationFrameId);
-  let startTimestamp = null;
-  const step = (timestamp) => {
-    if (!startTimestamp) startTimestamp = timestamp;
-    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-    obj.innerHTML = (progress * (end - start) + start).toFixed(2) + " gram";
-    if (progress < 1) {
-      animationFrameId = window.requestAnimationFrame(step);
+  try {
+    const c = localStorage.getItem(cacheKey);
+    if(c) {
+      const o = JSON.parse(c);
+      if(Date.now() - o.time < 15 * 60 * 1000) {
+        badgeText.innerText = "LIVE (Cached)"; dot.classList.add('online');
+        return o.price;
+      }
     }
-  };
-  animationFrameId = window.requestAnimationFrame(step);
-}
-
-/* ===== SYSTEM LOGIC ===== */
-function getCachedHarga(){
-  try {
-    const c=localStorage.getItem("harga_emas_cache");
-    if(!c) return null;
-    const o=JSON.parse(c);
-    if(Date.now()-o.time>15*60*1000) return null;
-    return o.price;
-  } catch(e) { return null; }
-}
-function setCachedHarga(p){
-  try {
-    localStorage.setItem("harga_emas_cache",JSON.stringify({time:Date.now(),price:p}));
-  } catch(e) {}
-}
-
-async function getHargaEmas(){
-  const cached=getCachedHarga();
-  const badge = document.getElementById("apiStatus");
-  if(cached) {
-    badge.innerText = "LIVE"; badge.classList.add("status-online");
-    return cached;
-  }
-  badge.innerText = "Updating...";
-  try{
-    // Corrected API URL just in case
-    const r=await fetch("https://logam-mulia-api.vercel.app/api/antam");
-    const d=await r.json();
-    setCachedHarga(d.buy);
-    badge.innerText = "LIVE"; badge.classList.add("status-online");
+    badgeText.innerText = "Updating...";
+    const r = await fetch("https://logam-mulia-api.vercel.app/api/antam");
+    const d = await r.json();
+    localStorage.setItem(cacheKey, JSON.stringify({time:Date.now(), price:d.buy}));
+    badgeText.innerText = "LIVE"; dot.classList.add('online');
     return d.buy;
-  }catch(err){
-    console.log("API Error:", err);
-    badge.innerText = "OFFLINE"; badge.classList.remove("status-online");
-    return getCachedHarga()||2652000; 
+  } catch(err) {
+    console.log(err);
+    badgeText.innerText = "OFFLINE"; dot.classList.remove('online');
+    const cached = JSON.parse(localStorage.getItem(cacheKey));
+    return cached ? cached.price : 2652000; // Fallback
   }
 }
 
-window.onload=async ()=>{ await getHargaEmas(); };
-
-function bantu(topik) {
-  if(!confirm(`Apakah Anda ingin meminta bantuan untuk: ${topik}?`)) return;
-  const text = encodeURIComponent(`Halo Admin, saya mengalami masalah: ${topik}. Mohon bantuannya.`);
-  window.open("https://wa.me/6285123882845?text="+text);
+// --- CHART RENDERER ---
+function renderChart(aman, buffer) {
+  const ctx = document.getElementById('chart').getContext('2d');
+  if(chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Aman (Emas)", "Penyangga (Tunai)"],
+      datasets: [{
+        data: [aman, buffer],
+        backgroundColor: ["#10b981", "#fbbf24"],
+        borderWidth: 0, hoverOffset: 4
+      }]
+    },
+    options: {
+      cutout: '80%', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: {family: 'Plus Jakarta Sans'} } } },
+      animation: { animateScale: true, animateRotate: true }
+    }
+  });
 }
 
-function donasi() {
-  if(!confirm(`Apakah Anda yakin ingin melakukan donasi pengembangan?`)) return;
-  const text = encodeURIComponent("Assalamualaikum, saya ingin sedekah untuk pengembangan aplikasi HONORER DIGITAL.");
-  window.open("https://wa.me/6285123882845?text="+text);
+// --- LOCKING MECHANISM ---
+function unlockForm() {
+  document.getElementById('input-section').classList.remove('hidden');
+  document.getElementById('unlock-btn').classList.add('hidden');
+  document.getElementById('detail-container').classList.add('hidden');
+  document.getElementById('initial-msg').classList.remove('hidden');
+  document.getElementById('btn-calc').classList.remove('hidden');
 }
 
-async function hitung(){
-  try {
-    // --- INPUT PARSING (SAFETY NET) ---
-    const gajiPokokVal = document.getElementById("gajiPokok").value || "0";
-    const sideHustleVal = document.getElementById("sideHustle").value || "0";
-    const debtVal = document.getElementById("debt").value || "0";
-    const dreamPriceVal = document.getElementById("dreamPrice").value || "0";
+// --- CORE CALCULATION ---
+async function hitung() {
+  const income = getRawVal('gajiPokok') + getRawVal('sideHustle');
+  const debt = getRawVal('debt');
+  const dreamPrice = getRawVal('dreamPrice');
+  
+  if(!income) { alert("Mohon isi penghasilan Anda"); return; }
 
-    const gajiPokok = Number(gajiPokokVal.replace(/[^0-9]/g,""));
-    const sideHustle = Number(sideHustleVal.replace(/[^0-9]/g,""));
-    const debt = Number(debtVal.replace(/[^0-9]/g,""));
+  // Loading State
+  const btn = document.getElementById('btn-calc');
+  const btnText = document.getElementById('btn-text');
+  btn.disabled = true; btnText.innerText = "MENGHITUNG...";
+
+  // Logic Algoritma
+  const lifestyleFactor = { 'hemat': 0.8, 'standar': 1.0, 'mewah': 1.5 };
+  const baseMult = { 'nikah':6, 'hamil':4, 'anak':3 };
+  const statusVal = document.getElementById('status').value;
+  const lifestyleVal = document.getElementById('lifestyle').value;
+
+  const target = Math.ceil(income * baseMult[statusVal] * lifestyleFactor[lifestyleVal]);
+  const buffer = Math.ceil(income * 0.7 * 3);
+  const aman = Math.max(0, target - buffer);
+  
+  const hargaEmas = await getHargaEmas();
+  const gram = aman / hargaEmas;
+
+  // --- RENDER HEADER & CHART ---
+  document.getElementById('emas').innerText = gram.toFixed(2) + " gram";
+  renderChart(aman, buffer);
+
+  // --- RENDER ADVICE ---
+  const needsMonthly = Math.ceil(income * 0.7);
+  const savingsMonthly = income - needsMonthly - debt;
+  const isDeficit = (needsMonthly + debt) > income;
+  const adviceWrapper = document.getElementById('advice-wrapper');
+  let adviceText = "";
+
+  if (statusVal === 'anak' && isDeficit) adviceText = "Jangan kurangi biaya sekolah/makan anak. Solusi wajib: Cari Side Hustle.";
+  else if (statusVal === 'hamil' && isDeficit) adviceText = "Prioritas vitamin/ibu. Jangan kurangi tabungan.";
+  else if (statusVal === 'nikah' && isDeficit) adviceText = "Solusi: Tunda tanggal atau Kurangi gaya hidup.";
+  else if (statusVal === 'nikah') adviceText = "Jangan buru beli barang dekorasi mahal hari ini. Nabung Rp 50rb untuk mahar atau beli logam mulia lebih penting untuk masa depanmu.";
+  else adviceText = "Keuangan stabil. Lanjutkan komitmen tabunganmu.";
+
+  adviceWrapper.innerHTML = `<div class="advice-card"><div class="advice-title">💡 Nasehat Harianmu</div><div class="advice-text">${adviceText}</div></div>`;
+
+  // --- RENDER DREAM PLANNER ---
+  const dreamWrapper = document.getElementById('dream-result-wrapper');
+  const dreamType = document.getElementById('dreamType').value;
+  const dreamMethod = document.getElementById('dreamMethod').value;
+  let dreamHTML = "";
+
+  if(dreamType !== 'none' && dreamPrice > 0) {
+    let needed = dreamMethod === 'kredit' ? dreamPrice * 0.2 : dreamPrice;
+    let status = aman >= needed;
+    let label = status ? 'CUKUP AMAN' : 'BELUM CUKUP';
+    let msg = status ? `Selamat! Dana Amanmu (${formatIDR(aman)}) cukup untuk ${dreamType} ini.` : `Kurang Rp ${formatIDR(Math.abs(aman - needed))}. Tingkatkan tabungan!`;
+
+    dreamHTML = `
+    <div class="dream-result-card">
+      <div class="info-header"><div class="info-title">🏆 Cek Mimpi: ${dreamType.toUpperCase()}</div><span class="info-tag">${dreamMethod.toUpperCase()}</span></div>
+      <div style="font-size:14px; color:var(--text-muted); margin-top:4px;">Harga Perkiraan</div>
+      <div style="font-size:22px; font-weight:800; color:var(--text-main);">Rp ${formatIDR(dreamPrice)}</div>
+      <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">Kebutuhan Dana Tunai (DP/Lunas)</div>
+      <div style="font-size:16px; font-weight:700; color:var(--text-main); margin-bottom:8px;">Rp ${formatIDR(needed)}</div>
+      <div class="dream-status-badge ${status?'status-success':'status-fail'}">${label}</div>
+      <div style="font-size:13px; color:var(--text-muted); text-align:center; margin-top:8px;">${msg}</div>
+    </div>`;
+  }
+  dreamWrapper.innerHTML = dreamHTML;
+
+  // --- RENDER MONTHLY ANALYSIS ---
+  document.getElementById('cash-income').innerText = "Rp " + formatIDR(income) + " (Gaji + Bonus)";
+  document.getElementById('cash-needs').innerText = formatIDR(needsMonthly) + ` (${Math.round((needsMonthly/income)*100)}%)`;
+  document.getElementById('cash-debt').innerText = formatIDR(debt) + ` (${Math.round((debt/income)*100)}%)`;
+  document.getElementById('cash-save').innerText = formatIDR(savingsMonthly) + ` (${100 - Math.round((needsMonthly/income)*100) - Math.round((debt/income)*100)}%)`;
+
+  // --- RENDER DETAILED CARDS (GRID) ---
+  document.getElementById('buffer-price').innerText = "Rp " + formatIDR(buffer);
+  document.getElementById('target-price-detail').innerText = "Rp " + formatIDR(target);
+  document.getElementById('lifestyle-tag-detail').innerText = lifestyleVal.charAt(0).toUpperCase() + lifestyleVal.slice(1);
+  document.getElementById('lifestyle-text').innerText = lifestyleVal.charAt(0).toUpperCase() + lifestyleVal.slice(1);
+  
+  // List Items (Sesuai Permintaan)
+  const reasonLists = {
+    nikah: ["Biaya KUA & Legalitas Dokumen", "Mahar/Seserahan", "Biaya Akad & Pesta Sederhana", "Pindahan & Uang Muka Tempat Tinggal", "Perlengkapan Rumah Tangga", "Biaya Hidup Bulan Pertama", "Dana Cadangan Tak Terduga"],
+    hamil: ["Biaya Kontrol Rutin & USG", "Suplemen & Nutrisi Ibu", "Biaya Persalinan & RS", "Biaya Dokter Spesialis", "Perlengkapan Bayi Baru", "Biaya Perawatan Pasca Melahirkan", "Dana Darurat Komplikasi"],
+    anak: ["Biaya Rutin Susu & Makanan", "Imunisasi & Kesehatan", "Perlengkapan Anak", "Biaya Pendidikan Awal", "Transportasi & Aktivitas", "Biaya Hidup Tambahan", "Dana Sakit Anak"]
+  };
+  const listHTML = reasonLists[statusVal].map(item => `<li>${item}</li>`).join('');
+  document.getElementById('budget-list-items').innerHTML = listHTML;
+
+  document.getElementById('safe-price-detail').innerText = "Rp " + formatIDR(aman);
+  document.getElementById('gram-detail').innerText = gram.toFixed(2);
+  document.getElementById('gold-price-detail').innerText = "Rp " + formatIDR(hargaEmas);
+
+  // --- RENDER TARGET PLAN ---
+  const dateInput = document.getElementById('targetDate').value;
+  const planCard = document.getElementById('target-plan-card');
+  
+  if(dateInput) {
+    planCard.style.display = 'block';
+    const diffMonths = Math.ceil((new Date(dateInput) - new Date()) / (1000 * 60 * 60 * 24 * 30));
+    const perMonth = Math.ceil(aman / diffMonths);
+    const daily = Math.ceil(perMonth / 30);
+    const weekly = Math.ceil(perMonth / 4);
     
-    const dreamType = document.getElementById("dreamType").value;
-    const dreamMethod = document.getElementById("dreamMethod").value;
-    const dreamPrice = Number(dreamPriceVal.replace(/[^0-9]/g,""));
+    let contextText = "";
+    if (daily < 25000) contextText = "Setara dengan 1 botol air minum.";
+    else if (daily < 50000) contextText = "Setara dengan 1x jajan snack kecil.";
+    else contextText = "Hemat sedikit saja dari uang jajan/harian.";
 
-    const lifestyle = document.getElementById("lifestyle").value;
-    const status = document.getElementById("status").value;
-    const targetDateInput = document.getElementById("targetDate").value;
-    
-    // Total Income Logic
-    const income = gajiPokok + sideHustle;
-    
-    // Validation
-    if(!income || income === 0) {
-      alert("Mohon isi penghasilan (Gaji Pokok atau Side Hustle) dengan benar.");
-      document.getElementById("gajiPokok").focus();
-      return;
-    }
+    document.getElementById('plan-date').innerText = new Date(dateInput).toLocaleDateString('id-ID');
+    document.getElementById('plan-months').innerText = diffMonths + " Bulan";
+    document.getElementById('plan-daily').innerText = "Rp " + formatIDR(daily);
+    document.getElementById('plan-weekly').innerText = "Rp " + formatIDR(weekly);
+    document.getElementById('plan-context').innerText = contextText;
+    document.getElementById('plan-monthly').innerText = "Rp " + formatIDR(perMonth) + " / bln";
+    document.getElementById('plan-compare').innerText = "Rp " + formatIDR(savingsMonthly);
+  } else {
+    planCard.style.display = 'none';
+  }
 
-    // UI LOADING STATE
-    const btn = document.getElementById("btn-calc");
-    const btnText = document.getElementById("btn-text");
-    const btnSpinner = document.getElementById("btn-spinner");
-    const inputSection = document.getElementById("input-section");
-    const unlockBtn = document.getElementById("unlock-btn");
-    
-    btn.disabled = true;
-    btnText.innerText = "Menganalisis...";
-    btnSpinner.style.display = "inline-block";
+  // --- WA LINKS (MONETIZATION) ---
+  const summary = `HONORER DIGITAL REPORT\nStatus: ${statusVal}\nGaji: Rp ${formatIDR(income)}\nTarget: Rp ${formatIDR(target)}`;
+  const baseWA = "https://wa.me/6285123882845?text=" + encodeURIComponent(summary + "\n\nSaya ingin membeli: ");
+  document.getElementById('wa-excel').href = baseWA + "Template Excel (Rp 49rb)";
+  document.getElementById('wa-ebook').href = baseWA + "E-Book Emas (Rp 29rb)";
 
-    // --- CORE CALCULATION ---
-    const lifestyleFactor = { 'hemat': 0.8, 'standar': 1.0, 'mewah': 1.5 };
-    const baseMult={nikah:6,hamil:4,anak:3};
-    const targetRaw = income * baseMult[status];
-    const target = Math.ceil(targetRaw * lifestyleFactor[lifestyle]); 
-    const buffer = Math.ceil(income * 0.7 * 3);
-    const aman = Math.max(0, target - buffer);
-
-    // --- DREAM PLANNER LOGIC ---
-    let dreamHTML = "";
-    if (dreamType !== 'none' && dreamPrice > 0) {
-      let requiredCash = 0;
-      let feasibilityText = "";
-      let feasibilityColor = "#10b981"; // Green
-      let feasibilityLabel = "CUKUP AMAN";
-      let advice = "";
-
-      // Kalkulasi Kebutuhan Tunai
-      if (dreamMethod === 'tunai') {
-        requiredCash = dreamPrice;
-        advice = "Belanja Tunai (Cash) adalah cara terbaik. Tidak ada beban di masa depan.";
-      } else {
-        // Kredit (DP 20%)
-        requiredCash = dreamPrice * 0.2;
-        advice = "Pastikan angsuran cicilan kurang dari 30% gaji.";
-      }
-
-      // Cek Kecukupan
-      // Apakah Dana Aman (Emas) yang terkumpul cukup untuk membiayai mimpi ini?
-      const diff = aman - requiredCash;
-
-      if (diff >= 0) {
-        feasibilityLabel = "CUKUP AMAN";
-        feasibilityColor = "#10b981";
-        advice = `Selamat! Dana Amanmu (${formatIDR(aman)}) cukup untuk ${dreamType} ini.`;
-      } else {
-        feasibilityLabel = "BELUM CUKUP";
-        feasibilityColor = "#f59e0b"; // Orange
-        const kekurangan = Math.abs(diff);
-        advice = `Kurang Rp ${formatIDR(kekurangan)}. Anda bisa menabung tambahan atau menjual emas jika sudah butuh mendesak.`;
-      }
-
-      dreamHTML = `
-      <div class="section-box" style="animation-delay: 0.05s; background:#fffbeb; border-color:#fcd34d;">
-        <div class="section-title">
-          <span style="color:#b45309;">🏆 Cek Mimpi: ${dreamType.toUpperCase()}</span>
-          <span class="section-tag" style="background:#fff; border-color:#f59e0b; color:#b45309;">${dreamMethod.toUpperCase()}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;">
-          <div style="font-size:13px; color:#78350f;">Harga Perkiraan</div>
-          <div style="font-size:18px; font-weight:800; color:#78350f;">Rp ${formatIDR(dreamPrice)}</div>
-        </div>
-        <div class="plan-row" style="color:#78350f; margin-bottom:5px;">
-          <span>Kebutuhan Dana Tunai (DP/Lunas)</span>
-          <strong>Rp ${formatIDR(requiredCash)}</strong>
-        </div>
-        <div class="dream-feasibility" style="color:${feasibilityColor};">${feasibilityLabel}</div>
-        <div style="font-size:12px; color:#92400e; margin-top:5px;">${advice}</div>
-      </div>`;
-    }
-
-    // --- MONTHLY ANALYSIS ---
-    const needsMonthly = Math.ceil(income * 0.7);
-    const savingsMonthly = income - needsMonthly - debt; 
-    
-    let harga = await getHargaEmas();
-    if(!harga || harga === 0) harga = 2652000;
-    
-    const gram = aman / harga;
-    animateValue(document.getElementById("emas"), 0, gram, 1000);
-
-    const reason={
-      nikah:["Biaya KUA & Legalitas Dokumen","Mahar/Seserahan","Biaya Akad & Pesta Sederhana","Pindahan & Uang Muka Tempat Tinggal","Perlengkapan Rumah Tangga","Biaya Hidup Bulan Pertama","Dana Cadangan Tak Terduga"],
-      hamil:["Biaya Kontrol Rutin & USG","Suplemen & Nutrisi Ibu","Biaya Persalinan & RS","Biaya Dokter Spesialis","Perlengkapan Bayi Baru","Biaya Perawatan Pasca Melahirkan","Dana Darurat Komplikasi"],
-      anak:["Biaya Rutin Susu & Makanan","Imunisasi & Kesehatan","Perlengkapan Anak","Biaya Pendidikan Awal","Transportasi & Aktivitas","Biaya Hidup Tambahan","Dana Sakit Anak"]
-    };
-
-    const list = reason[status].map(x=>"<li>"+x+"</li>").join("");
-    const lifestyleLabel = lifestyle.charAt(0).toUpperCase() + lifestyle.slice(1);
-
-    // --- TARGET DATE LOGIC ---
-    let targetPlanHTML = "";
-    let targetMonthlySaving = 0;
-
-    if (targetDateInput) {
-      const diffMonths = Math.ceil((new Date(targetDateInput) - new Date()) / (1000 * 60 * 60 * 24 * 30));
-
-      if (diffMonths <= 0) {
-         targetPlanHTML = `<div class="plan-box" style="background:#fee2e2; border-color:#fca5a5;"><div style="color:#b91c1c; font-weight:bold; font-size:13px;">Waktu Terlampaui</div><div style="font-size:11px; color:#991b1b;">Tanggal target sudah lewat.</div></div>`;
-      } else {
-         const tabunganPerBulan = Math.ceil(aman / diffMonths);
-         targetMonthlySaving = tabunganPerBulan;
-         
-         const dailyTarget = Math.ceil(tabunganPerBulan / 30);
-         const weeklyTarget = Math.ceil(tabunganPerBulan / 4);
-         
-         let contextText = "";
-         if (dailyTarget < 25000) contextText = "Setara dengan 1 botol air minum.";
-         else if (dailyTarget < 50000) contextText = "Setara dengan 1x jajan snack kecil.";
-         else if (dailyTarget < 75000) contextText = "Setara dengan 1x makan siang warteg.";
-         else contextText = "Hemat sedikit saja dari uang jajan/harian.";
-
-         targetPlanHTML = `
-         <div class="plan-box">
-           <div class="plan-row"><span>Target Tanggal:</span> <strong>${new Date(targetDateInput).toLocaleDateString('id-ID')}</strong></div>
-           <div class="plan-row"><span>Sisa Waktu:</span> <strong>${diffMonths} Bulan</strong></div>
-           
-           <div class="action-plan-box">
-             <span class="action-header">🔥 Langkah Nyata Harian</span>
-             <div class="action-grid">
-               <div class="action-item">
-                 <span class="action-label">Target Harian</span>
-                 <span class="action-val">Rp ${formatIDR(dailyTarget)}</span>
-               </div>
-               <div class="action-item">
-                 <span class="action-label">Target Mingguan</span>
-                 <span class="action-val">Rp ${formatIDR(weeklyTarget)}</span>
-               </div>
-             </div>
-             <div class="action-tip">
-               ${contextText}
-             </div>
-           </div>
-
-           <div class="plan-row highlight">
-             <span>Total Bulanan:</span> <span>Rp ${formatIDR(tabunganPerBulan)} / bln</span>
-           </div>
-           <div class="footnote">
-             *Bandingkan dengan Kemampuanmu (Rp ${formatIDR(savingsMonthly)}).
-           </div>
-         </div>`;
-      }
-    } else {
-      const cicil6 = aman/6; const cicil12 = aman/12;
-      targetPlanHTML = `
-      <div class="plan-box" style="background:#f8fafc; border-color:#e2e8f0;">
-        <div style="font-size:11px; color:#64748b; margin-bottom:6px; font-weight:600;">Simulasi Tabungan Emas (Umum)</div>
-        <div class="plan-row"><span>6 Bulan:</span> <strong>Rp ${formatIDR(Math.ceil(cicil6))} / bln</strong></div>
-        <div class="plan-row"><span>12 Bulan:</span> <strong>Rp ${formatIDR(Math.ceil(cicil12))} / bln</strong></div>
-      </div>`;
-    }
-
-    // --- WARNING & ADVICE LOGIC ---
-    let warningHTML = "";
-    let isDeficit = (needsMonthly + debt) > income; 
-    let dailyAdviceText = "";
-
-    if (isDeficit) {
-      if (status === 'anak') {
-        warningHTML = `
-        <div class="section-box danger-box" style="animation-delay: 0.1s; border:2px solid #fca5a5;">
-          <div class="section-title"><span style="color:#b91c1c;">⚠️ KRISIS PENGHASILAN KELUARGA</span></div>
-          <div class="section-desc" style="color:#991b1b; font-weight:600;">
-            Pengeluaranmu (${formatIDR(needsMonthly + debt)}) melebihi gaji (${formatIDR(income)}). <br><br>
-            Karena sudah punya anak (tanggungan), sangat tidak disarankan untuk mengurangi makan atau biaya sekolah. <br><br>
-            <strong>SOLUSI WAJIB: Segera cari penghasilan tambahan (Side Hustle).</strong>
-          </div>
-        </div>`;
-      } else {
-        warningHTML = `
-        <div class="section-box danger-box" style="animation-delay: 0.1s; border:2px solid #fca5a5;">
-          <div class="section-title"><span style="color:#b91c1c;">⚠️ PERINGATAN KRITIS</span></div>
-          <div class="section-desc" style="color:#991b1b; font-weight:600;">
-            Pengeluaranmu (${formatIDR(needsMonthly + debt)}) melebihi gaji (${formatIDR(income)}). Kamu sedang berada di zona merah. <br><br>
-            Segera kurangi gaya hidup atau cari sumber pendapatan tambahan.
-          </div>
-        </div>`;
-      }
-    } else if (targetMonthlySaving > savingsMonthly && targetDateInput) {
-      const gap = targetMonthlySaving - savingsMonthly;
-      
-      if (status === 'anak') {
-        warningHTML = `
-        <div class="section-box warning-box" style="animation-delay: 0.1s;">
-          <div class="section-title"><span style="color:#b45309;">⚠️ TARGET TABUNGAN KURANG</span></div>
-          <div class="section-desc" style="color:#92400e;">
-            Target tabunganmu (${formatIDR(targetMonthlySaving)}/bln) lebih besar dari kemampuan nabung nyatamu (${formatIDR(savingsMonthly)}/bln). <br>
-            <strong>Defisit:</strong> Rp ${formatIDR(gap)}/bln.<br><br>
-            Solusi: Cari penghasilan tambahan atau pilih sekolah/sehatan yang lebih hemat.
-          </div>
-        </div>`;
-      } else {
-        warningHTML = `
-        <div class="section-box warning-box" style="animation-delay: 0.1s;">
-          <div class="section-title"><span style="color:#b45309;">⚠️ TARGET TERLALU BERAT</span></div>
-          <div class="section-desc" style="color:#92400e;">
-            Target tabunganmu (${formatIDR(targetMonthlySaving)}/bln) lebih besar dari kemampuan nabung nyatamu (${formatIDR(savingsMonthly)}/bln). <br>
-            <strong>Defisit:</strong> Rp ${formatIDR(gap)}/bln.<br><br>
-            Solusi: Tunda target tanggal atau kurangi gaya hidup (Ganti jadi "Hemat").
-          </div>
-        </div>`;
-      }
-    }
-
-    // Advice Text Logic
-    if (status === 'nikah') {
-      dailyAdviceText = "Jangan buru beli barang dekorasi mahal hari ini. Nabung Rp 50rb untuk mahar atau beli logam mulia lebih penting untuk masa depanmu.";
-    } else if (status === 'hamil') {
-      dailyAdviceText = "Nutrisi dan vitamin Ibu adalah prioritas. Jangan ambil dari tabungan emas. Hemat jajan kecil untuk vitaminnya.";
-    } else {
-      dailyAdviceText = "Mainan anak tidak harus selalu baru. Kualitas waktu mainkan mereka lebih berharga. Nabungkan Rp 20rb hari ini sebagai awal tabungan sekolah.";
-    }
-
-    // --- RENDER HTML ---
-    document.getElementById("detail").style.display = "block";
-    
-    document.getElementById("detail").innerHTML=`
-<!-- ADVICE -->
-<div class="advice-box" style="animation-delay: 0.05s;">
-  <strong style="font-size:14px; display:block; margin-bottom:4px;">💡 Nasehat Harianmu</strong>
-  ${dailyAdviceText}
-</div>
-
- ${warningHTML}
-
- ${dreamHTML}
-
-<!-- ANALISA BULANAN -->
-<div class="section-box" style="animation-delay: 0.15s;">
-  <div class="section-title">
-    Analisa Bulanan
-    <span class="section-tag tag-blue">Cash Flow</span>
-  </div>
-  <div class="section-desc" style="margin-bottom:12px;">
-    Total Penghasilan: <strong>Rp ${formatIDR(income)}</strong> (Gaji + Bonus)
-  </div>
-  <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; margin-bottom:4px;">
-    <span style="color:#1e40af;">Kebutuhan Hidup</span>
-    <span>${formatIDR(needsMonthly)} (${Math.round((needsMonthly/income)*100)}%)</span>
-  </div>
-  <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; margin-bottom:4px;">
-    <span style="color:#b91c1c;">Cicilan / Utang</span>
-    <span>${formatIDR(debt)} (${Math.round((debt/income)*100)}%)</span>
-  </div>
-  <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; margin-bottom:8px; border-top:1px dashed #cbd5e1; padding-top:4px;">
-    <span style="color:#059669;">Kemampuan Menabung (Nyata)</span>
-    <span>${formatIDR(savingsMonthly)} (${100 - Math.round((needsMonthly/income)*100) - Math.round((debt/income)*100)}%)</span>
-  </div>
-  ${!isDeficit ? `
-  <div class="progress-bar-container">
-    <div class="progress-segment seg-hidup" style="width:${Math.round((needsMonthly/income)*100)}%"></div>
-    <div class="progress-segment seg-utang" style="width:${Math.round((debt/income)*100)}%"></div>
-    <div class="progress-segment seg-sisa" style="width:${100 - Math.round((needsMonthly/income)*100) - Math.round((debt/income)*100)}%"></div>
-  </div>` : ''}
-</div>
-
-<!-- DANA PENYANGGA -->
-<div class="section-box highlight-box" style="animation-delay: 0.2s;">
-  <div class="section-title">
-    Dana Penyangga Hidup
-    <span class="section-tag tag-yellow">Wajib Tunai</span>
-  </div>
-  <div class="section-price" style="color:var(--primary-dark);">Rp ${formatIDR(buffer)}</div>
-  <div class="section-desc">
-    Uang tunai ini wajib ada di rekening. Ini adalah sabuk pengaman keuanganmu. Jika penghasilan berhenti (sakit/cuti/resign), uang ini menutup kebutuhan makan & sewa selama 3 bulan.
-  </div>
-</div>
-
-<!-- DANA BESAR -->
-<div class="section-box" style="animation-delay: 0.25s;">
-  <div class="section-title">
-    Kebutuhan Dana Besar
-    <span class="section-tag tag-yellow">Gaya Hidup ${lifestyleLabel}</span>
-  </div>
-  <div class="section-price">Rp ${formatIDR(target)}</div>
-  <div class="section-desc">
-    Estimasi biaya realistis dengan gaya hidup <strong>${lifestyleLabel}</strong>.
-    <ul style="margin: 8px 0 0 0; padding-left: 14px; color: var(--text-muted); font-size: 12px;">${list}</ul>
-  </div>
-</div>
-
-<!-- DANA DIKUNCI -->
-<div class="section-box" style="animation-delay: 0.3s; background: #fff; border: 1px solid #d1fae5;">
-  <div class="section-title">
-    Dana Siap Dikunci
-    <span class="section-tag tag-green">Bisa di Emas</span>
-  </div>
-  <div class="section-price" style="color:var(--success-dark);">Rp ${formatIDR(aman)}</div>
-  <div class="section-desc">
-    Ini adalah sisa dana dari total kebutuhan yang aman untuk dikunci (diinvestasikan) dalam bentuk emas.
-    <br><br>
-    <strong>Setara emas:</strong> ${gram.toFixed(2)} gram<br>
-    <strong>Harga emas:</strong> Rp ${formatIDR(harga)} / gram
-  </div>
-  ${targetPlanHTML}
-</div>
-`;
-
-    // --- CHART LOGIC ---
-    const data = [aman, buffer];
-    if(chart) chart.destroy();
-    const ctx = document.getElementById('chart').getContext('2d');
-    chart = new Chart(ctx,{
-      type:"doughnut",
-      data:{
-        labels:["Aman (Emas)","Penyangga (Tunai)"],
-        datasets:[{ data:data, backgroundColor: ["#10b981", "#fbbf24"], borderWidth:0, hoverOffset: 6 }]
-      },
-      options: {
-        cutout: '78%', responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: {size: 11, family: 'Plus Jakarta Sans'} } } },
-        animation: { animateScale: true, animateRotate: true, duration: 1500, easing: 'easeOutQuart' }
-      }
-    });
-
-    // --- LOCAL STORAGE ---
-    localStorage.setItem("honorer_kalkulasi",JSON.stringify({
-      status, gajiPokok, sideHustle, debt, lifestyle, dreamType, dreamMethod, dreamPrice,
-      targetDate:targetDateInput, target, buffer, aman, gram, harga
-    }));
-
-    // --- SHOW BUTTONS & LOCK UI ---
-    inputSection.classList.add('hidden-section');
-    unlockBtn.style.display = "block";
-    document.getElementById("btn-container").style.display = "grid";
-    document.getElementById("help-section").style.display = "block";
-
-    // --- WA LINKS ---
-    const fullWaText = encodeURIComponent(
-`HONORER DIGITAL - PRO PLAN
-
-DATA INPUT:
-- Status: ${status}
-- Penghasilan: Rp ${formatIDR(income)} (Gaji+Bonus)
-- Gaya Hidup: ${lifestyleLabel}
-- Cicilan/Utang: Rp ${formatIDR(debt)}
-
-HASIL PERHITUNGAN:
-1. Kebutuhan Dana Besar: Rp ${formatIDR(target)}
-2. Dana Penyangga: Rp ${formatIDR(buffer)}
-3. Dana Aman: Rp ${formatIDR(aman)}
-   Setara: ${gram.toFixed(2)} gram
-
-RENCANA TABUNGAN:
- ${targetDateInput ? `- Target: ${new Date(targetDateInput).toLocaleDateString('id-ID')}\n- Tabungan Emas: Rp ${formatIDR(Math.ceil(aman/Math.ceil((new Date(targetDateInput)-new Date())/(1000*60*60*24*30))))} / bln` : '- Umum'}`);
-
-    document.getElementById("waBtn") = {
-      onclick: () => window.open("https://wa.me/6285123882845?text="+fullWaText) // Assuming waBtn for general share or order
-    };
-    // Assign buttons if they exist in HTML (In my previous code I added separate buttons for sales)
-    const excelBtn = document.getElementById("excelBtn");
-    const ebookBtn = document.getElementById("ebookBtn");
-
-    if(excelBtn) {
-      const waExcel = `Halo, saya ingin order "Template Excel Pengatur Keuangan Keluarga" (Rp 49.000). \n\nBerikut data analisa saya:\n${fullWaText}`;
-      excelBtn.onclick = () => window.open("https://wa.me/6285123882845?text=" + encodeURIComponent(waExcel));
-    }
-    if(ebookBtn) {
-      const waBook = `Halo, saya ingin order "Panduan Beli Emas (E-Book)" (Rp 29.000).\n\nMohon infonya.`;
-      ebookBtn.onclick = () => window.open("https://wa.me/6285123882845?text=" + encodeURIComponent(waBook));
-    }
-
-    // --- RESET BUTTON ---
-    btn.disabled = false;
-    btnText.innerText = "Hitung Keamanan";
-    btnSpinner.style.display = "none";
-
-  } catch (error) {
-    console.error("Critical Error:", error);
-    alert("Terjadi Kesalahan Sistem: " + error.message);
-    
-    // Reset UI on Error
-    const btn = document.getElementById("btn-calc");
-    const btnText = document.getElementById("btn-text");
-    const btnSpinner = document.getElementById("btn-spinner");
-    if(btn) {
-      btn.disabled = false;
-      btnText.innerText = "Hitung Keamanan";
-      btnSpinner.style.display = "none";
-    }
+  // --- TRANSITION UI ---
+  document.getElementById('input-section').classList.add('hidden');
+  document.getElementById('unlock-btn').classList.remove('hidden');
+  document.getElementById('btn-calc').classList.add('hidden');
+  document.getElementById('initial-msg').classList.add('hidden');
+  document.getElementById('detail-container').classList.remove('hidden');
+  
+  btn.disabled = false; btnText.innerText = "ANALISIS KEAMANAN SAYA";
+  
+  if(window.innerWidth < 768) {
+    document.getElementById('result-section').scrollIntoView({behavior:'smooth'});
   }
 }
 </script>
