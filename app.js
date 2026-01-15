@@ -23,7 +23,7 @@ async function kirimKeHonorer(input) {
 }
 
 // Inisialisasi
-await getSession();
+getSession();
 
 // Form handler
 document.getElementById("form").addEventListener("submit", async (e) => {
