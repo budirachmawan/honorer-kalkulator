@@ -1,15 +1,15 @@
-const HONORER_API = "https://script.google.com/macros/s/AKfycbxGo_RvtvFKZ-9Pwu9_k2x7lNUWcfA486U4G140rn6CiTKwEM51cuF3C9rJ70MVb6VMbA/exec"; // ganti dengan punyamu
-
-let session = null;
+const HONORER_API = "https://script.google.com/macros/s/XXXXXXXX/exec"; // pakai punyamu
 
 async function getSession() {
-  const res = await fetch(HONORER_API + "/getSession");
+  const res = await fetch(`${HONORER_API}/getSession`);
   const data = await res.json();
-  session = data.session;
+  localStorage.setItem("honorer_session", data.session);
+  return data.session;
 }
 
 async function kirimKeHonorer(input) {
-  if (!session) await getSession();
+  const session = localStorage.getItem("honorer_session");
+  if (!session) throw new Error("Session belum ada");
 
   const payload = { session, ...input };
 
@@ -22,14 +22,22 @@ async function kirimKeHonorer(input) {
   return await res.json();
 }
 
+// Inisialisasi
+await getSession();
+
+// Form handler
 document.getElementById("form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const data = new FormData(e.target);
   const input = {};
-  for (const [k, v] of data.entries()) input[k] = v;
+
+  for (const [k, v] of data.entries()) {
+    input[k] = v;
+  }
 
   const hasil = await kirimKeHonorer(input);
+
   document.getElementById("output").textContent =
     JSON.stringify(hasil, null, 2);
 });
