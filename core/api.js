@@ -1,5 +1,5 @@
 // core/api.js
-const HONORER_API = "https://script.google.com/macros/s/AKfycbxGo_RvtvFKZ-9Pwu9_k2x7lNUWcfA486U4G140rn6CiTKwEM51cuF3C9rJ70MVb6VMbA/exec";
+const HONORER_API = "https://script.google.com/macros/s/AKfycbya2WKiAvkUvpcxbiu33kvOpSiz3LaQQU2gjBKYcePMoSTpneNk0qZ9VU3LAxATHljCIA/exec"; 
 // Ganti dengan URL Apps Script kamu yang sebenarnya
 
 export async function getSession() {
