@@ -1,31 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HONORER DIGITAL</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+    h1 { text-align: center; }
+    form { display: grid; gap: 10px; }
+    input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    button { padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    pre { background: #f8f9fa; padding: 15px; border-radius: 4px; white-space: pre-wrap; }
+  </style>
 </head>
 <body>
+  <h1>HONORER DIGITAL</h1>
+  <form id="form">
+    <input name="Total uang masuk per bulan" placeholder="Total uang masuk per bulan" type="number" required>
+    <input name="Uang Operasional Hidup" placeholder="Biaya hidup per bulan" type="number" required>
+    <input name="Cicilan & utang per bulan" placeholder="Cicilan per bulan" type="number" required>
+    <input name="Uang yang ada sekarang" placeholder="Uang yang ada sekarang" type="number" required>
+    <input name="Dana cadangan khusus darurat" placeholder="Dana darurat" type="number" required>
+    <input name="Tanggungan" placeholder="Tanggungan" type="number" required>
+    <input name="Aset Cair" placeholder="Aset cair" type="number" required>
+    <input name="Risiko Aktif" placeholder="Risiko aktif" type="number" required>
+    <button type="submit">Hitung</button>
+  </form>
+  <pre id="output"></pre>
+  <script>
+    const form = document.getElementById('form');
+    const output = document.getElementById('output');
+    const API_URL = 'https://script.google.com/macros/s/[GANTI_DENGAN_WEB_APP_ID_MU]/exec';  // Ganti dengan URL Web App-mu
 
-<h1>HONORER DIGITAL</h1>
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      output.textContent = 'Memproses...';
 
-<form id="form">
-  <input name="Total uang masuk per bulan" placeholder="Total uang masuk per bulan">
-  <input name="Uang Operasional Hidup" placeholder="Biaya hidup per bulan">
-  <input name="Cicilan & utang per bulan" placeholder="Cicilan per bulan">
-  <input name="Uang yang ada sekarang" placeholder="Uang yang ada sekarang">
-  <input name="Dana cadangan khusus darurat" placeholder="Dana darurat">
-  <input name="Tanggungan" placeholder="Tanggungan">
-  <input name="Aset Cair" placeholder="Aset cair">
-  <input name="Risiko Aktif" placeholder="Risiko aktif">
+      try {
+        // Dapatkan session
+        const sessionRes = await fetch(`${API_URL}/getSession`);
+        if (!sessionRes.ok) throw new Error('Gagal mendapatkan session');
+        const { id: session } = await sessionRes.json();
 
-  <button type="submit">Hitung</button>
-</form>
+        // Kumpulkan input
+        const formData = new FormData(form);
+        const input = { session };
+        for (let [key, value] of formData.entries()) {
+          input[key] = value;
+        }
 
-<pre id="output"></pre>
+        // Kirim POST
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(input)
+        });
 
-<script type="module" src="./app.js"></script>
+        if (!res.ok) throw new Error('Gagal menghitung');
+        const result = await res.json();
 
-
+        // Tampilkan output
+        output.textContent = JSON.stringify(result, null, 2);
+      } catch (error) {
+        output.textContent = `Error: ${error.message}`;
+      }
+    });
+  </script>
 </body>
 </html>
-
-
