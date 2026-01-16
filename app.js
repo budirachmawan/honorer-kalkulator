@@ -6,9 +6,15 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwpybWm8UqavSEP-8wVKUvc
  */
 async function getSession() {
   try {
-    const response = await fetch(`${API_URL}/getSession`);
+    // PERBAIKAN: Pakai ?path=getSession (Tanda Tanya), bukan /getSession
+    const response = await fetch(`${API_URL}?path=getSession`);
+    
     if (!response.ok) throw new Error("Gagal koneksi ke server (Session)");
     const data = await response.json();
+    
+    // Simpan session ID ke localStorage agar tidak hilang saat reload
+    localStorage.setItem("honorer_session", data.id);
+    
     return data.id;
   } catch (error) {
     console.error("Gagal ambil session:", error);
@@ -19,12 +25,12 @@ async function getSession() {
 /**
  * Fungsi untuk mengirim data ke API Honorer
  */
-async function kirimKeHonorer(payload) {
+async function kirimKeHonorer(input) {
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(input)
     });
 
     const data = await response.json();
@@ -44,7 +50,6 @@ async function kirimKeHonorer(payload) {
  * Fungsi untuk merender hasil ke HTML (Sinkronisasi UI)
  */
 function renderResult(data) {
-  // Element Output
   const form = document.getElementById('form');
   const resultContainer = document.getElementById('result-container');
   const errorBox = document.getElementById('error-box');
@@ -53,7 +58,7 @@ function renderResult(data) {
   // Reset Error
   errorBox.style.display = 'none';
 
-  // Isi Data
+  // Isi Data Output
   document.getElementById('res-mode').textContent = data.Mode;
   document.getElementById('res-napas').textContent = Number(data.Napas).toLocaleString('id-ID') + " Hari";
   document.getElementById('res-survival').textContent = data.Survival + " Bulan";
@@ -67,11 +72,10 @@ function renderResult(data) {
   // Pesan AI
   document.getElementById('res-pesan').textContent = data.Pesan;
 
-  // Tanggungan (Ambil dari input form karena API hanya return total calculation/other stuff)
-  // Catatan: Jika API mengembalikan nilai Tanggungan yang sudah dihitung, gunakan data["Tanggungan..."]
-  // Tapi untuk aman sinkronisasi, kita ambil dari form input
+  // Tanggungan (Ambil dari input form karena API hanya return hasil hitungan lain)
+  // Catatan: Pastikan name di HTML dan Form Data ini SAMA
   const formData = new FormData(form);
-  const tanggunganVal = formData.get("Tanggungan (orang yang bergantikan pada kamu)");
+  const tanggunganVal = formData.get("Tanggungan (orang yang bergantung pada kamu)");
   document.getElementById('res-tanggungan').textContent = tanggunganVal + " Jiwa";
 
   // Warna Badge Zona
@@ -132,14 +136,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // 4. Kirim ke API
+      // 4. Kirim Data
       const result = await kirimKeHonorer(input);
 
       // 5. Render Hasil
       renderResult(result);
 
     } catch (err) {
-      // Tampilkan Error
+      console.error(err);
       const errorBox = document.getElementById('error-box');
       if (errorBox) {
         errorBox.style.display = 'block';
@@ -149,7 +153,6 @@ document.addEventListener("DOMContentLoaded", () => {
       // Kembalikan tombol
       submitBtn.disabled = false;
       submitBtn.textContent = "ANALISA DATA";
-      console.error(err);
     }
   });
 });
