@@ -12,22 +12,17 @@ export async function getSession() {
 export async function kirimKeHonorer(input) {
   const session = localStorage.getItem("honorer_session");
 
-  if (!session) {
-    throw new Error("Session belum ada. getSession() belum dipanggil.");
-  }
-
   const payload = {
     session,
     ...input
   };
 
-  const res = await fetch(HONORER_API, {
+  await fetch(HONORER_API, {
     method: "POST",
+    mode: "no-cors",   // ⬅️ INI KUNCINYA
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(payload)
   });
-
-  return await res.json();
 }
