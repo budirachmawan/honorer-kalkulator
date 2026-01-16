@@ -1,31 +1,7 @@
-const HONORER_API = "https://script.google.com/macros/s/AKfycbxGo_RvtvFKZ-9Pwu9_k2x7lNUWcfA486U4G140rn6CiTKwEM51cuF3C9rJ70MVb6VMbA/exec"; // pakai punyamu
+import { getSession, kirimKeHonorer } from "/core/api.js";
 
-async function getSession() {
-  const res = await fetch(`${HONORER_API}/getSession`);
-  const data = await res.json();
-  localStorage.setItem("honorer_session", data.session);
-  return data.session;
-}
+await getSession();
 
-async function kirimKeHonorer(input) {
-  const session = localStorage.getItem("honorer_session");
-  if (!session) throw new Error("Session belum ada");
-
-  const payload = { session, ...input };
-
-  const res = await fetch(HONORER_API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-
-  return await res.json();
-}
-
-// Inisialisasi
-getSession();
-
-// Form handler
 document.getElementById("form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -36,8 +12,14 @@ document.getElementById("form").addEventListener("submit", async (e) => {
     input[k] = v;
   }
 
-  const hasil = await kirimKeHonorer(input);
+  document.getElementById("output").textContent = "Menghitung...";
 
-  document.getElementById("output").textContent =
-    JSON.stringify(hasil, null, 2);
+  try {
+    const hasil = await kirimKeHonorer(input);
+    document.getElementById("output").textContent =
+      JSON.stringify(hasil, null, 2);
+  } catch (err) {
+    document.getElementById("output").textContent =
+      "ERROR: " + err.message;
+  }
 });
