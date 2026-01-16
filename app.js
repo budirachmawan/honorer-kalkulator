@@ -1,5 +1,5 @@
 // PASTIKAN URL INI SAMA DENGAN WEB APP URL KAMU
-const API_URL = 'https://script.google.com/macros/s/AKfycbyaOC8_JkJs2qcRbr5NorqdHc-KOrP8tsjP8-ZC5_bCIX01_xKGGr3f-lBmcCBE5BHprA/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwpybWm8UqavSEP-8wVKUvcmw8r3iQxm1sFQI7M3SnlSR60q2OAN8fYMdAbYjMMPLgeCA/exec';
 
 /**
  * Fungsi untuk mendapatkan Session ID dari API
