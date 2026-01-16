@@ -12,14 +12,21 @@ document.getElementById("form").addEventListener("submit", async (e) => {
     input[k] = v;
   }
 
-  document.getElementById("output").textContent = "Menghitung...";
+  const outputEl = document.getElementById("output");
+  outputEl.textContent = "⏳ Data dikirim. Sistem sedang memproses...";
 
   try {
-    const hasil = await kirimKeHonorer(input);
-    document.getElementById("output").textContent =
-      JSON.stringify(hasil, null, 2);
+    await kirimKeHonorer(input);
+
+    // karena no-cors → tidak ada response
+    outputEl.textContent = `
+✅ Data berhasil dikirim.
+HONORER DIGITAL sedang menghitung di belakang layar.
+
+Silakan tunggu sebentar.
+`;
   } catch (err) {
-    document.getElementById("output").textContent =
-      "ERROR: " + err.message;
+    outputEl.textContent = "❌ Gagal mengirim data.";
+    console.error(err);
   }
 });
