@@ -1,20 +1,30 @@
 // core/api.js
-const HONORER_API = "https://script.google.com/macros/s/AKfycbyaOC8_JkJs2qcRbr5NorqdHc-KOrP8tsjP8-ZC5_bCIX01_xKGGr3f-lBmcCBE5BHprA/exec"; // Masukkan URL baru tadi
+
+// ==========================================
+// !!! PERHATIAN !!!
+// GANTI URL DI BAWAH INI DENGAN URL DEPLOYMENT BARU KAMU
+// Contoh: https://script.google.com/macros/s/AKfycb.../exec
+// ==========================================
+const HONORER_API = "https://script.google.com/macros/s/AKfycbwpybWm8UqavSEP-8wVKUvcmw8r3iQxm1sFQI7M3SnlSR60q2OAN8fYMdAbYjMMPLgeCA/exec";
+
 
 export async function getSession() {
   try {
-    // GANTI INI: Pakai ?path=getSession
+    // Menggunakan parameter ?path=getSession agar server (Code.gs) bisa menerima
     const res = await fetch(`${HONORER_API}?path=getSession`);
     
     if (!res.ok) {
-      // Coba lihat text errornya apa jika ada masalah
+      // Jika gagal, coba baca error text dari server untuk debug
       const errorText = await res.text();
-      console.error("GAS Error Response:", errorText); 
+      console.error("GAS Error Response (getSession):", errorText); 
       throw new Error(`Gagal fetch session: ${res.status}`);
     }
     
     const data = await res.json();
+    
+    // Simpan ID session di browser agar tidak hilang saat reload
     localStorage.setItem("honorer_session", data.id);
+    
     return data.id;
   } catch (error) {
     console.error('Error getSession:', error);
@@ -23,11 +33,14 @@ export async function getSession() {
 }
 
 export async function kirimKeHonorer(input) {
+  // Ambil session yang tersimpan di localStorage
   const session = localStorage.getItem("honorer_session");
+  
   if (!session) {
     throw new Error("Session tidak ditemukan. Panggil getSession dulu.");
   }
 
+  // Gabungkan session ID dengan data input form
   const payload = {
     session,
     ...input
@@ -43,9 +56,9 @@ export async function kirimKeHonorer(input) {
     });
 
     if (!res.ok) {
-       const errorText = await res.text();
-       console.error("GAS Error Response:", errorText);
-       throw new Error(`Gagal kirim data: ${res.status}`);
+      const errorText = await res.text();
+      console.error("GAS Error Response (kirimKeHonorer):", errorText);
+      throw new Error(`Gagal kirim data: ${res.status}`);
     }
 
     const result = await res.json();
