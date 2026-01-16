@@ -1,5 +1,5 @@
 // core/api.js
-const HONORER_API = "https://script.google.com/macros/s/AKfycbya2WKiAvkUvpcxbiu33kvOpSiz3LaQQU2gjBKYcePMoSTpneNk0qZ9VU3LAxATHljCIA/exec"; // Masukkan URL baru tadi
+const HONORER_API = "https://script.google.com/macros/s/AKfycbyaOC8_JkJs2qcRbr5NorqdHc-KOrP8tsjP8-ZC5_bCIX01_xKGGr3f-lBmcCBE5BHprA/exec"; // Masukkan URL baru tadi
 
 export async function getSession() {
   try {
