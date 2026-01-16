@@ -5,67 +5,422 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HONORER DIGITAL</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
-    h1 { text-align: center; }
-    form { display: grid; gap: 10px; }
-    input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-    button { padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    button:hover { background: #0056b3; }
-    pre { background: #f8f9fa; padding: 15px; border-radius: 4px; white-space: pre-wrap; }
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-body: #f3f4f6;
+      --bg-card: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius: 16px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      line-height: 1.5;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: 1.75rem;
+      margin-bottom: 5px;
+      letter-spacing: -0.025em;
+    }
+    
+    .subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 30px;
+      font-weight: 500;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    form { display: block; }
+    
+    label {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .help-text {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      color: var(--text-main);
+      margin-bottom: 0; 
+      background-color: #fff;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .currency-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    
+    .currency-wrapper span {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .currency-wrapper input {
+      padding-left: 50px;
+      background-color: #fafafa; 
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.2s;
+      box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+    }
+
+    button:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+    button:disabled { background: #9ca3af; cursor: not-allowed; box-shadow: none; }
+
+    #result-container { display: none; }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 50px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .zone-critical { background-color: #ef4444; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+    .zone-danger { background-color: #f97316; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
+    .zone-vulnerable { background-color: #eab308; color: #000; box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3); }
+    .zone-safe { background-color: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 0.95rem;
+    }
+
+    .stat-row:last-child { border-bottom: none; }
+
+    .stat-label { color: var(--text-muted); font-weight: 500; }
+    .stat-value { font-weight: 700; color: var(--text-main); }
+
+    .ai-message {
+      background-color: #eff6ff;
+      color: #1e3a8a;
+      border-left: 4px solid var(--primary);
+      padding: 16px;
+      margin-top: 20px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .error-message {
+      background-color: #fee2e2;
+      color: #991b1b;
+      padding: 14px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 20px;
+      display: none;
+      font-weight: 500;
+    }
+
+    .btn-reset {
+      background: #fff;
+      color: var(--text-main);
+      border: 2px solid #e5e7eb;
+      margin-top: 20px;
+      box-shadow: none;
+    }
+    .btn-reset:hover { background: #f9fafb; border-color: #d1d5db; transform: none; }
+
   </style>
 </head>
 <body>
+
   <h1>HONORER DIGITAL</h1>
+  <p class="subtitle">Analisa Kesehatan Finansial</p>
+
+  <div id="error-box" class="error-message"></div>
+
   <form id="form">
-    <input name="Total uang masuk per bulan" placeholder="Total uang masuk per bulan" type="number" required>
-    <input name="Uang Operasional Hidup" placeholder="Biaya hidup per bulan" type="number" required>
-    <input name="Cicilan & utang per bulan" placeholder="Cicilan per bulan" type="number" required>
-    <input name="Uang yang ada sekarang" placeholder="Uang yang ada sekarang" type="number" required>
-    <input name="Dana cadangan khusus darurat" placeholder="Dana darurat" type="number" required>
-    <input name="Tanggungan" placeholder="Tanggungan" type="number" required>
-    <input name="Aset Cair" placeholder="Aset cair" type="number" required>
-    <input name="Risiko Aktif" placeholder="Risiko aktif" type="number" required>
-    <button type="submit">Hitung</button>
+    
+    <div class="card">
+      <label>Total uang masuk per bulan (rata-rata)</label>
+      <small class="help-text">Rata-rata 3 bulan terakhir (gaji + freelance + usaha)</small>
+      <div class="currency-wrapper">
+        <span>Rp</span>
+        <input name="Total uang masuk per bulan (rata-rata)" type="number" placeholder="0" required>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Uang Operasional Hidup</label>
+      <small class="help-text">Biaya agar hidup jalan: makan, tempat tinggal, listrik, transport, pulsa, dll</small>
+      <div class="currency-wrapper">
+        <span>Rp</span>
+        <input name="Uang Operasional Hidup" type="number" placeholder="0" required>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Cicilan & utang per bulan</label>
+      <small class="help-text">Total yang harus dibayar tiap bulan untuk semua utang & cicilan</small>
+      <div class="currency-wrapper">
+        <span>Rp</span>
+        <input name="Cicilan & utang per bulan" type="number" placeholder="0" required>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Uang yang ada sekarang (Cash + ATM)</label>
+      <small class="help-text">Uang yang bisa dipakai hari ini: cash, ATM, e-wallet</small>
+      <div class="currency-wrapper">
+        <span>Rp</span>
+        <input name="Uang yang ada sekarang (Cash + ATM)" type="number" placeholder="0" required>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Uang cadangan khusus darurat</label>
+      <small class="help-text">Uang yang disimpan khusus krisis, tidak dipakai harian</small>
+      <div class="currency-wrapper">
+        <span>Rp</span>
+        <input name="Uang cadangan khusus darurat" type="number" placeholder="0">
+      </div>
+    </div>
+
+    <!-- TANGGUNGAN: FINAL VERSION -->
+    <div class="card">
+      <label>Tanggungan (orang yang bergantikan pada kamu)</label>
+      <small class="help-text">Jumlah total orang yang bergantung pada penghasilanmu (Anak, Pasangan, Orang Tua, dll)</small>
+      
+      <div class="currency-wrapper">
+        <span>Jiwa</span>
+        <input name="Tanggungan (orang yang bergantikan pada kamu)" type="number" placeholder="0" required>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Aset Cair (bisa dicairkan ≤ 7 hari)</label>
+      <small class="help-text">Nilai aset yang benar-benar bisa kamu ubah jadi uang dalam waktu sekitar seminggu tanpa merusak hidupmu</small>
+      <div class="currency-wrapper">
+        <span>Rp</span>
+        <input name="Aset Cair (bisa dicairkan ≤ 7 hari)" type="number" placeholder="0">
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Risiko Aktif (Pilih salah satu)</label>
+      <small class="help-text">Pilih jika salah satu ini sedang terjadi sekarang. Ini akan membuat sistem lebih hati-hati, bukan lebih keras</small>
+      
+      <select name="Risiko Aktif (Pilih salah satu)" required style="background-color: #fafafa;">
+        <option value="" disabled selected>Pilih situasi...</option>
+        <option value="Tidak ada">Tidak ada</option>
+        <option value="Usaha rugi / bangkrut">Usaha rugi / bangkrut</option>
+        <option value="PHK / kehilangan penghasilan">PHK / kehilangan penghasilan</option>
+        <option value="Konflik rumah tangga / perceraian">Konflik rumah tangga / perceraian</option>
+        <option value="Sakit serius / pengobatan">Sakit serius / pengobatan</option>
+        <option value="Masalah hukum">Masalah hukum</option>
+        <option value="Utang macet / dikejar debt collector">Utang macet / dikejar debt collector</option>
+        <option value="Bencana / kehilangan tempat tinggal">Bencana / kehilangan tempat tinggal</option>
+        <option value="Lainnya (krisis aktif)">Lainnya (krisis aktif)</option>
+      </select>
+    </div>
+
+    <button type="submit" id="btn-submit">ANALISA DATA</button>
   </form>
-  <pre id="output"></pre>
+
+  <!-- Hasil -->
+  <div id="result-container">
+    <div class="card" style="text-align: center; padding-top: 30px; padding-bottom: 30px;">
+      <div id="res-zone-badge" class="status-badge" style="margin-bottom: 20px;">MENUNGGU...</div>
+      <h2 id="res-mode" style="margin: 0; font-size: 1.8rem; color: var(--text-main);">-</h2>
+      <p style="color: var(--text-muted); margin-top: 5px; font-size: 0.9rem;">Status Mode Perlindungan</p>
+    </div>
+
+    <div class="card">
+      <!-- Tanggungan Output 1 Kolom Saja -->
+      <div class="stat-row">
+        <span class="stat-label">Tanggungan (orang yang bergantikan pada kamu)</span>
+        <span class="stat-value" id="res-tanggungan">-</span>
+      </div>
+
+      <div class="stat-row">
+        <span class="stat-label">Napas Bulanan</span>
+        <span class="stat-value" id="res-napas">-</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Kekuatan Bertahan</span>
+        <span class="stat-value" id="res-survival">-</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Boleh Beli Emas?</span>
+        <span class="stat-value" id="res-emas">-</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Zona Awal</span>
+        <span class="stat-value" id="res-zona-awal">-</span>
+      </div>
+
+      <div id="res-pesan" class="ai-message"></div>
+      
+      <button onclick="window.location.reload()" class="btn-reset">HITUNG ULANG</button>
+    </div>
+  </div>
+
   <script>
     const form = document.getElementById('form');
-    const output = document.getElementById('output');
-    const API_URL = 'https://script.google.com/macros/s/[GANTI_DENGAN_WEB_APP_ID_MU]/exec';  // Ganti dengan URL Web App-mu
+    const resultContainer = document.getElementById('result-container');
+    const errorBox = document.getElementById('error-box');
+    const submitBtn = document.getElementById('btn-submit');
+
+    // GANTI URL INI
+    const API_URL = 'https://script.google.com/macros/s/[GANTI_DENGAN_WEB_APP_ID_MU]/exec';
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      output.textContent = 'Memproses...';
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = "SEDANG MEMPROSES...";
+      resultContainer.style.display = 'none';
+      errorBox.style.display = 'none';
+      errorBox.textContent = '';
 
       try {
-        // Dapatkan session
+        // 1. Session
         const sessionRes = await fetch(`${API_URL}/getSession`);
-        if (!sessionRes.ok) throw new Error('Gagal mendapatkan session');
+        if (!sessionRes.ok) throw new Error('Gagal koneksi server');
         const { id: session } = await sessionRes.json();
 
-        // Kumpulkan input
+        // 2. Input
         const formData = new FormData(form);
         const input = { session };
-        for (let [key, value] of formData.entries()) {
-          input[key] = value;
-        }
 
-        // Kirim POST
+        formData.forEach((value, key) => {
+          if (key !== "Risiko Aktif (Pilih salah satu)") {
+             input[key] = Number(value);
+          } else {
+             input[key] = value;
+          }
+        });
+
+        // 3. Kirim
         const res = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(input)
         });
 
-        if (!res.ok) throw new Error('Gagal menghitung');
-        const result = await res.json();
+        const data = await res.json();
 
-        // Tampilkan output
-        output.textContent = JSON.stringify(result, null, 2);
+        if (!res.ok || data.error) {
+          throw new Error(data.error || 'Gagal memproses data');
+        }
+
+        // 4. Render
+        renderResult(data);
+
       } catch (error) {
-        output.textContent = `Error: ${error.message}`;
+        console.error(error);
+        errorBox.style.display = 'block';
+        errorBox.textContent = `Terjadi kesalahan: ${error.message}`;
+        submitBtn.disabled = false;
+        submitBtn.textContent = "ANALISA DATA";
       }
     });
+
+    function renderResult(data) {
+      document.getElementById('res-mode').textContent = data.Mode;
+      document.getElementById('res-napas').textContent = Number(data.Napas).toLocaleString('id-ID') + " Hari";
+      document.getElementById('res-survival').textContent = data.Survival + " Bulan";
+      document.getElementById('res-emas').textContent = data['Boleh Emas'] === true ? "BOLEH" : "TIDAK";
+      
+      if(data['Zona Awal']) {
+        document.getElementById('res-zona-awal').textContent = data['Zona Awal'];
+      }
+      
+      document.getElementById('res-pesan').textContent = data.Pesan;
+
+      // Ambil tanggungan dari form (karena input 1 field)
+      const formData = new FormData(form);
+      const tanggunganVal = formData.get("Tanggungan (orang yang bergantikan pada kamu)");
+      document.getElementById('res-tanggungan').textContent = tanggunganVal + " Jiwa";
+
+      const zoneBadge = document.getElementById('res-zone-badge');
+      const zonaText = String(data.Zona).toUpperCase();
+      zoneBadge.textContent = zonaText;
+
+      zoneBadge.className = 'status-badge'; 
+
+      if (zonaText.includes('KRITIS')) zoneBadge.classList.add('zone-critical');
+      else if (zonaText.includes('BAHAYA')) zoneBadge.classList.add('zone-danger');
+      else if (zonaText.includes('RAWAN')) zoneBadge.classList.add('zone-vulnerable');
+      else if (zonaText.includes('AMAN')) zoneBadge.classList.add('zone-safe');
+
+      form.style.display = 'none';
+      resultContainer.style.display = 'block';
+      resultContainer.scrollIntoView({ behavior: 'smooth' });
+    }
   </script>
 </body>
 </html>
