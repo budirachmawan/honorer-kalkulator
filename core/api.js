@@ -1,15 +1,20 @@
 // core/api.js
-const HONORER_API = "https://script.google.com/macros/s/AKfycbya2WKiAvkUvpcxbiu33kvOpSiz3LaQQU2gjBKYcePMoSTpneNk0qZ9VU3LAxATHljCIA/exec"; 
-// Ganti dengan URL Apps Script kamu yang sebenarnya
+const HONORER_API = "https://script.google.com/macros/s/AKfycbya2WKiAvkUvpcxbiu33kvOpSiz3LaQQU2gjBKYcePMoSTpneNk0qZ9VU3LAxATHljCIA/exec"; // Masukkan URL baru tadi
 
 export async function getSession() {
   try {
-    const res = await fetch(`${HONORER_API}/getSession`);
+    // GANTI INI: Pakai ?path=getSession
+    const res = await fetch(`${HONORER_API}?path=getSession`);
+    
     if (!res.ok) {
+      // Coba lihat text errornya apa jika ada masalah
+      const errorText = await res.text();
+      console.error("GAS Error Response:", errorText); 
       throw new Error(`Gagal fetch session: ${res.status}`);
     }
+    
     const data = await res.json();
-    localStorage.setItem("honorer_session", data.id);  // Fix: Gunakan data.id, sesuai output {id: uuid}
+    localStorage.setItem("honorer_session", data.id);
     return data.id;
   } catch (error) {
     console.error('Error getSession:', error);
@@ -38,11 +43,13 @@ export async function kirimKeHonorer(input) {
     });
 
     if (!res.ok) {
-      throw new Error(`Gagal kirim data: ${res.status}`);
+       const errorText = await res.text();
+       console.error("GAS Error Response:", errorText);
+       throw new Error(`Gagal kirim data: ${res.status}`);
     }
 
-    const result = await res.json();  // Hapus mode: "no-cors" agar bisa baca response (asumsi CORS dihandle via proxy jika perlu)
-    return result;  // Return hasil untuk ditampilkan di UI
+    const result = await res.json();
+    return result;
   } catch (error) {
     console.error('Error kirimKeHonorer:', error);
     throw error;
